@@ -1,0 +1,60 @@
+/style/ - 样式文件结构说明
+======================================================================
+本文件夹存放项目所有的样式源文件（SCSS）。
+我们采用模块化的方式组织代码，遵循类似 "7-1 Pattern" 的思想，
+使得样式代码清晰、易于维护和扩展。
+
+所有样式模块最终由 `main.scss` 文件统一引入，并编译成单个 `main.css` 文件。
+
+--- 源文件 (Source Files - 我们在这里编写代码) ---
+
+ |- main.scss              (Sass 的主入口文件，像一个“司令官”，负责按顺序引入所有其他 SCSS 模块)
+
+ |- /base/                 (存放项目最基础的、全局性的样式)
+ |   |- _variables.scss    (定义全局 Sass 变量，如主色、字体、间距等)
+ |   |- _base.scss         (定义基础元素样式，如 body, a, p 标签，以及 CSS 重置)
+
+ |- /layout/               (存放网站主要布局结构，如页面骨架、通用页面容器)
+ |   |- _scaffold.scss     (定义应用的基本骨架，如整体背景、flex 布局容器等)
+ |   |- _page.scss         (定义通用页面的容器样式，如内边距、最大宽度等)
+
+ |- /components/           (存放可复用的 UI 组件样式，这是项目的核心部分)
+ |   |- _app-dock.scss       (底部应用 Dock 栏样式)
+ |   |- _app-icon.scss       (应用图标组件样式)
+ |   |- _bottom-nav.scss     (底部导航栏样式)
+ |   |- _button.scss         (通用按钮组件的样式)
+ |   |- _card.scss           (卡片组件样式)
+ |   |- _chat-input.scss     (聊天输入框区域的样式)
+ |   |- _conversation-item.scss (会话列表项的样式)
+ |   |- _fab.scss            (悬浮操作按钮 (Floating Action Button) 的样式)
+ |   |- _function-panel.scss (功能面板的样式，如聊天输入框下方的附加功能区)
+ |   |- _list-item.scss      (通用列表项样式，如设置菜单中的条目)
+ |   |- _message-bubble.scss (聊天消息气泡的样式)
+ |   |- _modal.scss          (模态框/弹窗组件样式)
+ |   |- _popover.scss        (气泡弹出框/提示框样式)
+ |   |- _status-bar.scss     (顶部状态栏样式)
+ |   |- _sticker-picker.scss (表情包选择器的样式)
+ |   |- _dropdown.scss（下拉栏样式）
+
+ |- /pages/                (存放特定页面的独有样式，这些样式不具有通用性)
+ |   |- _home-screen.scss    (主屏幕/首页的特定样式)
+ |   |- _settings.scss       (设置页面的样式)
+ |   |- _chat.scss           (聊天列表页面的样式)
+ |   |- _chat-detail.scss    (聊天详情/对话窗口的特定样式)
+ |   |- _chat-settings.scss  (聊天设置页面的样式)
+ |   |- _call.scss           (语音/视频通话界面的样式)
+ |   |- _memory.scss         (记忆页面的特定样式)
+ |   |- _world-book.scss         (世界书页面的特定样式)
+ |   |- _gallery.scss（相册页面的样式）
+ |   |-_offline-mode.scss（线下模式页面的样式）
+ |   |-_moments.scss（ 存放所有跟新版动态页面相关的样式代码）
+ |   |-_chat-beautify.scss（ 存放所有跟聊天美化页面相关的样式代码）
+ |   |-_diary.scss（ 存放日记页面相关的样式代码）
+
+
+
+--- 编译产物 (Generated Files - 由编译器生成，切勿手动修改！) ---
+
+ |- main.css               (【自动生成】由所有 .scss 文件编译而成的最终 CSS 文件。这是部署上线时需要的文件)
+ |- main.css.map           (【自动生成】用于浏览器调试，将 .css 映射回 .scss 源文件。部署时可选)
+

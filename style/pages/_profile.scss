@@ -1,0 +1,356 @@
+/* style/pages/_profile.scss */
+
+#page-profile.profile-immersive-page {
+    background-color: #fff;
+    position: absolute;
+    width: 100%;
+    height: calc(100% - var(--app-page-offset, 0px)) !important;
+   overflow-y: hidden;
+
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-scroll-container {
+    flex-grow: 1;
+    min-height: 0;
+    background-color: #fff;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+// 1. 背景视觉区
+.profile-bg-wrapper {
+    position: relative;
+    width: 100%;
+    height: 52vh; // 稍微加高
+    background-color: #f0f0f0;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1.05);
+        // 去饱和度，让背景稍微灰一点，突出前景的黑色标签
+        filter: saturate(0.8); 
+    }
+
+    // 遮罩：使用“空气感”渐变
+    .profile-bg-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(255,255,255,1) 100%);
+        opacity: 0.3;
+    }
+
+    .edit-bg-capsule {
+        position: absolute;
+        bottom: 90px;
+        right: 24px;
+        background: rgba(0, 0, 0, 0.4); // 半透明黑
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 6px 14px;
+        border-radius: 100px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 500;
+        z-index: 5;
+        transition: transform 0.2s;
+
+        svg { width: 12px; height: 12px; opacity: 0.9; }
+        &:active { transform: scale(0.95); }
+    }
+}
+
+// 2. 内容承载层
+.profile-sheet {
+    position: relative;
+    margin-top: -60px;
+    background: #fff;
+    // 改变圆角策略：更接近 iOS 模态窗
+    border-radius: 40px 40px 0 0; 
+    padding: 0 24px;
+    min-height: calc(60vh + var(--app-page-offset-pull-up, 0px));
+    z-index: 10;
+    box-shadow: 0 -15px 40px rgba(0,0,0,0.08);
+}
+
+// 【新增】装饰性线条 (Design Line)
+// 一条极细的竖线，穿过手柄，增加几何感
+.design-line-deco {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 60px; // 向下延伸
+    background: linear-gradient(to bottom, transparent, #e5e5ea, transparent);
+    z-index: 0;
+}
+
+// 手柄
+.sheet-handle-bar {
+    position: relative;
+    width: 40px;
+    height: 4px;
+    background-color: #e5e5ea;
+    border-radius: 4px;
+    margin: 12px auto 0 auto;
+    z-index: 1;
+}
+
+// 3. 头像区域
+.sheet-header {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: -55px;
+    margin-bottom: -35px;
+    z-index: 2; // 确保在装饰线之上
+}
+
+.avatar-hero-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    
+    img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #fff;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    }
+
+    .avatar-edit-overlay {
+        position: absolute;
+        inset: 4px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+        svg { width: 24px; height: 24px; }
+    }
+    &:hover .avatar-edit-overlay { opacity: 1; }
+}
+
+// 4. 信息区
+.info-cluster {
+    text-align: center;
+    padding-top: 10px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+
+    // 名字 + 认证
+.name-row {
+        // 1. 自身作为 h1 的容器，并成为图标的定位参考
+        position: relative;
+        display: flex;
+        justify-content: center; // 核心：居中唯一的流内元素 h1
+        align-items: center;
+        margin-bottom: 12px;
+        h1 {
+            // 2. 将 h1 也设为相对定位，以便图标可以附着于它
+            position: relative;
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+            color: #111;
+            letter-spacing: -0.5px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            &:focus {
+                outline: none;
+                background: #f5f5f5;
+            }
+        }
+        // 复杂的星芒认证标
+        .verified-badge-complex {
+            // 3. 将图标从文档流中剥离，变为绝对定位
+            position: absolute;
+            left: 100%; // 定位到 h1 的右侧边缘
+            top: 50%;   // 垂直居中
+            transform: translateY(-50%); // 精准垂直居中
+            margin-left: 8px; // 与 h1 之间创建间距
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            animation: pulse-badge 3s infinite ease-in-out;
+            
+            svg { 
+                width: 100%; 
+                height: 100%; 
+                filter: drop-shadow(0 2px 4px rgba(0, 114, 255, 0.3));
+            }
+        }
+    }
+
+    // 标签组 (设计感核心)
+    .profile-tags {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+
+        .tag-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: transform 0.2s;
+            cursor: text; // 提示可编辑
+
+            &:hover {
+                transform: translateY(-1px);
+            }
+
+            span {
+                outline: none;
+                min-width: 20px;
+                display: inline-block;
+            }
+
+            // 风格 A: 黑底白字 (实心高对比)
+            &.style-solid-black {
+                background-color: #111;
+                color: #fff;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15); // 黑色物体的投影
+
+                svg {
+                    color: #fff; // 强制白色
+                    width: 14px;
+                    height: 14px;
+                }
+            }
+
+            // 风格 B: 极细线条框 (Outline)
+            &.style-outline {
+                background-color: transparent;
+                color: #333;
+                border: 1px solid #e0e0e0; // 极细灰线
+                
+                &:focus-within {
+                    border-color: #999;
+                    background: #fafafa;
+                }
+            }
+        }
+    }
+
+    .signature-line {
+        p {
+            margin: 0;
+            font-size: 14px;
+            color: #888;
+            font-family: serif; // 衬线体增加文艺感
+            font-style: italic;
+            padding: 2px 8px;
+            border-radius: 4px;
+            &:focus { outline: none; background: #f9f9f9; }
+        }
+    }
+}
+
+// 5. 数据网格
+.modern-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 12px;
+    padding: 0 12px;
+}
+
+.stat-box {
+    background: #fff;
+    border: 1px solid #f2f2f2;
+    border-radius: 18px;
+    padding: 16px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+
+    .stat-val { font-size: 18px; font-weight: 700; color: #111; }
+    .stat-key { margin-top: 4px; font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+
+    &.premium-card {
+        border: none;
+        background: #111;
+        position: relative;
+        overflow: hidden;
+
+        .stat-val { color: #fff; }
+        .premium-badge {
+            margin-top: 4px;
+            font-size: 9px;
+            font-weight: 800;
+            color: #111;
+            background: #fff; // 黑白反转
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        // 极简光效
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 40px; height: 40px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            border-radius: 0 0 0 100%;
+        }
+    }
+}
+// 6. 新增功能卡片
+.profile-feature-card {
+    margin-top: 25px; // 和上面的数字框拉开一点距离
+    background-color: #fff; // 卡片背景是白色
+    border: 1px solid #f2f2f2; // 加一个很淡的边框
+    border-radius: 22px; // 圆角大一点，显得圆润
+    padding: 10px 16px; // 卡片内部的留白
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); // 加一个淡淡的阴影，让它浮起来
+}
+// 带图标的设置项样式
+.settings-item.with-icon {
+    display: flex; // 开启flex布局
+    align-items: center; // 垂直居中对齐
+    gap: 12px; // 图标和文字之间的距离
+    .settings-icon-wrapper {
+        background-color: #f0f2f5; // 图标的灰色背景
+        width: 32px;
+        height: 32px;
+        border-radius: 8px; // 圆角
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg {
+            width: 18px;
+            height: 18px;
+            color: #8e8e93; // 图标的颜色
+        }
+    }
+}
+@keyframes pulse-badge {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}

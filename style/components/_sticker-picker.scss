@@ -1,0 +1,163 @@
+// 文件路径: styles/components/_sticker-picker.scss
+// 描述: 聊天界面中的表情包选择面板。
+
+.sticker-picker-panel {
+  position: fixed;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88%;
+  max-width: 350px;
+  max-height: min(360px, calc(100dvh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
+  z-index: 100;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px) scale(0.9);
+    pointer-events: none;
+    visibility: hidden;
+  }
+}
+
+// Android's keyboard overlays the WebView instead of resizing it. Lift the
+// chat sticker panel above the keyboard only in the native APK runtime.
+html.looky-native body.android-pwa-keyboard-open .sticker-picker-panel {
+  bottom: calc(100dvh - var(--looky-app-height, 100dvh) + 80px + env(safe-area-inset-bottom)) !important;
+  max-height: min(360px, calc(var(--looky-app-height, 100dvh) - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom))) !important;
+}
+
+html.looky-native body.android-pwa-keyboard-open .sticker-picker-panel .sticker-picker-content {
+  max-height: min(260px, calc(var(--looky-app-height, 100dvh) - 180px - env(safe-area-inset-top) - env(safe-area-inset-bottom))) !important;
+}
+
+.sticker-picker-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  // [优化1] 减小整个内容区的内边距，让整体更紧凑
+  padding: var(--space-sm); 
+  display: grid;
+  // [优化2] 这是核心！实现自适应列数
+  // auto-fill: 自动填充，有多宽就放多少个
+  // minmax(65px, 1fr): 每个格子最小65px宽，最大占满剩余空间。
+  // 这样在宽屏上可能是4~5列，在窄手机上会自动变成3列，保证了最佳显示效果。
+  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+  gap: var(--space-sm);
+  align-content: start;
+  max-height: min(260px, calc(100dvh - 180px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.sticker-picker-item {
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  background-color: var(--c-bg-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px; // [优化3] 将内部边距从 6px 减小到 4px
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  &:hover {
+    transform: scale(1.08);
+    box-shadow: var(--shadow-md);
+    z-index: 1;
+  }
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.sticker-image-wrapper {
+  width: 100%;
+  flex: 1; 
+  min-height: 0; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3px;
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+.sticker-label {
+  font-size: 10px; // [优化4] 稍微增大字体，提升可读性
+  color: var(--c-text-secondary);
+  text-align: center;
+  margin: 0;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 2px;
+}
+
+.sticker-picker-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--c-text-secondary);
+  font-size: var(--font-sm);
+  padding: var(--space-lg) var(--space-md);
+  line-height: 1.6;
+}
+
+.sticker-picker-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px var(--space-md);
+  background-color: var(--c-bg-secondary);
+  border-top: 1px solid var(--c-border);
+  overflow-x: auto;
+  flex-shrink: 0;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.sticker-pack-tab {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border-radius: 14px;
+  background-color: var(--c-bg-primary);
+  color: var(--c-text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--c-border);
+  white-space: nowrap;
+  &:hover {
+    background-color: var(--c-bg-tertiary);
+  }
+  &.active {
+    background-color: #8a6dff;
+    color: white;
+    border-color: #8a6dff;
+  }
+}

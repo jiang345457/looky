@@ -1,0 +1,732 @@
+/* ========================================================================== */
+/* == Looky Pay 钱包页面样式 (全新浅色 UI 版) == */
+/* ========================================================================== */
+.looky-pay-page {
+  /* 找到这前两行代码 */
+  background-color: #FAFAFC; /* 纯净极简的灰白底色 */
+  color: #111; /* 深色文字 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* --- 顶部 Header --- */
+  .lp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: calc(max(env(safe-area-inset-top), 20px) + var(--app-page-offset-pull-up, 0px)) 20px 10px;
+    z-index: 10;
+    button.back-button { color: #111; background: none; border: none; padding: 0; cursor: pointer; }
+    .lp-mini-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  }
+  /* --- 核心容器 --- */
+  .lp-content-wrapper { 
+    flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 0 20px 100px; scrollbar-width: none; 
+    &::-webkit-scrollbar { display: none; } 
+  }
+  .lp-tab-view { display: none; animation: lpFadeIn 0.3s ease; &.active { display: block; } }
+  @keyframes lpFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* --- Face ID 浅色毛玻璃遮罩 --- */
+  .lp-face-mask {
+    position: absolute; inset: 0; background: rgba(250,250,252,0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s;
+    .lp-face-icon { width: 60px; height: 60px; border: 3px solid #111; border-radius: 12px; animation: scanFace 1.5s infinite alternate; }
+    .lp-face-text { margin-top: 20px; font-weight: 600; color: #111; letter-spacing: 1px; }
+  }
+  @keyframes scanFace { 0% { box-shadow: 0 0 0 rgba(0,0,0,0); } 100% { box-shadow: 0 0 25px rgba(0,0,0,0.15); border-color: #555; } }
+
+  .lp-virtual-notice-modal {
+    position: absolute; inset: 0; z-index: 1003; background: rgba(0,0,0,0.38);
+    align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .lp-virtual-notice-card {
+    width: 100%; max-width: 320px; background: #fff; color: #111; border-radius: 22px;
+    padding: 22px 20px 18px; box-sizing: border-box; box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+    h3 { margin: 4px 0 12px; font-size: 20px; font-weight: 800; }
+    p { margin: 0 0 8px; font-size: 13px; line-height: 1.55; color: #555; font-weight: 600; }
+    button {
+      width: 100%; border: none; border-radius: 14px; background: #111; color: #fff;
+      padding: 13px 0; margin-top: 10px; font-size: 14px; font-weight: 800; cursor: pointer;
+    }
+  }
+
+  /* --- 首页：顶部余额 --- */
+  .lp-top-balance { margin: 10px 0 20px; text-align: center; cursor: pointer; }
+  .lp-sub-text { font-size: 13px; color: #888; margin: 0; }
+  .lp-main-balance { font-size: 34px; font-weight: 700; margin: 5px 0 0; display: flex; justify-content: center; align-items: baseline; gap: 8px; small { font-size: 12px; color: #888; font-weight: normal; } }
+  /* --- 首页：标题与过滤胶囊 --- */
+  .lp-section-header { 
+    
+    /* ▼▼▼ 从这里开始替换，直到账单列表的上方 ▼▼▼ */
+    display: flex; justify-content: space-between; align-items: center; margin: 25px 0 15px; 
+    .lp-header-title-group {
+      display: flex; flex-direction: column;
+      h2 { font-size: 14px; font-weight: 600; margin: 0; color: #111; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+      h2::before { content: ''; display: block; width: 6px; height: 6px; border-radius: 50%; background: #111; }
+      .lp-header-sub { font-size: 9px; color: #999; font-weight: 500; font-family: -apple-system, sans-serif; margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; padding-left: 12px; }
+    }
+    .lp-btn-icon { background: transparent; border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: #111; padding: 0; cursor: pointer; } 
+  }
+  .lp-filter-pills { 
+    display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none;
+    .lp-pill { padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; color: #888; cursor: pointer; transition: 0.2s; white-space: nowrap; &.active { background: #111; color: #fff; } } 
+  }
+  /* --- 首页：卡片设计 (参考 Figma) --- */
+  
+  /* ATM充值提示语 */
+  .lp-atm-hint {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 15px; padding: 6px 12px;
+    background: rgba(0,0,0,0.04); border-radius: 20px; color: #666; font-size: 11px; font-weight: 500;
+  }
+  .lp-transfer-out-btn {
+    border: 1px solid rgba(0,0,0,0.08); background: #fff; color: #111; border-radius: 999px;
+    font-size: 11px; font-weight: 700; padding: 7px 12px; cursor: pointer; line-height: 1; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .lp-balance-preview {
+    background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: 16px; padding: 14px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.035); margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .lp-preview-item {
+    display: grid; grid-template-columns: 64px 1fr 88px; align-items: center; gap: 10px;
+  }
+  .lp-preview-label { font-size: 11px; color: #777; font-weight: 600; white-space: nowrap; }
+  .lp-preview-bar {
+    height: 10px; border-radius: 999px; background: rgba(0,0,0,0.06); overflow: hidden;
+  }
+  .lp-preview-bar span {
+    display: block; height: 100%; width: 0; border-radius: inherit; transition: width 0.3s ease;
+  }
+  #lp-wallet-preview-bar { background: linear-gradient(90deg, #111, #5c5c5c); }
+  #lp-card-preview-bar { background: linear-gradient(90deg, #A5D2C1, #5B8C7A); }
+  .lp-preview-amount { font-size: 12px; font-weight: 700; color: #111; text-align: right; font-variant-numeric: tabular-nums; }
+  /* --- 首页：虚拟卡包展示 (Card Stack) --- */
+  /* 找到这前两行代码 */
+  .lp-card-stack-container {
+    position: relative;
+    transition: height 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+  
+ 
+  .lp-bank-card {
+    /* 把 height 改为 180px, 圆角 border-radius 改为 16px */
+    position: absolute; width: 100%; height: 180px; border-radius: 16px; padding: 20px;
+    box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s, box-shadow 0.3s; cursor: pointer;
+    overflow: hidden; /* 关键：防止光影特效超出圆角边界 */
+    
+    /* 增加高级反光斜纹质感 */
+    &::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to bottom right, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 100%); transform: rotate(30deg); pointer-events: none; z-index: 0; }
+
+    .card-top, .card-number, .card-bottom { position: relative; z-index: 1; } /* 确保文字漂浮在反光特效上方 */
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .card-chip { 
+      width: 38px; height: 28px; background: rgba(255,255,255,0.4); border-radius: 6px; 
+      position: relative; box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+      &::after { content:''; position:absolute; border: 1px solid rgba(0,0,0,0.2); width:100%; height:100%; box-sizing:border-box; border-radius:6px; } 
+    }
+    .card-logo { font-size: 14px; font-weight: 800; font-style: italic; letter-spacing: 1px; }
+    .card-number { font-family: 'Courier New', Courier, monospace; font-size: 18px; letter-spacing: 2px; font-weight: 600; margin-top: auto; margin-bottom: 12px; }
+    .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
+  }
+  /* ▼▼▼ 从这里开始替换 (改为同色系暗纹，并增加专属弥散阴影将其与底部区域隔开) ▼▼▼ */
+  .theme-mint { 
+    background: 
+      /* 右上角柔和高光 */
+      radial-gradient(circle at 90% -10%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 40%, transparent 40.5%),
+      /* 左下角深绿色暗纹(不再是生硬的白色) */
+      radial-gradient(circle at 10% 110%, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.01) 30%, transparent 30.5%),
+      linear-gradient(135deg, #CEE7DF 0%, #A5D2C1 100%); 
+    color: #111; 
+    box-shadow: 0 10px 20px rgba(165, 210, 193, 0.4); /* 增加薄荷绿专属悬浮阴影 */
+    .card-logo, .card-number, .card-bottom { color: #111; text-shadow: none; }
+    .card-chip { background: rgba(0,0,0,0.05); box-shadow: inset 0 0 4px rgba(0,0,0,0.05); &::after { border-color: rgba(0,0,0,0.1); } }
+  }
+  .theme-silver { 
+    background: 
+      /* 底部金属深色暗槽 */
+      radial-gradient(circle at 50% 150%, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.01) 60%, transparent 60.5%),
+      /* 右上角高光 */
+      radial-gradient(circle at 85% 15%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 20%, transparent 20.5%),
+      linear-gradient(135deg, #F8F9FA 0%, #D0D4D7 100%); 
+    color: #111; 
+    box-shadow: 0 10px 20px rgba(208, 212, 215, 0.5); /* 增加银色专属悬浮阴影 */
+    .card-logo, .card-number, .card-bottom { color: #111; text-shadow: none; }
+    .card-chip { background: rgba(0,0,0,0.05); box-shadow: inset 0 0 4px rgba(0,0,0,0.05); &::after { border-color: rgba(0,0,0,0.1); } }
+  }
+  .theme-black { 
+    background: 
+      /* 极微弱的黑灰重叠圆(不突兀) */
+      radial-gradient(circle at 85% 85%, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 20%, transparent 20.5%),
+      radial-gradient(circle at 72% 85%, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 20%, transparent 20.5%),
+      linear-gradient(135deg, #2A2A2A 0%, #111111 100%); 
+    color: #fff; 
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* 增加黑色专属悬浮阴影 */
+    .card-number { text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    &::after { content: ''; position: absolute; right: -50px; top: -50px; width: 200px; height: 200px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.05); pointer-events: none; z-index: 0; } 
+  }
+  /* 堆叠层级设定 (只管位置和阴影) */
+  .stack-card-3 { top: 60px; z-index: 1; transform: scale(0.9); opacity: 0.7; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+  .stack-card-2 { top: 30px; z-index: 2; transform: scale(0.95); opacity: 0.9; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+  .stack-card-1 { top: 0; z-index: 3; transform: scale(1); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+  /* 触摸交互效果：点击卡包时稍微展开 */
+  .lp-card-stack-container:active .stack-card-3 { transform: translateY(20px) scale(0.9); opacity: 0.9; }
+  .lp-card-stack-container:active .stack-card-2 { transform: translateY(10px) scale(0.95); opacity: 1; }
+  /* --- 新版胶囊形卡片资产展示区 --- */
+  .lp-asset-list-modern {
+    display: flex; flex-direction: column; gap: 12px; margin-bottom: 100px;
+    .lp-asset-item-modern {
+      display: flex; align-items: center; padding: 20px 20px; border-radius: 30px; cursor: pointer; transition: transform 0.2s;
+      &:active { transform: scale(0.98); }
+       /* 找到这前两行代码 */
+      .asset-icon {
+        width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;
+      }
+      
+      /* ▼▼▼ 从这里开始替换 (字号整体下调 1-2px) ▼▼▼ */
+      .asset-info { 
+        flex: 1; 
+        .asset-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; letter-spacing: 0.5px; } 
+        .asset-desc { font-size: 10px; opacity: 0.6; font-weight: 500; } 
+      }
+      
+      .asset-amount-group {
+        text-align: right; margin-right: 15px;
+        .asset-amount { font-size: 14px; font-weight: 700; font-family: -apple-system, sans-serif; margin-bottom: 2px; }
+        .asset-trend { font-size: 9px; font-weight: 600; font-variant-emoji: text; }
+      }
+      .asset-action-btn {
+        width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      }
+    }
+    /* 独立主题颜色覆盖 (针对列表中的胶囊) */
+    .theme-mint {
+      .asset-icon { background: rgba(255,255,255,0.7); color: #111; }
+      .asset-amount-group .plus { color: #5B8C7A; }
+      .asset-amount-group .minus { color: #8C5B5B; }
+      .asset-action-btn { background: transparent; border: 1px solid rgba(0,0,0,0.1); color: #111; }
+    }
+    .theme-black {
+      .asset-icon { background: rgba(255,255,255,0.15); color: #fff; }
+      .asset-amount-group .plus { color: #73D1A5; }
+      .asset-amount-group .minus { color: #E87A7A; }
+      .asset-action-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+    }
+    .theme-silver {
+      .asset-icon { background: #fff; color: #111; }
+      .asset-amount-group .plus { color: #5B8C7A; }
+      .asset-amount-group .minus { color: #8C5B5B; }
+      .asset-action-btn { background: transparent; border: 1px solid rgba(0,0,0,0.1); color: #111; }
+    }
+  }
+  /* ▼▼▼ 修改开始：匹配图片风格的月度统计与流水样式 ▼▼▼ */
+  .lp-ledger-title-area {
+    margin: 20px 0 15px;
+    .lp-page-headline { font-size: 30px; font-weight: 600; color: #111; margin: 0 0 15px; font-family: -apple-system, sans-serif; letter-spacing: -0.5px; }
+    .lp-crypto-filters {
+      display: flex; gap: 8px; align-items: center; background: #fff; padding: 6px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: inline-flex;
+      .lp-filter-btn { padding: 8px 20px; font-size: 13px; font-weight: 600; color: #888; border-radius: 20px; cursor: pointer; transition: 0.2s; }
+      .lp-filter-btn.active { background: #111; color: #fff; }
+    }
+  }
+
+  .lp-crypto-card {
+    background: #DCEBE4; /* 图片中的薄荷绿 */
+    border-radius: 28px; padding: 22px 20px; margin-bottom: 25px;
+    .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .card-title-col { display: flex; align-items: center; gap: 10px; }
+    .card-icon { width: 34px; height: 34px; background: rgba(255,255,255,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #111; svg { width: 16px; height: 16px; } }
+    .card-name { font-size: 14px; font-weight: 600; color: #111; opacity: 0.8; }
+    .card-more { font-weight: bold; font-size: 18px; line-height: 1; letter-spacing: 2px; opacity: 0.4; }
+
+    .card-price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+    .price-col { display: flex; flex-direction: column; gap: 4px; }
+    .price-label { font-size: 11px; color: #5B7569; font-weight: 600; }
+    .price-val { font-size: 30px; font-weight: 600; color: #111; letter-spacing: -0.5px; font-family: -apple-system, sans-serif; &.plus { font-size: 15px; margin-bottom: 6px; background: rgba(255,255,255,0.5); padding: 4px 10px; border-radius: 12px; } }
+    
+    .lp-analytics-bars {
+      display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 16px;
+      .bar-group { 
+        display: flex; align-items: center; gap: 10px; 
+        .bar-label { font-size: 11px; color: #5B7569; width: 30px; font-weight: 700; }
+        .bar-bg { flex: 1; height: 4px; background: rgba(0,0,0,0.05); border-radius: 2px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease-out; }
+      }
+    }
+  }
+  .lp-list-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+    .list-title-group {
+      display: flex; flex-direction: column; gap: 2px;
+      h3 { margin: 0; font-size: 16px; font-weight: 700; color: #111; line-height: 1.2; }
+      .sub-title { font-size: 11px; color: #aaa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    }
+    .lp-add-record-btn {
+      width: 34px; height: 34px; border-radius: 50%; background: #111; color: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      &:active { transform: scale(0.9); }
+      svg { width: 18px; height: 18px; }
+    }
+  }
+
+  /* 胶囊状列表项 */
+  .lp-tx-list-crypto {
+    display: flex; flex-direction: column; gap: 12px; margin-bottom: 100px;
+    .lp-tx-item-crypto {
+      background: #fff; border-radius: 26px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02); transition: 0.2s;
+      .tx-left { display: flex; align-items: center; gap: 14px; }
+      .tx-icon { width: 46px; height: 46px; border-radius: 50%; background: #F4F5F7; display: flex; align-items: center; justify-content: center; color: #111; svg { width: 22px; height: 22px; } }
+      .tx-info { display: flex; flex-direction: column; gap: 4px; .title { font-size: 15px; font-weight: 700; color: #111; } .time { font-size: 11px; color: #aaa; font-weight: 600; } }
+      .tx-right { display: flex; align-items: center; gap: 15px; }
+      .tx-amount { font-size: 15px; font-weight: 700; font-family: -apple-system, sans-serif; &.minus { color: #111; } &.plus { color: #8bbea6; } }  
+      /* 添加的删除按钮，和原图右侧的按钮风格一致 */
+      .tx-delete-btn { width: 38px; height: 38px; border-radius: 50%; background: #111; color: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; &:active { transform: scale(0.9); } svg { width: 14px; height: 14px; } }
+    }
+    .lp-ledger-more-btn {
+      width: 100%;
+      border: none;
+      border-radius: 20px;
+      background: #fff;
+      color: #5B7569;
+      padding: 13px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+      cursor: pointer;
+      &.secondary { background: transparent; box-shadow: none; color: #999; }
+    }
+  }
+
+  /* ▲▲▲ 修改结束 ▲▲▲ */
+    /* --- 金库页 (Vault) --- */
+  .lp-vault-char-scroll {
+    display: flex; gap: 12px; margin: 15px 0 25px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px;
+    &::-webkit-scrollbar { display: none; }
+    .vault-char-item {
+      display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; opacity: 0.5; transition: 0.3s; border: none; background: transparent; padding: 0; flex: 0 0 auto;
+      img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid transparent; }
+      span { font-size: 11px; font-weight: 600; color: #111; white-space: nowrap; }
+      &.active { opacity: 1; img { border-color: #111; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } }
+    }
+    .lp-vault-empty { width: 100%; padding: 18px; color: #999; font-size: 13px; text-align: center; background: #fff; border-radius: 18px; }
+  }
+
+  .lp-vault-fund-card {
+    border-radius: 28px; padding: 25px 20px; margin-bottom: 30px; position: relative; overflow: hidden;
+    &::after { content: ''; position: absolute; right: -30px; top: -30px; width: 150px; height: 150px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.05); pointer-events: none; }
+    .fund-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .fund-amount { margin: 0 0 30px; font-size: 20px; font-weight: 600; span { font-size: 40px; font-family: -apple-system, sans-serif; letter-spacing: -1px; margin-left: 5px; } }
+    .fund-actions { display: flex; justify-content: flex-end; }
+    .fund-btn-deposit { background: #fff; color: #111; border: none; padding: 10px 24px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(255,255,255,0.1); }
+    .fund-btn-invite { background: #fff; color: #111; border: none; padding: 10px 22px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .lp-vault-locked-body {
+      margin: 4px 0 28px;
+      strong { display: block; font-size: 18px; line-height: 1.45; color: #fff; margin-bottom: 8px; }
+      p { margin: 0; color: rgba(255,255,255,0.55); font-size: 12px; line-height: 1.6; }
+    }
+    &.is-locked { background: #1c1c1e; }
+    .lp-vault-empty-card { color: rgba(255,255,255,0.65); font-size: 13px; text-align: center; padding: 34px 0; }
+  }
+  .lp-vault-fund-card.is-locked {
+    border-radius: 22px;
+    padding: 18px 16px;
+    margin-bottom: 22px;
+    max-width: 92%;
+    margin-left: auto;
+    margin-right: auto;
+    .fund-header { margin-bottom: 16px; font-size: 11px; }
+    .fund-header svg { width: 16px; height: 16px; }
+    .lp-vault-locked-body {
+      margin: 0 0 18px;
+      strong { font-size: 15px; line-height: 1.4; margin-bottom: 6px; }
+      p { font-size: 11px; line-height: 1.5; }
+    }
+    .fund-btn-invite { padding: 8px 18px; font-size: 12px; border-radius: 18px; }
+  }
+
+  .bond-stats-header {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 15px;
+    h3 { margin: 0; font-size: 16px; font-weight: 700; color: #111; }
+    .sub { font-size: 11px; color: #aaa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  }
+
+  .lp-vault-bond-stats {
+    background: #fff; border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 30px;
+    .bond-compare-bar {
+      display: flex; flex-direction: column; gap: 12px;
+      .compare-info { display: flex; justify-content: space-between; align-items: center; }
+      .info-left, .info-right { display: flex; flex-direction: column; gap: 4px; }
+      .info-left { align-items: flex-start; span { font-size: 11px; color: #888; font-weight: 500; } strong { font-size: 18px; color: #111; font-family: -apple-system, sans-serif; } }
+      .info-right { align-items: flex-end; span { font-size: 11px; color: #888; font-weight: 500; } strong { font-size: 18px; color: #8bbea6; font-family: -apple-system, sans-serif; } }
+      .compare-track { width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; display: flex; overflow: hidden; }
+      .compare-fill-left { background: #111; height: 100%; border-radius: 4px 0 0 4px; transition: 0.5s; }
+      .compare-fill-right { background: #A5D2C1; height: 100%; border-radius: 0 4px 4px 0; transition: 0.5s; }
+    }
+  }
+
+  .lp-vault-quick-actions {
+    margin-bottom: 24px;
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .vault-action-btn { background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.2s; &:active { transform: scale(0.95); } }
+    .v-icon { width: 44px; height: 44px; border-radius: 50%; background: #F4F5F7; display: flex; align-items: center; justify-content: center; color: #111; svg { width: 20px; height: 20px; } }
+    span { font-size: 13px; font-weight: 600; color: #111; }
+  }
+  .lp-vault-ledger-panel {
+    margin-bottom: 110px;
+    .lp-crypto-card { margin-bottom: 18px; }
+    .lp-tx-list-crypto { margin-bottom: 0; }
+  }
+  .lp-vault-ledger-toggle {
+    display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.55); border-radius: 999px; padding: 4px;
+    button {
+      border: none; border-radius: 999px; background: transparent; color: #5B7569; padding: 6px 10px; font-size: 12px; font-weight: 800; cursor: pointer;
+      &.active { background: #111; color: #fff; }
+    }
+  }
+  .lp-vault-amount-modal {
+    position: absolute; inset: 0; z-index: 2300; background: rgba(0,0,0,0.38);
+    display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .lp-vault-amount-card {
+    width: 100%; max-width: 320px; background: #fff; border-radius: 22px; padding: 22px; box-sizing: border-box;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.16);
+    input { width: 100%; border: none; background: #f4f5f7; border-radius: 14px; padding: 14px; box-sizing: border-box; font-size: 18px; outline: none; text-align: center; }
+  }
+  .lp-vault-amount-title { font-size: 17px; font-weight: 700; color: #111; text-align: center; margin-bottom: 16px; }
+  .lp-vault-amount-actions {
+    display: flex; gap: 10px; margin-top: 18px;
+    button { flex: 1; border: none; border-radius: 14px; padding: 12px 0; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .secondary { background: #f4f5f7; color: #666; }
+    .primary { background: #111; color: #fff; }
+  }
+   /* --- 个人主页 (Profile) --- */
+  .lp-profile-header { 
+    margin: 20px 0 25px; 
+    text-align: left;
+    
+    .profile-typo-box {
+      background: #fff; border-radius: 24px; padding: 25px 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+      position: relative; overflow: hidden;
+      /* 已去除侧边条 */
+    }
+
+    .typo-en { font-size: 11px; font-weight: 800; color: #aaa; letter-spacing: 2px; margin-bottom: 4px; font-family: -apple-system, sans-serif; }
+    .typo-cn { font-size: 24px; font-weight: 700; color: #111; letter-spacing: 1px; margin-bottom: 15px; }
+    /* 改为薄荷绿的点缀线，拉长一点更有质感 */
+    .typo-divider { width: 45px; height: 3px; background: #DCEBE4; margin-bottom: 25px; border-radius: 2px; }
+
+    .typo-user-info {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+      /* 昵称可编辑的样式 */
+      h3 { margin: 0; font-size: 20px; font-weight: 700; color: #111; letter-spacing: 0.5px; border-bottom: 1px dashed transparent; transition: 0.2s; outline: none; &:focus { border-bottom: 1px dashed #888; } } 
+      /* 英文引言格言的排版样式 */
+      p { margin: 0; color: #999; font-size: 10px; font-style: italic; letter-spacing: 0.5px; text-transform: uppercase; transition: 0.2s; outline: none; border-bottom: 1px dashed transparent; &:focus { color: #555; border-bottom: 1px dashed #ccc; } } 
+    }
+  }
+  .lp-settings-list { 
+    .lp-setting-item { 
+      display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; background: #fff; border-radius: 22px; margin-bottom: 12px; font-weight: 500; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); cursor: pointer; transition: 0.2s;
+      &:active { transform: scale(0.98); background: #fafafa; }
+      .left { display: flex; align-items: center; gap: 12px; color: #111; svg { width: 18px; height: 18px; color: #888; } }
+      .right { display: flex; align-items: center; gap: 8px; span { color: #ccc; font-weight: normal; font-size: 16px; } }
+    } 
+  }
+  .lp-sheet-overlay {
+    position: fixed; inset: 0; min-height: 100dvh; z-index: 2600; background: rgba(0,0,0,0.38);
+    align-items: flex-end; justify-content: center; padding: 0 14px 18px; box-sizing: border-box;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .lp-subpage-sheet {
+    width: 100%; max-height: 86%; overflow-y: auto; background: #fff; color: #111;
+    border-radius: 26px; padding: 20px; box-sizing: border-box; box-shadow: 0 -14px 40px rgba(0,0,0,0.16);
+    transform: translateY(0) scale(1);
+    animation: lpSheetIn 0.24s ease-out;
+  }
+  .lp-sheet-header {
+    display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;
+    h3 { margin: 3px 0 0; font-size: 20px; font-weight: 700; }
+  }
+  .lp-sheet-kicker { font-size: 10px; letter-spacing: 1.6px; color: #aaa; font-weight: 800; }
+  .lp-sheet-close {
+    width: 32px; height: 32px; border-radius: 50%; border: none; background: #f4f5f7; color: #777;
+    font-size: 22px; line-height: 1; cursor: pointer;
+  }
+  .lp-payment-summary {
+    display: flex; justify-content: space-between; align-items: center; background: #f4f5f7;
+    border-radius: 18px; padding: 16px; margin-bottom: 16px;
+    span { color: #666; font-size: 13px; font-weight: 600; }
+    strong { font-size: 24px; letter-spacing: 0; }
+  }
+  .lp-form-block {
+    margin-bottom: 14px;
+    label { display: block; font-size: 12px; color: #888; font-weight: 700; margin-bottom: 7px; }
+    input, select {
+      width: 100%; border: none; background: #f4f5f7; border-radius: 14px; padding: 13px 14px;
+      box-sizing: border-box; font-size: 14px; color: #111; outline: none;
+    }
+    input[type="password"] { letter-spacing: 5px; text-align: center; font-family: monospace; }
+  }
+  .lp-sheet-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .lp-secondary-btn, .lp-primary-btn {
+    flex: 1; border: none; border-radius: 14px; padding: 13px 0; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .lp-secondary-btn { background: #f4f5f7; color: #666; }
+  .lp-primary-btn { background: #111; color: #fff; }
+  .lp-vault-freepay-btn {
+    width: 100%; border: 1px solid rgba(0,0,0,0.08); border-radius: 18px; background: #111; color: #fff;
+    padding: 15px 16px; margin-top: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.12); transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .lp-vault-freepay-btn:active { transform: scale(0.98); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+  .lp-vault-freepay-main { font-size: 14px; font-weight: 800; line-height: 1.2; }
+  .lp-vault-freepay-sub { font-size: 11px; color: rgba(255,255,255,0.68); font-weight: 600; line-height: 1.35; }
+  .lp-full-btn { width: 100%; flex: none; }
+  .lp-link-btn {
+    width: 100%; border: none; background: transparent; color: #555; font-size: 12px;
+    font-weight: 700; padding: 4px 0 12px; cursor: pointer;
+  }
+  .lp-payment-auth-switch {
+    display: flex; gap: 6px; padding: 4px; margin: 0 0 14px; border-radius: 14px;
+    background: #f4f5f7;
+    button {
+      flex: 1; border: none; border-radius: 11px; padding: 10px 0; background: transparent;
+      color: #777; font-size: 13px; font-weight: 800; cursor: pointer;
+    }
+    button.active { background: #111; color: #fff; box-shadow: 0 5px 12px rgba(0,0,0,0.12); }
+  }
+  .lp-fingerprint-btn {
+    width: 100%; border: 1px solid #e8e8e8; background: radial-gradient(circle at 50% 28%, #fff 0, #f6f7f8 48%, #eceff1 100%);
+    color: #111; border-radius: 18px; padding: 15px 0 14px; margin-top: 10px; font-size: 13px; font-weight: 800;
+    cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 9px; user-select: none; -webkit-user-select: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 18px rgba(0,0,0,0.05);
+    transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  }
+  .lp-fingerprint-mark {
+    position: relative; width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(145deg, #fff, #eef1f3); border: 1px solid rgba(0,0,0,0.08); overflow: hidden;
+    box-shadow: inset 0 1px 5px rgba(255,255,255,0.85), inset 0 -8px 16px rgba(0,0,0,0.04), 0 8px 20px rgba(0,0,0,0.08);
+  }
+  .lp-fingerprint-ring {
+    width: 42px; height: 42px; border-radius: 50%; border: 8px solid currentColor; box-sizing: border-box;
+    box-shadow: inset 0 0 0 9px rgba(255,255,255,0.96);
+  }
+  .lp-fingerprint-text { font-size: 12px; color: #555; letter-spacing: 0; }
+  .lp-fingerprint-btn.holding { background: #111; color: #fff; border-color: #111; transform: scale(0.98); }
+  .lp-fingerprint-btn.holding .lp-fingerprint-mark { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.25); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), 0 0 24px rgba(255,255,255,0.14); }
+  .lp-fingerprint-btn.holding .lp-fingerprint-mark::before,
+  .lp-fingerprint-btn.holding .lp-fingerprint-mark::after {
+    content: ''; position: absolute; inset: 50%; width: 18px; height: 18px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.55); transform: translate(-50%, -50%) scale(0.4);
+    animation: lpFingerprintRipple 0.9s ease-out infinite;
+  }
+  .lp-fingerprint-btn.holding .lp-fingerprint-mark::after { animation-delay: 0.28s; }
+  .lp-fingerprint-btn.holding .lp-fingerprint-ring { box-shadow: inset 0 0 0 9px rgba(17,17,17,0.92); }
+  .lp-fingerprint-btn.holding .lp-fingerprint-text { color: #fff; }
+  @keyframes lpFingerprintRipple {
+    to { opacity: 0; transform: translate(-50%, -50%) scale(4.4); }
+  }
+  .lp-sheet-note { color: #777; font-size: 12px; line-height: 1.55; margin: 0 0 14px; }
+  .lp-toggle-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 18px; background: #f4f5f7;
+    border-radius: 18px; padding: 16px;
+    strong { display: block; font-size: 15px; margin-bottom: 4px; }
+    span { display: block; color: #888; font-size: 12px; line-height: 1.45; }
+  }
+  .lp-switch {
+    position: relative; width: 52px; height: 30px; flex-shrink: 0;
+    input { display: none; }
+    span { position: absolute; inset: 0; background: #d8d8d8; border-radius: 999px; transition: 0.2s; }
+    span::after { content: ''; position: absolute; width: 26px; height: 26px; left: 2px; top: 2px; background: #fff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.18); transition: 0.2s; }
+    input:checked + span { background: #111; }
+    input:checked + span::after { transform: translateX(22px); }
+  }
+  .lp-scene-list { display: flex; flex-direction: column; gap: 12px; }
+  .lp-scene-row {
+    background: #f4f5f7; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px;
+    strong { display: block; font-size: 15px; margin-bottom: 2px; }
+    span { color: #888; font-size: 12px; }
+    select { width: 100%; border: none; background: #fff; border-radius: 12px; padding: 12px; font-size: 13px; outline: none; }
+  }
+  /* 通用辅助类 */
+  .text-center { text-align: center; } .my-3 { margin: 15px 0 25px; } .lp-flex-btn { display: flex; justify-content: center; } 
+  .lp-btn-primary { background: #fff; color: #111; padding: 14px 35px; border-radius: 25px; font-weight: 600; font-size: 15px; border: none; cursor: pointer; }
+
+  /* --- 底部悬浮黑色胶囊导航 (核心设计点) --- */
+  .lp-floating-nav {
+    position: absolute; bottom: max(env(safe-area-inset-bottom), 25px); left: 50%; transform: translateX(-50%);
+    width: 88%; background: #1C1C1E; /* 深色胶囊底色 */
+    border-radius: 40px; display: flex; justify-content: space-around; align-items: center; height: 70px; padding: 0 10px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15); z-index: 50;
+    .lp-nav-item {
+      background: none; border: none; color: #666; width: 48px; height: 48px; border-radius: 50%;
+      display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s;
+      &.active { background: #fff; color: #111; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+      svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2.2; fill: none; }
+    }
+  }
+}
+
+/* 原生 Android 的系统栏可能同时出现在 env 与原生桥接变量中，钱包页只取未重复计算的安全区。 */
+html.looky-native body.android-viewport-sync #page-looky-pay .lp-header {
+  padding-top: calc(max(env(safe-area-inset-top, 0px), var(--looky-native-status-bar-height, 0px), 20px) + var(--app-page-offset-pull-up, 0px));
+}
+
+html.looky-native body.android-viewport-sync #page-looky-pay .lp-floating-nav {
+  translate: 0 calc(var(--app-bottom-offset, 0px) - max(0px, calc(var(--looky-native-navigation-bar-height, 0px) - env(safe-area-inset-bottom, 0px)))) !important;
+}
+
+html.looky-native body.android-viewport-sync #page-looky-pay .lp-content-wrapper {
+  padding-bottom: calc(100px + max(0px, calc(var(--looky-native-navigation-bar-height, 0px) - env(safe-area-inset-bottom, 0px))));
+}
+
+/* JS 会把支付确认弹窗移到 body 下，单独补回这一层的 Looky Pay 弹窗样式。 */
+#lp-payment-modal.lp-sheet-overlay {
+  position: fixed; inset: 0; min-height: 100dvh; z-index: 2600; background: rgba(0,0,0,0.38);
+  align-items: flex-end; justify-content: center; padding: 0 14px 18px; box-sizing: border-box;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: #111;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+#lp-payment-modal {
+  .lp-subpage-sheet {
+    width: 100%; max-height: 86%; overflow-y: auto; background: #fff; color: #111;
+    border-radius: 26px; padding: 20px; box-sizing: border-box; box-shadow: 0 -14px 40px rgba(0,0,0,0.16);
+    transform: translateY(0) scale(1);
+    animation: lpSheetIn 0.24s ease-out;
+  }
+  .lp-sheet-header {
+    display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;
+    h3 { margin: 3px 0 0; font-size: 20px; font-weight: 700; }
+  }
+  .lp-sheet-kicker { font-size: 10px; letter-spacing: 1.6px; color: #aaa; font-weight: 800; }
+  .lp-sheet-close {
+    width: 32px; height: 32px; border-radius: 50%; border: none; background: #f4f5f7; color: #777;
+    font-size: 22px; line-height: 1; cursor: pointer;
+  }
+  .lp-payment-summary {
+    display: flex; justify-content: space-between; align-items: center; background: #f4f5f7;
+    border-radius: 18px; padding: 16px; margin-bottom: 16px;
+    span { color: #666; font-size: 13px; font-weight: 600; }
+    strong { font-size: 24px; letter-spacing: 0; }
+  }
+  .lp-form-block {
+    margin-bottom: 14px;
+    label { display: block; font-size: 12px; color: #888; font-weight: 700; margin-bottom: 7px; }
+    input, select {
+      width: 100%; border: none; background: #f4f5f7; border-radius: 14px; padding: 13px 14px;
+      box-sizing: border-box; font-size: 14px; color: #111; outline: none;
+    }
+    input[type="password"] { letter-spacing: 5px; text-align: center; font-family: monospace; }
+  }
+  .lp-sheet-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .lp-secondary-btn, .lp-primary-btn {
+    flex: 1; border: none; border-radius: 14px; padding: 13px 0; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .lp-secondary-btn { background: #f4f5f7; color: #666; }
+  .lp-primary-btn { background: #111; color: #fff; }
+  .lp-vault-freepay-btn {
+    width: 100%; border: 1px solid rgba(0,0,0,0.08); border-radius: 18px; background: #111; color: #fff;
+    padding: 15px 16px; margin-top: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.12); transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .lp-vault-freepay-btn:active { transform: scale(0.98); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+  .lp-vault-freepay-main { font-size: 14px; font-weight: 800; line-height: 1.2; }
+  .lp-vault-freepay-sub { font-size: 11px; color: rgba(255,255,255,0.68); font-weight: 600; line-height: 1.35; }
+  .lp-payment-auth-switch {
+    display: flex; gap: 6px; padding: 4px; margin: 0 0 14px; border-radius: 14px;
+    background: #f4f5f7;
+    button {
+      flex: 1; border: none; border-radius: 11px; padding: 10px 0; background: transparent;
+      color: #777; font-size: 13px; font-weight: 800; cursor: pointer;
+    }
+    button.active { background: #111; color: #fff; box-shadow: 0 5px 12px rgba(0,0,0,0.12); }
+  }
+  .lp-fingerprint-btn {
+    width: 100%; border: 1px solid #e8e8e8; background: radial-gradient(circle at 50% 28%, #fff 0, #f6f7f8 48%, #eceff1 100%);
+    color: #111; border-radius: 18px; padding: 15px 0 14px; margin-top: 10px; font-size: 13px; font-weight: 800;
+    cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 9px; user-select: none; -webkit-user-select: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 18px rgba(0,0,0,0.05);
+    transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  }
+  .lp-fingerprint-mark {
+    position: relative; width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(145deg, #fff, #eef1f3); border: 1px solid rgba(0,0,0,0.08); overflow: hidden;
+    box-shadow: inset 0 1px 5px rgba(255,255,255,0.85), inset 0 -8px 16px rgba(0,0,0,0.04), 0 8px 20px rgba(0,0,0,0.08);
+  }
+  .lp-fingerprint-ring {
+    width: 42px; height: 42px; border-radius: 50%; border: 8px solid currentColor; box-sizing: border-box;
+    box-shadow: inset 0 0 0 9px rgba(255,255,255,0.96);
+  }
+  .lp-fingerprint-text { font-size: 12px; color: #555; letter-spacing: 0; }
+  .lp-fingerprint-btn.holding { background: #111; color: #fff; border-color: #111; transform: scale(0.98); }
+  .lp-fingerprint-btn.holding .lp-fingerprint-mark { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.25); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), 0 0 24px rgba(255,255,255,0.14); }
+  .lp-fingerprint-btn.holding .lp-fingerprint-mark::before,
+  .lp-fingerprint-btn.holding .lp-fingerprint-mark::after {
+    content: ''; position: absolute; inset: 50%; width: 18px; height: 18px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.55); transform: translate(-50%, -50%) scale(0.4);
+    animation: lpFingerprintRipple 0.9s ease-out infinite;
+  }
+  .lp-fingerprint-btn.holding .lp-fingerprint-mark::after { animation-delay: 0.28s; }
+  .lp-fingerprint-btn.holding .lp-fingerprint-ring { box-shadow: inset 0 0 0 9px rgba(17,17,17,0.92); }
+  .lp-fingerprint-btn.holding .lp-fingerprint-text { color: #fff; }
+}
+/* 虚拟卡片创建弹窗弹出动画 */
+@keyframes lpModalPop {
+  from { opacity: 0; transform: scale(0.85) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+/* 虚拟卡片生成动画 */
+#lp-card-progress-modal #lp-progress-spinner { display: none !important; }
+#lp-card-progress-modal .lp-printer-anim {
+  position: relative; width: 220px; height: 160px; margin-bottom: 25px;
+}
+#lp-card-progress-modal .lp-printer-body {
+  position: absolute; bottom: 0; left: 0; width: 220px; height: 80px;
+  background: linear-gradient(180deg, #3a3a3e, #232327); border-radius: 16px;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.08), 0 12px 25px rgba(0,0,0,0.45); z-index: 3;
+}
+#lp-card-progress-modal .lp-printer-slot {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  width: 172px; height: 8px; background: #0a0a0a; border-radius: 4px;
+  box-shadow: inset 0 2px 3px rgba(0,0,0,0.9);
+}
+#lp-card-progress-modal .lp-printer-body::after {
+  content: ''; position: absolute; bottom: 14px; left: 22px; width: 8px; height: 8px;
+  border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80;
+  animation: lpBlink 1.2s infinite;
+}
+/* ▼▼▼ 把原来的 .lp-ejecting-card 等区域及 @keyframes 替换成以下这段（开启 GPU 加速） ▼▼▼ */
+#lp-card-progress-modal .lp-ejecting-card {
+  position: absolute; top: 0; left: 50%; margin-left: -80px; width: 160px; height: 105px;
+  border-radius: 12px; background: linear-gradient(135deg, #2a2a2a, #0a0a0a 60%, #333);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.6); z-index: 2; padding: 14px; box-sizing: border-box;
+  animation: lpEjectCard 3s ease-in-out infinite;
+  will-change: transform, opacity; /* 强制硬件加速 */
+}
+#lp-card-progress-modal .lp-card-chip-mini {
+  width: 30px; height: 22px; border-radius: 5px; background: linear-gradient(135deg, #e0e0e0, #888);
+  border: 1px solid #111;
+}
+#lp-card-progress-modal .lp-card-lines {
+  position: absolute; left: 14px; bottom: 16px; width: 65%; height: 7px; border-radius: 4px;
+  background: rgba(255,255,255,0.3); box-shadow: 0 13px 0 rgba(255,255,255,0.15);
+}
+@keyframes lpEjectCard {
+  0%   { transform: translateY(80px); opacity: 0; }
+  15%  { transform: translateY(80px); opacity: 1; }
+  55%  { transform: translateY(-28px); opacity: 1; }
+  85%  { transform: translateY(-28px); opacity: 1; }
+  100% { transform: translateY(80px); opacity: 0; }
+}
+@keyframes lpBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}

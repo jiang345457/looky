@@ -1,0 +1,245 @@
+/* ========================================================= */
+/* == 群聊专属样式文件 (group-chat.css) == */
+/* ========================================================= */
+
+/* === 0. 基础架构：复用壁纸背景，解决堆叠 === */
+#page-group-chat-settings .app-content {
+    background-color: transparent !important; /* 透出用户设置的壁纸 */
+    display: flex !important;
+    flex-direction: column !important; 
+    gap: 16px !important; /* 卡片之间的呼吸间距 */
+    overflow-y: auto !important; 
+    padding: 20px 16px 80px !important; 
+    min-height: 0 !important; 
+}
+
+/* === 卡片全局基调：纯白实卡 + 利落圆角 + 极细边框 === */
+#page-group-chat-settings .settings-card {
+    background-color: #ffffff !important; /* 纯白底色，更加干净利落 */
+    border-radius: 16px !important; /* 减小圆角，去除气泡感，增加设计感 */
+    border: 1px solid #ebebeb !important; /* 极细灰线边框强化实体感 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important; /* 极柔和的底层阴影 */
+    margin: 0 !important; 
+    flex-shrink: 0 !important; /* 绝对禁止挤压变形 */
+     overflow: hidden !important; 
+    position: relative;
+}
+/* === 统一：卡片标题的英文装饰角标 === */
+#page-group-chat-settings .settings-card:nth-child(2) > div:first-child span:first-child::after,
+#page-group-chat-settings .settings-card:nth-child(3) > div:first-child::after,
+#page-group-chat-settings .settings-card:nth-child(4) > div:first-child::after,
+#page-group-chat-settings .settings-card:nth-child(5) > div:first-child::after {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 10px !important;
+    color: #c7c7cc !important; /* 银灰色英文，不抢风头 */
+    margin-left: 8px !important;
+    letter-spacing: 1px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+}
+
+/* 为各个模块指定专属英文词汇 */
+#page-group-chat-settings .settings-card:nth-child(2) > div:first-child span:first-child::after { content: "MEMBERS"; }
+#page-group-chat-settings .settings-card:nth-child(3) > div:first-child::after { content: "MY ROLE"; }
+#page-group-chat-settings .settings-card:nth-child(4) > div:first-child::after { content: "INFO"; }
+#page-group-chat-settings .settings-card:nth-child(5) > div:first-child::after { content: "MANAGE"; }
+
+/* === 1. 顶部信息：杂志封面排版 === */
+#group-settings-info-btn {
+
+    padding: 40px 20px 32px !important; 
+    flex-direction: column !important; 
+    align-items: center !important; 
+    text-align: center;
+    background: transparent !important; 
+}
+
+/* 顶部增加杂志感英文小角标 */
+#group-settings-info-btn::before {
+    content: "GROUP PROFILE";
+    display: block;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 2px !important;
+    color: #999 !important;
+    margin-bottom: 24px !important;
+}
+
+/* 头像：模拟实体照片的白底留白画框感 */
+#group-settings-avatar {
+    width: 88px !important; 
+    height: 88px !important;
+    border-radius: 50% !important; /* 经典纯圆 */
+    object-fit: cover;
+    padding: 3px !important; /* 制造内部白边留白 */
+    background-color: #fff !important; 
+    border: 1px solid rgba(0,0,0,0.08) !important; /* 外围细黑线 */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important; 
+    margin-bottom: 20px !important; 
+    flex-shrink: 0 !important;
+}
+
+#group-settings-info-btn > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center !important; 
+    justify-content: center;
+    width: 100%;
+    gap: 12px !important; 
+}
+
+/* 名字：极致的高对比粗体 */
+#group-settings-name {
+    font-size: 22px !important; 
+    font-weight: 900 !important; 
+    color: #111 !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 0 !important; 
+    line-height: 1.2;
+}
+#group-settings-info-btn > svg {
+    display: none !important; 
+}
+
+/* 简介：镂空描边胶囊标签 */
+#page-group-chat-settings #group-settings-desc,
+#page-group-chat-settings #group-settings-desc span {
+    font-size: 11px !important; /* 绝对比22px的群名称小很多 */
+    font-weight: 400 !important; /* 去除加粗，让文字不要太跳 */
+    color: #999999 !important; /* 换成低调的浅灰色 */
+    line-height: 1.6 !important;
+    background-color: transparent !important; 
+    border: 1px solid #e5e5e5 !important; /* 边框也调浅一点配合灰色字体 */
+    padding: 6px 16px !important; 
+    border-radius: 20px !important; 
+    max-width: 85% !important; 
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important; 
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    margin-top: 4px !important; /* 强制覆盖掉 HTML 原本自带的 margin-top: 6px */
+}
+/* === 2. 标题与网格：冷淡克制风 === */
+#page-group-chat-settings .settings-card > div:first-child:not(.settings-item) {
+    padding: 20px 20px 10px !important;
+    background: transparent !important;
+}
+
+/* 所有的中文小标题加粗纯黑（智能排除掉常规设置项） */
+#page-group-chat-settings .settings-card > div:first-child:not(.settings-item) span:first-child,
+#page-group-chat-settings .settings-card > div:first-child:not(.settings-item) {
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+}
+
+#group-settings-members-area {
+
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)) !important;
+    gap: 20px 14px !important; 
+    padding: 10px 20px 28px !important;
+    border-bottom: none;
+    background: transparent;
+}
+
+.group-member-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px !important;
+}
+
+/* 小头像也采用白底画框风 */
+.group-member-item img {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important; 
+    object-fit: cover;
+    padding: 2px !important;
+    background-color: #fff !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+    margin-bottom: 0 !important;
+}
+
+.group-member-item span {
+    font-size: 10px !important;
+    font-family: monospace, -apple-system, sans-serif !important; 
+    font-weight: 600 !important;
+    color: #666 !important;
+    text-align: center;
+    width: 100%;
+    max-width: 52px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* === 3. 常规列表项与身份区 === */
+#group-settings-user-identity {
+    padding: 16px 20px 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important; 
+    background: transparent !important;
+}
+
+#group-settings-user-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important; /* 自己的头像采用方圆形做区分，更方正 */
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    margin-right: 0 !important; 
+}
+
+#group-settings-user-identity span {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #111 !important;
+}
+
+#page-group-chat-settings .settings-item {
+    padding: 20px !important;
+    background: transparent !important;
+    border-bottom: 1px solid rgba(0,0,0,0.04) !important; 
+}
+#page-group-chat-settings .settings-item:last-child {
+    border-bottom: none !important;
+}
+#page-group-chat-settings .settings-item span {
+    font-size: 15px !important;
+    font-weight: 400 !important; /* 【修改这里】从 600 改为 400，即正常的字体粗细 */
+    color: #333 !important; /* 稍微调柔和一点的黑色，不那么刺眼 */
+}
+
+/* ▼▼▼ 新增：保护补充说明类的小文字，防止被上面的 15px 全局放大变黑 ▼▼▼ */
+#page-group-chat-settings .settings-item .settings-note-text {
+    font-size: 11px !important;
+    color: #888 !important;
+    line-height: 1.5 !important;
+}
+/* ▲▲▲ 新增结束 ▲▲▲ */
+
+/* === 4. 退出按钮：编辑部红线/黑白风格 === */
+#group-settings-quit-btn {
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 22px !important;
+    background-color: transparent !important;
+    cursor: pointer;
+}
+
+/* 高级黑色下划线粗体 */
+#group-settings-quit-btn span {
+    color: #111 !important; 
+    font-size: 14px !important;
+    font-weight: 800 !important; 
+    letter-spacing: 1px !important;
+    border-bottom: 2px solid #111 !important; 
+    padding-bottom: 2px !important;
+}
+#group-settings-quit-btn span::after {
+    display: none !important; /* 退出按钮不需要英文角标 */
+}

@@ -1,0 +1,1081 @@
+// 文件路径: /style/pages/_gallery.scss
+// 风格: Hybrid List View (Groups + Grid)
+
+#page-gallery {
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  position: relative; 
+  height: 100%;
+  overflow: hidden;
+  min-height: 0;
+}
+
+// =======================================================
+//   1. ▼▼▼【修改处】将顶栏样式独立出来，使其通用 ▼▼▼
+// =======================================================
+.gallery-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 40px 15px 12px; position: relative; width: 100%;
+  box-sizing: border-box; background-color: #ffffff;
+  border-bottom: 1px solid #f0f0f0; z-index: 10; flex-shrink: 0;
+  h1 {
+    flex: 1; min-width: 0; text-align: center; padding: 0 10px;
+    font-size: 17px; font-weight: 600; color: #1a1a1a; margin: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+}
+.gallery-search-container {
+  padding: 8px 20px 12px;
+  flex-shrink: 0;
+  .search-bar-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    width: 18px;
+    height: 18px;
+    color: #aaa;
+    pointer-events: none;
+  }
+  #gallery-ai-search-input {
+    width: 100%;
+    height: 40px;
+    border-radius: 20px;
+    border: 1px solid #e0e0e0;
+    background-color: #f7f7f7;
+    padding: 0 15px 0 40px;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+    &:disabled {
+      background-color: #f0f0f0;
+      cursor: not-allowed;
+    }
+    &:focus {
+      border-color: #007aff;
+      background-color: #fff;
+    }
+  }
+  
+  .spinner {
+    position: absolute;
+    right: 12px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  .status-text {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    margin-top: 6px;
+  }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.header-btn {
+  background: none; border: none; cursor: pointer; padding: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #333; min-width: 40px; 
+  &:hover { background-color: #f5f5f5; }
+  svg { width: 24px; height: 24px; }
+}
+
+#page-gallery {
+  // =======================================================
+  //   角色选择器 (无变化)
+  // =======================================================
+  .character-selector {
+    margin: 16px 20px; background-color: #f0f2f5; border-radius: 20px;
+    padding: 12px 0; flex-shrink: 0;
+    .character-wrapper {
+      display: flex; gap: 16px; padding: 0 20px; overflow-x: auto;
+      scroll-behavior: smooth;
+      &::-webkit-scrollbar { display: none; }
+    }
+    .character-avatar {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; cursor: pointer; width: 58px; flex-shrink: 0;
+      .img-wrapper {
+        width: 50px; height: 50px; border-radius: 50%; display: flex;
+        align-items: center; justify-content: center;
+        transition: transform 0.2s ease; border: 2px solid transparent;
+      }
+      img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+      span {
+        font-size: 11px; color: #8E8E93; width: 100%;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
+      }
+      &.active {
+        .img-wrapper { border-color: #000000; transform: scale(1.05); }
+        span { color: #000000; font-weight: 500; }
+      }
+    }
+    .add-new-character .img-wrapper {
+      border: 1.5px dashed #C7C7CC;
+      .add-icon { color: #C7C7CC; font-size: 22px; font-weight: 300; }
+    }
+  }
+
+  .gallery-character-image-settings {
+    flex-shrink: 0;
+    padding: 0 20px 12px;
+  }
+
+  .gallery-character-settings-card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+
+    &.is-collapsed {
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .gallery-character-settings-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+
+      strong {
+        font-size: 14px;
+        color: #111;
+      }
+
+      span {
+        font-size: 11px;
+        color: #999;
+      }
+    }
+
+    .gallery-character-settings-summary {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+
+      span {
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #f2f2f7;
+        color: #666;
+        font-size: 11px;
+      }
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    textarea,
+    input[type="number"] {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #e5e5ea;
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 13px;
+      background: #fafafa;
+      outline: none;
+    }
+
+    .gallery-character-switch {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .gallery-character-face-row {
+      display: grid;
+      grid-template-columns: 1fr 86px;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .gallery-character-face-preview {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #777;
+
+      img {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #111;
+      color: #fff;
+      font-size: 13px;
+    }
+  }
+
+  // =======================================================
+  //   2. 混合内容列表样式 (无变化)
+  // =======================================================
+  .image-grid-container {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    padding: 0 20px 80px 20px; 
+  }
+  
+  .image-groups-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .date-separator {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    padding: 10px 0;
+  }
+  
+  .image-group-card {
+    background-color: #f7f7f7;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+    .group-cover-image {
+      width: 100%; padding-bottom: 56.25%;
+      background-color: #e0e0e0; background-size: cover; background-position: center;
+    }
+    .group-info {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px;
+    }
+    .info-main {
+      .group-title {
+        font-size: 16px; font-weight: 600; color: #000; margin: 0 0 5px 0;
+      }
+      .group-status {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 13px; color: #888;
+        svg { width: 16px; height: 16px; stroke-width: 2.5; }
+      }
+    }
+    .info-action {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    // ▼▼▼ 【新增】分组卡片的操作按钮样式 ▼▼▼
+.group-action-btn {
+  // ▼▼▼ 【修改】移除背景色 ▼▼▼
+  background-color: transparent;
+  border: none;
+  // ▼▼▼ 【修改】缩小按钮尺寸 ▼▼▼
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  padding: 0;
+  color: #555;
+
+  // ▼▼▼ 【修改】调整 hover 效果，使用更通用的淡灰色背景 ▼▼▼
+  &:hover {
+    background-color: #f5f5f5; 
+  }
+  
+  svg {
+    // ▼▼▼ 【修改】缩小图标尺寸 ▼▼▼
+    width: 16px;
+    height: 16px;
+  }
+}
+
+  }
+
+  // =======================================================
+  //   3. 单个图片网格样式 (无变化)
+  // =======================================================
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 12px;
+  }
+
+    .image-card {
+    position: relative; // 为浮层定位
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-3px);
+    }
+    
+    .image-placeholder {
+      width: 100%;
+      padding-bottom: 100%;
+      background-color: #f0f2f5;
+      border-radius: 12px;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .image-meaning {
+      // 【修改】隐藏旧的注释
+      display: none;
+    }
+    
+    // 【新增】浮层样式
+    .image-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.45);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px;
+      box-sizing: border-box;
+      // 默认隐藏
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    
+    // 【新增】当卡片被点击时，显示浮层
+    &.active .image-overlay {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .image-description-overlay {
+      font-size: 12px;
+      color: #fff;
+      margin: 0;
+      align-self: flex-start; // 放在左下角
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      // 多行文本截断
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-all;
+    }
+    
+    .image-actions {
+      align-self: flex-end; // 放在右上角
+      display: flex;
+      gap: 6px;
+      button {
+        background-color: rgba(255, 255, 255, 0.8);
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        backdrop-filter: blur(4px);
+        transition: background-color 0.2s ease;
+        padding: 0;
+        
+        &:hover { background-color: rgba(255, 255, 255, 1); }
+        
+        svg {
+          width: 16px; height: 16px;
+          color: #333;
+        }
+      }
+    }
+  }
+}
+// =======================================================
+//   右上角“更多”菜单的样式 (无变化)
+// =======================================================
+#gallery-action-menu {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.95);
+  pointer-events: none;
+  transform-origin: top right;
+  position: absolute;
+  z-index: 150;
+  top: 75px;
+  right: 15px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  min-width: 160px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 6px;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  &.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+  .action-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s ease;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 1.8;
+      flex-shrink: 0;
+    }
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+}
+
+ /* =======================================================
+   4. ▼▼▼【修改处】分组详情页样式 ▼▼▼
+   ======================================================= */
+#page-gallery-group-detail {
+  // 【新增】让页面本身成为一个 flex 容器，垂直排列
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #FFFFFF;
+  
+  .group-detail-content {
+    padding: 16px; 
+    // 【新增】让内容区占据剩余空间并可以滚动
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+  
+  .group-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+     gap: 12px;
+  }
+  
+  .image-card {
+    position: relative; 
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-3px);
+    }
+    
+    .image-placeholder {
+      width: 100%;
+      padding-bottom: 100%;
+      background-color: #f0f2f5;
+      border-radius: 12px;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .image-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.45);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px;
+      box-sizing: border-box;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    
+    &.active .image-overlay {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .image-description-overlay {
+      font-size: 12px;
+      color: #fff;
+      margin: 0;
+      align-self: flex-start;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-all;
+    }
+    
+    .image-actions {
+      align-self: flex-end;
+      display: flex;
+      gap: 6px;
+      button {
+        background-color: rgba(255, 255, 255, 0.8);
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        backdrop-filter: blur(4px);
+        transition: background-color 0.2s ease;
+        padding: 0;
+        
+        &:hover { background-color: rgba(255, 255, 255, 1); }
+        
+        svg { width: 16px; height: 16px; color: #333; }
+      }
+    }
+  }
+}
+// =======================================================
+//   相册设置单页样式 (Ins black / white / gray)
+// =======================================================
+#gallery-settings-page {
+  &.gallery-settings-screen {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    color: #111111;
+    overflow: hidden;
+  }
+
+  // --- 1. 单页外壳 ---
+  .gallery-settings-shell {
+    background-color: #ffffff;
+    border-radius: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    overflow: hidden;
+    border: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+  }
+  // --- 2. 单页头部 ---
+  .gallery-settings-header {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: center;
+    min-height: 76px;
+    padding: 47px 20px 14px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #eeeeee;
+    position: relative;
+    background: #ffffff;
+    flex-shrink: 0;
+    h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 28px;
+      color: #1d1d1f; // 纯正的黑色标题
+    }
+  }
+  // --- 3. 关闭按钮 ---
+  .gallery-settings-back-btn {
+    position: absolute;
+    top: 47px;
+    left: 16px; // 移到左上角，更符合iOS风格
+    transform: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background-color: #f4f4f4;
+    color: #555;
+    font-size: 16px;
+    line-height: 28px;
+    border: 1px solid #e6e6e6;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    &:hover {
+      background-color: #d1d1d1;
+      color: #333;
+    }
+  }
+  @supports (-webkit-touch-callout: none) {
+    .gallery-settings-header {
+      min-height: 81px;
+      padding-top: 52px;
+    }
+
+    .gallery-settings-back-btn {
+      top: 52px;
+    }
+  }
+
+  // --- 4. 单页主体与内容行 ---
+  .gallery-settings-content {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    max-height: none;
+    overflow-y: auto;
+    background: #ffffff;
+  }
+
+  .gallery-settings-page {
+    padding: 28px 18px calc(28px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+
+    &::before {
+      content: 'LOOKY GALLERY SETTINGS';
+      display: block;
+      color: #9b9b9b;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-align: center;
+      padding-bottom: 8px;
+    }
+  }
+
+  .gallery-settings-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .gallery-settings-panel + .gallery-settings-panel {
+    border-top: 1px solid #eeeeee;
+    padding-top: 14px;
+  }
+
+  .settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid #eeeeee;
+    label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1d1d1f;
+    }
+  }
+
+  .settings-row[style*="column"] {
+    gap: 9px !important;
+  }
+
+  .styled-input,
+  .styled-select {
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    background: #fafafa;
+    color: #111111;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .hidden-select {
+    display: none;
+  }
+
+  .gallery-choice-trigger {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    background: #fafafa;
+    color: #111111;
+    font-size: 13px;
+    text-align: left;
+    padding: 0 12px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &::after {
+      content: '›';
+      color: #a0a0a0;
+      font-size: 18px;
+      line-height: 1;
+    }
+  }
+
+  textarea.styled-input {
+    min-height: 78px;
+    resize: vertical;
+  }
+
+  .gallery-settings-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 1px;
+
+    &::after {
+      content: attr(data-kicker);
+      color: #9b9b9b;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      order: 2;
+    }
+
+    span {
+      flex: 0 0 auto;
+      order: 1;
+      background: #111111;
+      color: #ffffff;
+      border-radius: 7px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    i {
+      height: 1px;
+      flex: 1;
+      order: 3;
+      background: #e8e8e8;
+    }
+  }
+
+  .settings-inline-subtitle {
+    display: inline-block;
+    position: relative;
+    width: fit-content;
+    margin: 0 0 2px;
+    padding-bottom: 5px;
+    color: #111111;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: 0;
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 2px;
+      border-radius: 999px;
+      background: #c7c7cc;
+    }
+  }
+  
+  // 分割线，手动控制
+  .settings-divider {
+    height: 1px;
+    background-color: #eeeeee;
+    margin: 3px 0;
+  }
+  .settings-hint {
+    font-size: 13px;
+    color: #86868b; // 苹果规范的辅助文字灰色
+    margin: -4px 0 8px 0;
+    line-height: 1.5;
+    padding: 0 4px;
+  }
+  
+  // --- 5. 开关 (Switch) 样式 ---
+  .switch {
+    input:checked + .slider {
+      background-color: #111111;
+    }
+  }
+  
+  // --- 6. 滑块 (Slider) 样式 ---
+  .slider-row {
+    flex-direction: column; // 让标签和滑块垂直排列
+    align-items: stretch;
+    gap: 12px;
+    padding-top: 16px;
+    .label-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .slider-value {
+      font-size: 15px;
+      font-weight: 500;
+      color: #333;
+    }
+    // 滑块轨道
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      outline: none;
+      transition: background 0.2s;
+      
+      // 滑块按钮 (Thumb)
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 26px;
+        height: 26px;
+        background: #ffffff;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 0.5px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 0.5px 4px rgba(0,0,0,0.12), 0 2px 5px rgba(0,0,0,0.1);
+      }
+      &::-moz-range-thumb {
+        width: 26px;
+        height: 26px;
+        background: #ffffff;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 0.5px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 0.5px 4px rgba(0,0,0,0.12), 0 2px 5px rgba(0,0,0,0.1);
+      }
+    }
+  }
+   .btn-danger {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    &:hover {
+        background-color: #c0392b;
+    }
+  }
+  .settings-help-text {
+      font-size: 13px;
+      color: #86868b;
+      margin-top: 8px;
+      text-align: center;
+      line-height: 1.5;
+      padding: 0 4px;
+  }
+  .image-gen-preset-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    border-bottom: 0;
+
+    .btn {
+      width: 100%;
+      min-height: 42px;
+      border-radius: 8px;
+    }
+  }
+}
+/* ========================================================== */
+/* == 【精修版】相册页面在手机端的响应式微调 == */
+/* ========================================================== */
+.gallery-choice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10030;
+  background: rgba(0, 0, 0, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  backdrop-filter: blur(5px);
+}
+
+.gallery-choice-card {
+  width: min(340px, calc(100vw - 32px));
+  max-height: 76dvh;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.18);
+}
+
+.gallery-choice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #ededed;
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #111111;
+  }
+
+  button {
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background: #f7f7f7;
+    color: #222222;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+.gallery-choice-list {
+  padding: 8px;
+  max-height: calc(76dvh - 58px);
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+.gallery-choice-option {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid #f1f1f1;
+  background: #ffffff;
+  color: #1c1c1e;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  font-size: 14px;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &.selected {
+    background: #f7f7f7;
+    font-weight: 600;
+  }
+
+  b {
+    color: #111111;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+
+  /* --- 顶部通用样式 --- */
+  #page-gallery {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+  .gallery-header {
+    padding: 10.25vw 3.84vw 3.07vw; /* 40px 15px 12px */
+    h1 {
+      /* 【修改】标题字体使用 clamp() 进行严格控制，在16px-17px之间微调 */
+      font-size: clamp(16px, 4.35vw, 17px);
+      padding: 0 2.56vw; /* 10px */
+    }
+  }
+  .gallery-search-container {
+    padding: 2.05vw 5.12vw 3.07vw; /* 8px 20px 12px */
+    .search-icon { left: 3.07vw; width: 4.61vw; height: 4.61vw; }
+    #gallery-ai-search-input {
+      height: 10.25vw; /* 40px */
+      border-radius: 5.12vw; /* 20px */
+      padding: 0 3.84vw 0 10.25vw;
+      /* 输入框字体已经在原始样式中固定为15px，这里无需修改 */
+    }
+  }
+
+  /* --- 角色选择器 --- */
+  .character-selector {
+    margin: 4.1vw 5.12vw;
+    border-radius: 5.12vw;
+    padding: 3.07vw 0;
+    .character-wrapper {
+      gap: 4.1vw;
+      padding: 0 5.12vw;
+    }
+    .character-avatar {
+      gap: 1.53vw;
+      width: 14.87vw;
+      .img-wrapper { width: 12.82vw; height: 12.82vw; }
+      span {
+        /* 【修改】将角色名字的字体彻底固定为 11px */
+        font-size: 11px;
+      }
+    }
+  }
+
+  /* --- 图片网格 (这部分没有字体，保持不变) --- */
+  .image-grid-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 5.12vw 20.51vw 5.12vw;
+  }
+  .image-groups-list { gap: 4.1vw; }
+  .date-separator { padding: 2.56vw 0; }
+  .image-group-card {
+    border-radius: 4.1vw;
+    .group-info { padding: 3.07vw 4.1vw; }
+    .info-main .group-title { margin-bottom: 1.28vw; /* 这里的字体已在原样式固定为16px */ }
+  }
+  .image-grid { gap: 3.07vw; }
+  .image-card .image-placeholder { border-radius: 3.07vw; }
+}

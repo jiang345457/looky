@@ -1,0 +1,4790 @@
+// 文件路径: styles/components/_message-bubble.scss
+// 描述: 聊天界面中的所有消息气泡及其变体样式。
+
+#chat-message-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--space-sm) 16px; 
+  box-sizing: border-box;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// --- 消息通用包裹容器 ---
+.message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  max-width: 80%;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  position: relative;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+
+  &.message-entry-animate {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+    will-change: transform, opacity;
+  }
+
+  &.received {
+    align-self: flex-start;
+  }
+  &.sent {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  // 多选模式
+  &.selected {
+    background-color: rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-md);
+    outline: 1px solid rgba(0, 0, 0, 0.14);
+    &::before {
+      content: '✓';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      box-sizing: border-box;
+      background-color: rgba(255, 255, 255, 0.82);
+      color: #222;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+      border: 1.5px solid rgba(0, 0, 0, 0.55);
+      border-radius: 50%;
+      flex-shrink: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+  }
+  &.sent.selected::before {
+    left: -10px;
+    right: auto;
+  }
+  // 气泡外时间戳的样式
+  .message-timestamp-outside {
+    color: #8e8e93;       // 柔和的灰色
+    font-size: 10px;
+    white-space: nowrap; // 防止时间换行
+    margin: 0; // ◀◀◀ 把 margin: 0 8px; 改成 margin: 0;
+    padding-bottom: 3px;       // 和气泡之间留点空隙
+  }
+}
+
+// --- 左滑引用：只移动消息本身，不触发布局重排 ---
+.swipe-quote-target {
+  touch-action: pan-y;
+}
+
+.swipe-quote-target.is-message-swiping {
+  transform: translate3d(var(--message-swipe-offset, 0px), 0, 0);
+  transition: none;
+  will-change: transform;
+}
+
+// 卡片和懒加载占位块不是 .message-wrapper，但也必须显示同样的选中状态。
+.message-placeholder.selected,
+.message-narration.selected,
+.message-system-event.selected,
+.friend-verification-wrapper.selected,
+.phone-npc-card-center-wrapper.selected,
+.friend-request-card-center-wrapper.selected,
+.char-interaction-card-center-wrapper.selected,
+.mcp-tool-card-center-wrapper.selected,
+.forwarded-card-center-wrapper.selected,
+.npc-chat-forward-center-wrapper.selected,
+.chat-forward-center-wrapper.selected {
+  position: relative;
+  border-radius: var(--radius-md);
+  outline: 1px solid rgba(0, 0, 0, 0.14);
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.message-placeholder.selected::before,
+.message-narration.selected::before,
+.message-system-event.selected::before,
+.friend-verification-wrapper.selected::before,
+.phone-npc-card-center-wrapper.selected::before,
+.friend-request-card-center-wrapper.selected::before,
+.char-interaction-card-center-wrapper.selected::before,
+.mcp-tool-card-center-wrapper.selected::before,
+.forwarded-card-center-wrapper.selected::before,
+.npc-chat-forward-center-wrapper.selected::before,
+.chat-forward-center-wrapper.selected::before {
+  content: '✓';
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.82);
+  color: #222;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  border: 1.5px solid rgba(0, 0, 0, 0.55);
+  border-radius: 50%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.chat-avatar-small {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.bubble-container {
+  display: flex;
+  align-items: flex-end; // ◀◀◀ 底部对齐，但只影响气泡和时间戳
+  gap: 8px;              // 在气泡和时间戳之间制造一些间隙
+}
+.message-wrapper.sent .bubble-container {
+  flex-direction: row-reverse;
+}
+// --- 基础消息气泡 ---
+.message-bubble {
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  
+  p {
+    padding: var(--space-sm) var(--space-md);
+    margin: 0;
+    font-size: var(--font-md);
+    line-height: 1.5;
+    word-break: break-word;
+  }
+}
+.message-bubble.has-translation-toggle {
+  position: relative;
+}
+.message-bubble.has-translation-toggle > .has-translation-toggle-anchor {
+  position: relative;
+  box-sizing: border-box;
+}
+.message-wrapper.sent .message-bubble {
+  background-color: #8a6dff;
+  color: white;
+
+  #page-voice-call & {
+    background-color: rgba(80, 80, 80, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+}
+
+
+// --- 引用消息 ---
+.message-reply-preview {
+  padding: 10px 12px;
+  margin: 8px 12px 0;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-left: 3px solid;
+  position: relative;
+  strong {
+    font-weight: 600;
+  }
+}
+.message-wrapper.received .message-reply-preview {
+  background-color: var(--c-bg-secondary);
+  color: var(--c-text-secondary);
+  border-color: #dcdcdc;
+  strong {
+    color: var(--c-text-primary);
+  }
+}
+.message-wrapper.sent .message-reply-preview {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.4);
+  strong {
+    color: white;
+  }
+}
+
+// --- 表情包消息 ---
+.message-bubble.sticker-bubble {
+  background: transparent !important;
+  box-shadow: none !important; 
+  padding: 0;
+  max-width: 120px;
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+  }
+}
+// --- 【新增】相册图片消息 (最终完美版) ---
+.message-bubble.gallery-image-bubble {
+  // === 基础造型 ===
+  padding: 0;
+  border: none;
+  background: transparent !important; // 强制透明，解决紫色闪现
+  box-shadow: none !important;
+  overflow: hidden;                 // 裁剪图片以匹配圆角
+  border-radius: var(--radius-lg);   // 保持和文字气泡一致的圆角
+  
+  // ★ 关键修改1：只限制最大宽度，让高度完全自适应
+  // 使用百分比，在手机和电脑上都能灵活适应
+  max-width: 60%; 
+  
+  // ★ 关键修改2：设置一个最小高度，防止图片加载前完全“塌陷”
+  // 这样即使用户网速慢，也能看到一个正在加载的占位区域
+  min-height: 50px;
+  background-color: #efeff4; // 在图片加载出来前，显示一个淡淡的灰色块，体验更好
+  
+  // === 交互行为控制 ===
+  cursor: pointer;
+  position: relative;
+  -webkit-touch-callout: none; // 禁止iOS长按菜单
+  -webkit-user-select: none;   // 禁止选中
+  user-select: none;
+
+  // === 图片样式 (核心改动) ===
+  img {
+    display: block; // 消除图片底部的空白间隙
+    
+    // ★ 关键修改3：让图片宽度撑满气泡，高度自动按比例缩放
+    width: 100%;
+    height: auto; // <-- 这句是关键！它告诉图片高度要自适应
+    
+    // 我们不再需要 object-fit，因为现在是图片本身决定了气泡的比例
+    
+    pointer-events: none; // 依然需要，防止图片拦截点击事件
+  }
+ 
+  // 下面这部分保持原样，不要动
+  &.expanded {
+    .gallery-image-preview {
+      opacity: 0;
+    }
+    .gallery-image-details {
+      opacity: 1;
+    }
+  }
+}
+
+
+
+// --- 照片消息 ---
+.message-bubble.photo-card {
+  width: 150px;
+  height: 150px;
+  background-color: var(--c-bg-secondary);
+  border: 1px solid var(--c-border);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  overflow: hidden;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--c-border-light);
+  }
+  
+  &.expanded {
+    .photo-card-preview {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .photo-card-details {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+.message-bubble.image-generating-card {
+  width: 256px;
+  max-width: calc(100vw - 96px);
+  box-sizing: border-box;
+  padding: 11px 12px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.05);
+
+  .image-gen-card-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .image-gen-card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .image-gen-card-spinner {
+    display: block;
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid #d9d9d9;
+    border-top-color: #111;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    animation: image-gen-spin 0.8s linear infinite;
+  }
+
+  &.is-error .image-gen-card-spinner,
+  &.is-stopped .image-gen-card-spinner {
+    animation: none;
+    border-color: #d1d1d6;
+  }
+
+  .image-gen-card-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .image-gen-card-title strong {
+    font-size: 12px;
+    line-height: 1.35;
+    color: #222;
+    font-weight: 600;
+  }
+
+  .image-gen-card-title span,
+  .image-gen-card-prompt > span {
+    color: #aaa;
+    font-size: 9px;
+    line-height: 1;
+    letter-spacing: 0;
+    font-weight: 700;
+  }
+
+  .image-gen-card-prompt {
+    padding: 8px 9px;
+    border: 1px solid #ededed;
+    border-radius: 8px;
+    background: #f8f8f8;
+  }
+
+  .image-gen-card-prompt > span {
+    display: block;
+    margin-bottom: 5px;
+    color: #8c8c8c;
+  }
+
+  .image-gen-card-prompt p {
+    padding: 0;
+    margin: 0;
+    color: #666;
+    font-size: 11px;
+    line-height: 1.45;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .image-gen-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  button {
+    min-height: 28px;
+    min-width: 48px;
+    padding: 0 10px;
+    border: 1px solid #e1e1e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #333;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  button:disabled {
+    opacity: 0.45;
+  }
+
+  &.is-error .image-gen-card-prompt p {
+    color: #c62828;
+  }
+}
+
+@keyframes image-gen-spin {
+  to { transform: rotate(360deg); }
+}
+
+.chat-image-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 10030;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: rgba(20, 20, 20, 0.48);
+  backdrop-filter: blur(12px);
+}
+
+.chat-image-viewer-panel {
+  width: min(520px, 100%);
+  max-height: 94dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  color: #111;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.chat-image-viewer-top,
+.chat-image-viewer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.chat-image-viewer-heading,
+.chat-image-viewer-meta-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.chat-image-viewer-heading strong,
+.chat-image-viewer-meta-title strong {
+  color: #111;
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 650;
+}
+
+.chat-image-viewer-heading span,
+.chat-image-viewer-meta-title span {
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #aaa;
+  font-weight: 700;
+}
+
+.chat-image-viewer-top button,
+.chat-image-viewer-actions button {
+  min-height: 30px;
+  border: 1px solid #dedede;
+  border-radius: 7px;
+  background: #fff;
+  color: #222;
+  padding: 0 12px;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0;
+  font-weight: 700;
+}
+
+.chat-image-viewer-top button {
+  background: #f7f7f7;
+  color: #555;
+}
+
+.chat-image-viewer-frame {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  background: #f2f2f2;
+  padding: 6px;
+  box-shadow: none;
+}
+
+.chat-image-viewer-frame img {
+  width: 100%;
+  max-height: 70dvh;
+  display: block;
+  object-fit: contain;
+  border-radius: 7px;
+  background: #ededed;
+}
+
+.chat-image-viewer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.chat-image-viewer-description {
+  padding: 10px 11px;
+  border: 1px solid #e7e7e7;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.chat-image-viewer-description p {
+  max-height: 54px;
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+  color: #555;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.chat-image-viewer-actions {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.chat-image-viewer-actions button[data-action="save"] {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.chat-image-viewer-actions button:disabled {
+  opacity: 0.55;
+}
+.photo-card-preview {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.3s ease;
+  .photo-card-placeholder-icon svg {
+    width: 60px;
+    height: 60px;
+    stroke: var(--c-text-tertiary);
+    stroke-width: 1.5;
+  }
+  .preview-text {
+    font-size: var(--font-sm);
+    color: var(--c-text-secondary);
+    font-weight: 500;
+  }
+}
+.photo-card-details {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: var(--c-bg-primary);
+  padding: var(--space-md);
+  box-sizing: border-box;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--c-text-primary);
+  word-break: break-word;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+
+.gallery-image-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.3s ease;
+}
+.gallery-image-details {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%; 
+  background-color: var(--c-bg-primary);
+  padding: var(--space-md);
+  box-sizing: border-box;
+  opacity: 0; 
+  transition: opacity 0.3s ease;
+  
+  // ▼▼▼ 【核心修改】 ▼▼▼
+  // 1. 开启滚动
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // 2. 删掉了 display: flex 等居中代码，改用默认布局
+  // 这样文字就会从顶部开始显示，不会被挡住上边距
+  display: block; 
+  text-align: left; // 如果你想文字居中可以改成 center，建议长文用 left
+  // ▲▲▲ 修改结束 ▲▲▲
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--c-text-primary);
+    word-break: break-word;
+  }
+}
+
+// --- 位置消息 ---
+.message-bubble.is-location-message {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.location-card {
+  width: 220px;
+  background-color: var(--c-bg-primary);
+  border: 1px solid var(--c-border-light);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+}
+.location-card-text {
+  padding: 10px 12px;
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 500;
+  color: var(--c-text-primary);
+  border-bottom: 1px solid var(--c-border-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.location-card-map {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+// --- 转账消息 (V3 - 最终版) ---
+.message-bubble.is-transfer-message {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  width: 240px; 
+  overflow: visible;
+}
+
+.transfer-card {
+  border-radius: 8px;
+  width: 100%;
+
+  &.transfer-pending { 
+    background-color: #FA9D3B; 
+  }
+  &.transfer-receipt {
+    background-color: #F3E6D3 !important;
+  }
+}
+
+.message-wrapper.sent .is-transfer-message .transfer-card {
+  &.transfer-pending::after { border-left-color: #FA9D3B; }
+  &.transfer-receipt::after { border-left-color: #F3E6D3 !important; }
+}
+
+.message-wrapper.received .is-transfer-message .transfer-card {
+  &.transfer-pending {
+    background-color: #FFFFFF;
+    .transfer-text-group p { color: #000; }
+    .transfer-footer { color: #888; }
+    &::after { border-right-color: #FFFFFF; }
+  }
+  &.transfer-receipt {
+    .transfer-text-group p { color: #444; }
+    .transfer-footer { color: #888; }
+    &::after { border-right-color: #F3E6D3 !important; }
+  }
+}
+
+.transfer-content-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+}
+
+.transfer-icon {
+  width: 36px;
+  height: 36px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.transfer-text-group {
+  display: flex;
+  flex-direction: column;
+  p {
+    margin: 0;
+    line-height: 1.4;
+    color: white;
+    padding: 0;
+  }
+  .amount {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .status-text {
+    font-size: 14px;
+  }
+}
+
+.transfer-footer {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+// --- 语音消息 ---
+.message-bubble.is-voice-message {
+  padding: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  align-items: flex-start;
+}
+.message-wrapper.sent .message-bubble.is-voice-message {
+  align-items: flex-end;
+}
+.voice-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-lg);
+  transition: background-color 0.2s;
+  width: 180px; 
+  box-sizing: border-box; 
+
+  .voice-duration {
+    font-size: var(--font-sm);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+}
+.message-wrapper.received .voice-bar {
+  background-color: var(--c-bg-primary);
+  box-shadow: var(--shadow-sm);
+  .voice-duration { color: var(--c-text-secondary); }
+  .bar { background-color: var(--c-text-primary); }
+}
+.message-wrapper.sent .voice-bar {
+  background-color: #8a6dff;
+  flex-direction: row-reverse; 
+  .voice-duration { color: white; }
+  .bar { background-color: white; }
+}
+.voice-text-content {
+  display: none;
+  margin-top: 8px;
+  padding: 10px 14px;
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--c-text-primary);
+  word-break: break-word;
+  max-width: 260px;
+}
+.message-wrapper.voice-expanded .voice-text-content {
+  display: block;
+}
+.voice-waveform {
+  flex-grow: 1;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  .bar {
+    width: 2px;
+    height: 100%;
+    border-radius: 2px;
+    animation: sound-wave-staggered 2.2s infinite alternate;
+    transform-origin: center;
+    &:nth-child(5n+1) { animation-delay: -1.4s; }
+    &:nth-child(5n+2) { animation-delay: -1.1s; }
+    &:nth-child(5n+3) { animation-delay: -0.8s; }
+    &:nth-child(5n+4) { animation-delay: -0.5s; }
+    &:nth-child(5n+5) { animation-delay: -0.2s; }
+  }
+}
+@keyframes sound-wave-staggered {
+  0% { transform: scaleY(0.1); } 25% { transform: scaleY(0.8); } 50% { transform: scaleY(0.3); } 75% { transform: scaleY(1.0); } 100% { transform: scaleY(0.2); }
+}
+
+// --- 通话状态消息 (已合并和修复) ---
+.message-bubble.is-voice-call-summary,
+.message-bubble.is-voice-call-rejected {
+  display: flex;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px !important;
+  border-radius: var(--radius-md) !important;
+  max-width: fit-content; // 关键修复：让宽度自适应内容
+
+  p { 
+    padding: 0 !important; 
+    margin: 0; 
+    line-height: 1; 
+    white-space: nowrap; // 关键修复：禁止文字换行
+  }
+  svg { 
+    width: 20px; 
+    height: 20px; 
+    flex-shrink: 0; 
+  }
+  .call-status-icon {
+    width: 16px;
+    height: 16px;
+    stroke: var(--c-text-primary);
+    transform: rotate(135deg);
+  }
+}
+
+.message-wrapper.sent .message-bubble.is-voice-call-summary,
+.message-wrapper.sent .message-bubble.is-voice-call-rejected {
+  p { color: white; }
+  svg { stroke: white; }
+}
+
+
+// --- 撤回消息 ---
+.message-wrapper.recalled {
+  width: 100%;
+  max-width: 100%;
+  align-self: center;
+  justify-content: center;
+  margin: 8px 0;
+  padding: 0;
+}
+.recalled-text {
+  font-size: 12px;
+  color: #b2b2b7;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+/* ========================================================================== */
+/* === 【V3 - 最终版】转账功能样式 (Transfer Feature) === */
+/* ========================================================================== */
+
+/* --- 1. 聊天气泡中的转账/回执卡片 --- */
+.message-bubble.is-transfer-message {
+    padding: 0;
+    background: transparent;
+    width: 220px; /* <-- 修改 */
+    overflow: visible;
+}
+
+.transfer-card {
+    border-radius: 8px; /* <-- 修改 */
+    width: 100%;
+}
+
+/* 待处理的转账 (橙色) */
+.message-wrapper.sent .is-transfer-message .transfer-card.transfer-pending { background-color: #FA9D3B; }
+.message-wrapper.sent .is-transfer-message .transfer-card.transfer-pending::after { border-left-color: #FA9D3B; }
+.message-wrapper.received .is-transfer-message .transfer-card.transfer-pending { background-color: #FA9D3B;}
+.message-wrapper.received .is-transfer-message .transfer-card.transfer-pending::after { border-right-color: #FFFFFF; }
+.message-wrapper.received .is-transfer-message .transfer-card.transfer-pending .transfer-text-group p { color: #000; }
+.message-wrapper.received .is-transfer-message .transfer-card.transfer-pending .transfer-footer { color: #888; }
+
+
+/* 已完成/已退回的回执 (米色) */
+.transfer-card.transfer-receipt {
+    background-color: #F3E6D3 !important;
+}
+.message-wrapper.sent .is-transfer-message .transfer-card.transfer-receipt::after { border-left-color: #F3E6D3 !important; }
+.message-wrapper.received .is-transfer-message .transfer-card.transfer-receipt::after { border-right-color: #F3E6D3 !important; }
+.transfer-card.transfer-receipt .transfer-text-group p { color: #444; }
+.transfer-card.transfer-receipt .transfer-footer { color: #888; }
+
+
+/* 卡片内部结构 */
+.transfer-content-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 14px 12px; /* <-- 修改 */
+}
+
+.transfer-icon {
+    width: 36px; /* <-- 修改 */
+    height: 36px; /* <-- 修改 */
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+.transfer-text-group {
+    display: flex;
+    flex-direction: column;
+}
+.transfer-text-group p {
+    margin: 0;
+    line-height: 1.3;
+    color: white;
+}
+.transfer-text-group .amount {
+    font-size: 16px;
+    font-weight: 500;
+}
+.transfer-text-group .status-text {
+    font-size: 14px;
+}
+.transfer-footer {
+    font-size: 12px;
+    padding: 6px 12px; /* <-- 修改 */
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ========================================================================== */
+/* == 10. 系统事件消息 (System Event Message) == */
+/* ========================================================================== */
+
+// ▼▼▼ 使用这个新的样式块替换你原来的 ▼▼▼
+.message-system-event.is-date-start,
+.message-system-event.is-date-end {
+    background-color: #e5e5ea; /* 一个更中性的灰色，类似iOS系统提示 */
+    color: #8e8e93;            /* 搭配的文字颜色 */
+    padding: 4px 12px;         /* 减小内边距，让它更紧凑 */
+    border-radius: 12px;       /* 合适的圆角 */
+    font-size: 12px;           /* 减小字体大小 */
+    margin: 8px auto;          /* 减小垂直边距，左右居中 */
+    max-width: fit-content;    /* 宽度自适应内容 */
+    user-select: none;         /* 禁止用户选择文本 */
+    -webkit-user-select: none;
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+/* ========================================================================== */
+/* == 响应式布局调整 (Responsive Layout Adjustments) == */
+/* ========================================================================== */
+
+/* 当屏幕宽度小于等于 768px 时（覆盖大部分手机和平板竖屏模式）*/
+@media (max-width: 768px) {
+
+  #chat-message-list {
+    // 在小屏幕上，减小左右的内边距，让内容区域更宽
+    padding: var(--space-sm) 12px; 
+  }
+
+  .message-wrapper {
+    // [可选优化] 同时，可以适当增加气泡的最大宽度，优化长文本的阅读体验
+    max-width: 85%;
+  }
+  
+}
+// ===============================================
+// ▼▼▼ 【新增】聊天气泡 - 动态卡片样式 ▼▼▼
+// ===============================================
+
+.message-bubble.is-moment-card {
+  padding: 0 !important;
+  background: #fff !important;
+  width: 240px;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  cursor: pointer;
+  
+  .moment-card-inner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  // 卡片头部：作者信息
+  .mc-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+
+    img {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    span {
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+    }
+    .mc-tag {
+      margin-left: auto;
+      font-size: 10px;
+      color: #bbb;
+      border: 1px solid #ddd;
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+  }
+
+  // 卡片主体：摘要+图片
+  .mc-body {
+    padding: 12px;
+    display: flex;
+    gap: 10px;
+
+    .mc-text {
+      flex: 1;
+      font-size: 13px;
+      color: #333;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 3; // 最多显示3行
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .mc-thumb {
+      width: 50px; height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #eee;
+      flex-shrink: 0;
+    }
+  }
+
+   // 卡片底部：数据统计
+  .mc-footer {
+    padding: 8px 12px; // 稍微增加一点高度
+    font-size: 12px;
+    color: #999;
+    border-top: 1px solid #f5f5f5;
+    display: flex;
+    gap: 16px; // 两个统计项之间的间距
+
+    // ▼▼▼ 【新增】单个统计项样式 ▼▼▼
+    .mc-stat {
+      display: flex;
+      align-items: center;
+      gap: 4px; // 图标和数字之间的间距
+
+      svg {
+        width: 14px; // 图标大小
+        height: 14px;
+        stroke: #999; // 图标颜色与文字一致
+        stroke-width: 1.8; // 线条粗细
+      }
+      
+      span {
+        line-height: 1; // 确保数字垂直对齐
+        margin-top: 1px; // 微调数字位置
+      }
+    }
+  }
+}
+// ===============================================
+// ▼▼▼ 【新增】动态详情弹窗样式 ▼▼▼
+// ===============================================
+
+.moment-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
+.moment-detail-modal-content {
+  // 弹窗里的卡片，我们让它宽度最大是90%，但不能超过400px
+  max-width: 400px;
+  width: 90%;
+  // 让卡片可以滚动，如果内容太长的话
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 16px; // 圆角大一点好看
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+  // 弹窗里的这张卡片，我们把它的边框和阴影去掉，因为弹窗本身有阴影了
+  .moment-card {
+    border: none !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important; // 去掉它在动态列表里的底部边距
+  }
+
+  // 美化滚动条 (可选，但更好看)
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+  }
+}
+
+.message-bubble.is-forum-post-card {
+  width: min(262px, 72vw);
+  max-width: none;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible;
+}
+
+.forum-post-share-card {
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+
+  &:active {
+    transform: scale(0.985);
+    border-color: #c7c7c7;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+  }
+}
+
+.forum-post-share-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #efefef;
+
+  img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #e6e6e6;
+    flex: 0 0 auto;
+  }
+}
+
+.forum-post-share-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  b {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  span {
+    margin-top: 2px;
+    font-size: 10px;
+    color: #8e8e8e;
+    letter-spacing: 0;
+  }
+}
+
+.forum-post-share-badge {
+  margin-left: auto;
+  padding: 2px 6px;
+  border: 1px solid #111;
+  border-radius: 999px;
+  color: #111;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.forum-post-share-media {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 68px;
+  background: #f7f7f7;
+  border: 1px solid #efefef;
+  border-radius: 7px;
+  overflow: hidden;
+
+  img,
+  video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  &.is-generated {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    box-sizing: border-box;
+    color: #222;
+    font-size: 10px;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  &.is-music {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    aspect-ratio: auto;
+    min-height: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      flex: 0 0 auto;
+    }
+
+    span {
+      display: none;
+    }
+  }
+}
+
+.forum-post-share-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.forum-post-share-copy {
+  min-width: 0;
+}
+
+.forum-post-share-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.forum-post-share-subtitle {
+  margin-top: 5px;
+  font-size: 10px;
+  color: #8e8e8e;
+  line-height: 1.3;
+}
+
+.forum-post-share-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px 10px;
+  background: #fff;
+  font-size: 10px;
+  color: #555;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+
+  span {
+    flex: 0 0 auto;
+  }
+
+  b {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    color: #111;
+  }
+}
+
+.forum-post-detail-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.forum-post-detail-modal-overlay.visible {
+  opacity: 1;
+}
+
+.forum-post-detail-modal-card {
+  position: relative;
+  width: min(386px, 100%);
+  max-height: 84vh;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
+  color: #111;
+}
+
+.forum-post-detail-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #dbdbdb;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.forum-post-detail-mini-post {
+  background: #fff;
+  max-height: 84vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.forum-post-detail-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 48px 13px 14px;
+  border-bottom: 1px solid #efefef;
+
+  img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #e6e6e6;
+    object-fit: cover;
+  }
+
+  b {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  span {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #8e8e8e;
+  }
+}
+
+.forum-post-detail-media-grid {
+  display: grid;
+  gap: 2px;
+  margin: 10px 14px 0;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+
+  &.multi {
+    grid-auto-flow: column;
+    grid-auto-columns: 86%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+}
+
+.forum-post-detail-media-item {
+  min-height: 190px;
+  background: #f7f7f7;
+  scroll-snap-align: center;
+
+  img,
+  video {
+    width: 100%;
+    height: 100%;
+    min-height: 190px;
+    display: block;
+    object-fit: cover;
+  }
+
+  &.is-generated {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 22px;
+    box-sizing: border-box;
+    color: #222;
+    font-size: 14px;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  &.is-music {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 96px;
+      height: 96px;
+      min-height: 0;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    b {
+      font-size: 15px;
+    }
+
+    small {
+      margin-top: 5px;
+      color: #8e8e8e;
+    }
+  }
+}
+
+.forum-post-detail-body {
+  padding: 12px 14px 4px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: #111;
+}
+
+.forum-post-detail-stats {
+  display: flex;
+  gap: 14px;
+  padding: 10px 14px 12px;
+  border-bottom: 1px solid #efefef;
+  color: #111;
+  font-size: 13px;
+  font-weight: 700;
+
+  span {
+    white-space: nowrap;
+  }
+}
+
+.forum-post-detail-comments {
+  padding: 12px 14px 16px;
+}
+
+.forum-post-detail-comment {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+
+  img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: 0 0 auto;
+  }
+
+  > div {
+    flex: 1;
+    min-width: 0;
+  }
+
+  p {
+    margin: 3px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #333;
+  }
+
+  small {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #8e8e8e;
+  }
+}
+
+.forum-post-detail-comment-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  b {
+    font-size: 12px;
+    color: #111;
+  }
+
+  em {
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: #fff1f0;
+    color: #e5484d;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1.2;
+    flex: 0 0 auto;
+  }
+
+  span {
+    font-size: 11px;
+    color: #8e8e8e;
+  }
+}
+
+.forum-post-detail-mention {
+  color: #007aff;
+  font-weight: 500;
+}
+
+.forum-post-detail-replies {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  padding-left: 4px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: 2px;
+    bottom: 14px;
+    width: 1px;
+    background: rgba(17, 17, 17, 0.08);
+  }
+}
+
+.forum-post-detail-reply {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #444;
+
+  img {
+    position: relative;
+    z-index: 1;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 3px #fff;
+    flex: 0 0 auto;
+  }
+
+  > div {
+    flex: 1;
+    min-width: 0;
+    padding-top: 1px;
+  }
+
+  p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #4b4b4b;
+  }
+}
+
+.forum-post-detail-reply-head {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+
+  b {
+    color: #111;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  em {
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: #fff1f0;
+    color: #e5484d;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1.2;
+    flex: 0 0 auto;
+  }
+
+  span {
+    color: #aaa;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+}
+
+.forum-post-detail-empty {
+  padding: 14px 0 4px;
+  color: #8e8e8e;
+  font-size: 12px;
+}
+
+.forum-post-detail-section-title {
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #8e8e8e;
+  letter-spacing: 0.08em;
+}
+
+// ... 上面是原有的代码 ...
+
+// ▼▼▼ 【在此处添加/替换样式】 ▼▼▼
+// 系统事件消息（淡灰色胶囊样式）
+.message-system-event {
+    align-self: center;        /* 居中显示 */
+    background-color: rgba(0, 0, 0, 0.05); /* 极淡的灰色背景 */
+    color: #999;              /* 浅灰色文字 */
+    font-size: 12px;           /* 小号字体 */
+    padding: 4px 12px;         /* 胶囊内边距 */
+    border-radius: 100px;      /* 也就是胶囊形状 */
+    margin: 10px 0;            /* 上下留出一点空隙 */
+    max-width: 80%;            /* 防止文字太长撑爆屏幕 */
+    text-align: center;        /* 文字居中 */
+    user-select: none;         /* 不让用户选中复制，像系统提示一样 */
+    
+    // 如果想要深色模式适配，可以加这个（可选）
+    @media (prefers-color-scheme: dark) {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #888;
+    }
+}
+
+.message-narration {
+    align-self: center;
+    width: min(82%, 320px);
+    margin: 14px auto;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(138, 109, 255, 0.18);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    color: #5f5870;
+    text-align: center;
+    user-select: text;
+}
+
+.message-narration-label {
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #8a6dff;
+}
+
+.message-narration-text {
+    font-size: 13px;
+    line-height: 1.65;
+    font-style: italic;
+    word-break: break-word;
+}
+// ▼▼▼ 翻译功能样式 (精致版 - 修复偏移问题) ▼▼▼
+
+// 1. 气泡内部的翻译块
+.message-translation {
+  // 对齐：使用和上方气泡p标签一样的内边距
+  padding: 8px 14px 10px 14px; 
+  
+  margin-top: 4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06); // 极细的分割线
+  font-size: 13px; 
+  color: #666;     
+  line-height: 1.6;
+  
+  // 动画过渡效果
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden; 
+
+  &.collapsed {
+    display: none;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top: none;
+    margin-top: 0;
+  }
+}
+
+// 2. 气泡右侧的隐形翻译点击区
+.btn-toggle-translation {
+  width: 14px;
+  height: 28px;
+  min-width: 14px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  z-index: 3;
+  touch-action: manipulation;
+  transition: all 0.2s ease; 
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02); 
+  top: 50%;
+  right: -14px;
+  transform: translateY(-50%);
+
+  .translation-toggle-glyph {
+    display: block;
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 0;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+}
+
+// 3. 发送方特殊处理 (为了让按钮在发送方也能正确显示)
+// 如果你是发送方，按钮应该在气泡左侧，而不是右侧
+.message-wrapper.sent .btn-toggle-translation {
+  right: auto;
+  left: -14px;
+}
+// ===============================================
+// ▼▼▼ 【重构】线下邀约卡片 (精致紧凑版) ▼▼▼
+// ===============================================
+
+.message-bubble.is-offline-invite {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 240px; // 【缩小】宽度从 280 -> 240，更像气泡
+  overflow: visible;
+  margin-top: 15px; // 留出一点空间给突出的图标
+}
+
+// ▼▼▼ 新增：专门给情侣金库卡片松绑宽度，防止它向右溢出贴住头像 ▼▼▼
+.message-bubble.is-joint-fund-invite {
+  width: max-content !important; 
+}
+// ▲▲▲ 新增结束 ▲▲▲
+
+.invite-card {
+  position: relative;
+  background: #fffbf0; // 奶白色
+  border-radius: 10px; // 圆角稍微减小
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, 0.25); // 金色边框加深一点
+  // 阴影收敛，不再那么夸张
+  box-shadow: 
+    0 2px 8px rgba(0,0,0,0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset; 
+  transition: transform 0.2s, filter 0.3s;
+
+  // 1. 封面区域 (大幅压扁，变成横幅)
+  .invite-cover-container {
+    width: 100%;
+    height: 100px; // 【缩小】高度从 160 -> 80
+    background-color: #f0e6d2;
+    position: relative;
+    overflow: hidden;
+    
+    .invite-cover-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #cbbba8;
+      font-family: 'Times New Roman', serif;
+      font-size: 16px; // 字体减小
+      letter-spacing: 2px;
+      background-image: radial-gradient(#e6dcc3 1.5px, transparent 1.5px);
+      background-size: 12px 12px;
+    }
+
+    .invite-real-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: sepia(0.3) contrast(0.9); // 复古感更强一点
+      opacity: 0;
+      animation: fadeIn 0.8s forwards;
+    }
+  }
+
+  // 顶部装饰图标 (缩小并调整位置)
+  .invite-icon-wrapper {
+    width: 32px; // 【缩小】从 48 -> 32
+    height: 32px;
+    background: #fff;
+    border-radius: 50%;
+    // 精确计算位置：向上偏移一半(16px)
+    margin: -16px auto 4px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    border: 1px solid #f0e6d2;
+    position: relative;
+    z-index: 2; // 保证在图片上面
+    
+    svg {
+      width: 16px; // 图标缩小
+      height: 16px;
+      stroke: #d4af37; // 改为暗金色，比亮粉色更高级
+      stroke-width: 1.8;
+    }
+  }
+
+  // 2. 内容区域 (紧凑排版)
+  .invite-content-body {
+    padding: 0 12px 12px; // 减少内边距
+    text-align: center;
+    background: linear-gradient(to bottom, #fffbf0 0%, #fff 80%);
+  }
+
+  // 装饰线 (更细)
+  .invite-decorative-line {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #d4af37, transparent);
+    width: 40%; // 变短
+    margin: 4px auto;
+    opacity: 0.4;
+  }
+
+  .invite-title {
+    font-family: 'Times New Roman', serif;
+    font-size: 14px; // 【缩小】
+    font-style: italic;
+    color: #8b7d6b; 
+    margin: 4px 0;
+  }
+
+  .invite-text {
+    font-size: 13px; // 【缩小】
+    color: #444;
+    line-height: 1.4;
+    margin: 6px 0 10px;
+    font-family: system-ui, -apple-system, sans-serif;
+    padding: 0 4px;
+    // 限制文字行数，防止太长
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  // 3. 按钮区域 (更扁平)
+  .invite-actions {
+    display: flex;
+    border-top: 1px solid rgba(212, 175, 55, 0.15);
+    
+    button {
+      flex: 1;
+      padding: 10px 0; // 【缩小】高度减少
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Times New Roman', serif;
+      transition: background 0.2s;
+
+      &.btn-reject {
+        color: #999;
+        border-right: 1px solid rgba(212, 175, 55, 0.15);
+      }
+
+      &.btn-accept {
+        color: #d4af37;
+        letter-spacing: 1px;
+        background: rgba(255, 255, 255, 0.5);
+      }
+      
+      &:active {
+        background: rgba(212, 175, 55, 0.1);
+      }
+    }
+  }
+}
+
+// 已处理状态
+.invite-card.processed {
+  filter: grayscale(100%) opacity(0.6);
+  pointer-events: none;
+  box-shadow: none;
+  border-color: #ddd;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+// ... [文件末尾] ...
+
+// ===============================================
+// ▼▼▼ 【修改】过场动画遮罩层 (梦幻模糊版) ▼▼▼
+// ===============================================
+.scene-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  // 1. 默认状态：完全透明，且不阻挡点击 (pointer-events会在JS里控制)
+  background-color: rgba(255, 255, 255, 0); 
+  backdrop-filter: blur(0px); // 初始无模糊
+  -webkit-backdrop-filter: blur(0px); // 兼容iOS
+  
+  z-index: 9999; 
+  opacity: 0;
+  pointer-events: none;
+  
+  // 2. 动画过渡：设置 opacity 和 filter 的过渡时间
+  transition: 
+    opacity 0.5s ease-in-out,
+    background-color 0.5s ease-in-out,
+    backdrop-filter 0.5s ease-in-out,
+    -webkit-backdrop-filter 0.5s ease-in-out;
+
+  &.active {
+    opacity: 1;
+    pointer-events: auto; // 激活时阻挡点击
+    
+    // 3. 激活状态：变成半透明的乳白色，并带有重度模糊
+    // 这层模糊会遮住下面页面切换时的黑屏或闪烁
+    background-color: rgba(255, 255, 255, 0.85); 
+    
+    // 毛玻璃效果：下面的内容会变得非常模糊
+    backdrop-filter: blur(25px); 
+    -webkit-backdrop-filter: blur(25px);
+  }
+}
+
+// 适配深色模式 (如果你的应用有深色模式的话)
+@media (prefers-color-scheme: dark) {
+  .scene-transition-overlay.active {
+    // 深色模式下变成深灰色毛玻璃，而不是刺眼的白
+    background-color: rgba(30, 30, 30, 0.85); 
+  }
+}
+/* ===============================================
+▼▼▼ 【新增】外卖小票样式 ▼▼▼
+=============================================== */
+.message-bubble.is-receipt-message {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 240px; 
+  max-width: 100%; // 防止溢出
+  font-family: 'Songti SC', 'SimSun', serif; 
+  color: #000 !important; // 强制黑色文字
+}
+.receipt-card {
+  background: #fff !important; 
+  padding: 15px 12px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-radius: 4px;
+  width: 100%;          
+  box-sizing: border-box; 
+  overflow: hidden;     
+  color: #000;
+  
+  // ▼▼▼ 新增：过渡动画和手型光标 ▼▼▼
+  transition: all 0.3s ease; 
+  cursor: pointer; 
+  position: relative; // 为了放底部的提示文字
+
+  // ▼▼▼ 新增：折叠状态下的样式 ▼▼▼
+  &.collapsed {
+    padding-bottom: 25px; // 底部留点位置给“点击展开”几个字
+ .receipt-header {
+      border-bottom: 1px dashed #aaa; // 添加虚线
+      padding-bottom: 10px;           // 虚线距离上方文字的间距
+      margin-bottom: 10px;            // 虚线距离下方总价的间距
+    }
+    // 隐藏中间那些乱七八糟的列表、条形码、分割线
+    .receipt-items-table,
+    .receipt-barcode-section,
+    .receipt-footer,
+    .receipt-divider,
+    .receipt-slogan,
+    .receipt-info-row:not(.receipt-total-row) { // 只保留总价行，其他信息行隐藏
+       display: none;
+    }
+
+    // 或者是用 CSS 伪元素加一个提示文字
+    &::after {
+      content: "▽ 点击展开小票详情";
+      position: absolute;
+      bottom: 6px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      color: #999;
+      letter-spacing: 1px;
+    }
+  }
+  // ▲▲▲ 新增结束 ▲▲▲
+
+  /* 头部 (店名) */
+  .receipt-header {
+    text-align: center;
+    margin-bottom: 10px;
+    .title-cn {
+      font-size: 22px; 
+      font-weight: 600;
+      letter-spacing: 4px;
+    }
+    .title-en {
+      font-size: 13px;
+      letter-spacing: 2px;
+      margin-top: -5px;
+      margin-bottom: 10px;
+      font-family: 'Times New Roman', Times, serif; 
+    }
+    .subtitle, .address {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.5;
+    }
+  }
+  /* 分隔线 */
+  .receipt-divider {
+    border-top: 1px dashed #aaa;
+    margin: 12px 0;
+  }
+  
+  /* 居中口号 */
+  .receipt-slogan {
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+  }
+  /* 通用信息行 (左右对齐) */
+  .receipt-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    line-height: 1.8;
+    .key { color: #555; }
+    .value { font-family: monospace; } 
+  }
+  
+  /* 商品列表 */
+  .receipt-items-table {
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 8px;
+      .col-name { flex: 1; text-align: left; }
+      .col-qty, .col-price { width: 50px; text-align: right; }
+    }
+    .table-body {
+      font-size: 12px;
+    }
+    .table-row {
+      display: flex;
+      justify-content: space-between;
+      line-height: 1.8;
+      .item-name { 
+        flex: 1; 
+        text-align: left; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis;
+        padding-right: 10px;
+      }
+      .item-qty, .item-price { width: 50px; text-align: right; font-family: monospace; }
+    }
+  }
+  /* 实付金额 (加粗) */
+  .receipt-total-row {
+    .key { font-weight: 600; }
+    .value { font-weight: 600; font-size: 14px; }
+  }
+  
+  /* 条形码部分 */
+  .receipt-barcode-section {
+    text-align: center;
+    margin-top: 15px;
+    .barcode-number {
+      font-family: monospace;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      word-break: break-all;
+    }
+    .barcode-svg {
+      width: 100%;
+      height: 50px;
+      margin-top: 5px;
+    }
+  }
+  
+  /* 底部联系方式 */
+  .receipt-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #555;
+    margin-top: 10px;
+  }
+}
+// ... (在文件末尾添加或替换)
+
+/* ===============================================
+▼▼▼ 【重设计】找人代付卡片 (黑白极简版) ▼▼▼
+=============================================== */
+.message-bubble.is-pay-request {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 260px;
+  max-width: 100%;
+}
+
+.pay-request-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #eee; /* 极简边框 */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03); /* 极淡阴影 */
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* 上半部分：商品信息 */
+  .pr-body {
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+
+    .pr-img {
+      width: 64px;
+      height: 64px;
+      border-radius: 6px;
+      object-fit: cover;
+      background-color: #f9f9f9;
+      flex-shrink: 0;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .pr-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 64px;
+
+      .pr-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #000; /* 纯黑标题 */
+        line-height: 1.3;
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .pr-specs {
+        font-size: 12px;
+        color: #999; /* 浅灰规格 */
+        margin-bottom: 6px;
+      }
+
+      .pr-price-row {
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+        color: #000; /* 纯黑价格 */
+        font-weight: 700;
+        font-size: 16px;
+        
+        .currency { font-size: 12px; font-weight: normal; }
+        .label { 
+            font-size: 10px; 
+            color: #999; 
+            font-weight: normal; 
+            margin-left: auto; /* 靠右对齐 */
+            border: 1px solid #eee;
+            padding: 1px 4px;
+            border-radius: 4px;
+        }
+      }
+    }
+  }
+
+  /* 下半部分：操作区/状态区 */
+  .pr-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #f5f5f5;
+    background: #212121;
+    display: flex;
+     justify-content: center; 
+    align-items: center;
+    gap: 10px;
+
+    /* 按钮样式：黑白风 */
+    button {
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px; /* 胶囊按钮 */
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.btn-pay {
+        background: #000; /* 纯黑背景 */
+        color: #fff;
+        &:active { transform: scale(0.96); opacity: 0.8; }
+      }
+
+      &.btn-reject {
+        background: #fff;
+        color: #000;
+        border: 1px solid #e0e0e0;
+        &:active { background: #f5f5f5; }
+      }
+    }
+
+    /* 纯文本状态提示 (用于发送方或已完成状态) */
+    .status-text {
+      font-size: 12px;
+      color: #ffffff;
+      width: 100%;
+      text-align: center;
+      padding: 4px 0;
+    }
+  }
+
+  /* --- 状态变体 --- */
+  &.status-completed {
+    .status-text { color: #000; font-weight: 500; } /* 成功变黑字 */
+    &::before {
+       content: "";
+       position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+       background: #000; /* 左侧黑条装饰 */
+    }
+  }
+  
+  &.status-rejected, &.status-expired {
+    opacity: 0.6;
+    filter: grayscale(100%);
+  }
+}
+// ... (之前的样式)
+
+/* ▼▼▼ 【新增】角色购买专属红印章 ▼▼▼ */
+.receipt-card {
+  position: relative; // 确保印章能相对于小票定位
+  
+  &.is-ai-gift {
+    &::after {
+      content: "CHAR. PAID"; // 印章文字
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 8px;
+      border: 2px solid #d0021b;
+      color: #d0021b;
+      font-family: "Georgia", serif;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transform: rotate(15deg);
+      border-radius: 4px;
+      opacity: 0.8;
+      background: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 2px rgba(208, 2, 27, 0.2);
+      pointer-events: none;
+      z-index: 5;
+    }
+  }
+}
+/* ▲▲▲ 新增结束 ▲▲▲ */
+/* --- 之前代付卡片的样式 --- */
+
+/* ▼▼▼ 确保包含这段红色印章样式 ▼▼▼ */
+.receipt-card.is-ai-gift {
+    position: relative;
+    &::after {
+        content: "CHAR. PAID"; 
+        position: absolute;
+        top: 20px;
+        right: 15px;
+        padding: 4px 10px;
+        border: 2.5px solid #d0021b;
+        color: #d0021b;
+        font-family: "Georgia", serif;
+        font-weight: 900;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transform: rotate(15deg);
+        border-radius: 4px;
+        opacity: 0.8;
+        background: rgba(255, 255, 255, 0.4);
+        pointer-events: none;
+        z-index: 5;
+    }
+}
+/* ===============================================
+   ▼▼▼ 【最终修正版】精致小票 (250px等比缩小 + 胶囊状态) ▼▼▼
+   =============================================== */
+.pay-request-card.style-ride-classic {
+  position: relative;
+  width: 250px; /* 【缩小】宽度改为 250px，更精致 */
+  min-height: 100px;
+  
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08); /* 阴影也调小一点 */
+  font-family: "Songti SC", "SimSun", serif;
+  overflow: hidden;
+  color: #2c2c2c;
+  
+  /* 内边距缩小 */
+  padding: 6px 10px; 
+
+  /* 背景图 */
+  .card-bg-texture {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 1; 
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* 水印缩小 */
+  .card-watermark {
+    position: absolute;
+    right: -5px;
+    bottom: -10px;
+    font-size: 70px; /* 【缩小】字体变小 */
+    font-family: "Times New Roman", serif;
+    font-weight: 700;
+    color: #000;
+    opacity: 0.06;
+    z-index: 0;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  /* 内缩边框：间距缩小 */
+  .card-inner-border {
+    position: relative;
+    z-index: 1;
+    margin: 4px; /* 【缩小】边距变小 */
+    border: 1px dashed rgba(0, 0, 0, 0.3); /* 线条变细 */
+    border-radius: 3px;
+    padding: 6px 8px; /* 内部空间压缩 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(2px);
+    min-height: 90px;
+  }
+
+  /* 头部 */
+  .card-header-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1.5px solid #2c2c2c; /* 线条变细 */
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+
+    .header-tag {
+      font-size: 9px; /* 【缩小】 */
+      font-weight: 900;
+      letter-spacing: 1px;
+      background: #2c2c2c;
+      color: #fff;
+      padding: 1px 3px;
+    }
+    .header-date {
+      font-size: 9px; /* 【缩小】 */
+      font-family: monospace;
+      color: #333;
+      font-weight: 600;
+    }
+  }
+
+  /* 主体内容 */
+  .card-main-content {
+    width: 100%;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    .label-small { display: none; }
+    
+    .dest-text {
+      font-size: 18px; /* 【缩小】从22改为18 */
+      font-weight: 700;
+      color: #000;
+      line-height: 1.1;
+      margin: 2px 0 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  /* 装饰线 */
+  .specs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin: 2px 0;
+    opacity: 0.4;
+    .line { height: 1px; width: 30px; background: #000; }
+    .dot { width: 2px; height: 2px; background: #000; border-radius: 50%; }
+  }
+
+  /* 价格行 */
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+    padding: 0 2px;
+    margin-top: auto;
+
+    .car-specs {
+      font-size: 10px; /* 【缩小】 */
+      color: #444;
+      font-weight: 600;
+    }
+    .price-val {
+      font-family: "Times New Roman", serif;
+      font-size: 14px; /* 【缩小】 */
+      font-weight: 700;
+      color: #000;
+      border-bottom: 1px solid #999;
+      line-height: 1;
+    }
+  }
+
+  /* 底部操作区 */
+  .card-action-area {
+    width: 100%;
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 24px;
+
+    /* ▼▼▼ 【核心修改】胶囊样式状态条 ▼▼▼ */
+    .status-text {
+      font-size: 10px;
+      color: #fff;             /* 白字 */
+      background-color:#ababab; /* 黑底 */
+      padding: 3px 10px;       /* 胶囊内边距 */
+      border-radius: 12px;     /* 圆角胶囊 */
+      font-weight: 500;
+      letter-spacing: 1px;
+      display: inline-block;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    button {
+      border: 1px solid #000;
+      background: rgba(255,255,255,0.9);
+      color: #000;
+      border-radius: 0;
+      padding: 3px 10px; /* 按钮也稍微缩小 */
+      font-size: 10px;
+      font-family: serif;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 0 4px;
+      
+      &.btn-pay {
+        background: #000;
+        color: #fff;
+      }
+      &.btn-reject {
+        border: none;
+        background: transparent;
+        text-decoration: line-through;
+        color: #666;
+      }
+    }
+  }
+}
+// 文件：style/components/_message-bubble.scss
+
+/* ===============================================
+▼▼▼ 【新增】商品分享卡片 (Product Share Card) ▼▼▼
+=============================================== */
+
+// 气泡容器样式重置
+.message-bubble.is-product-share {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 200px; 
+  overflow: visible;
+}
+
+// 卡片主体
+.product-share-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  /* 极简边框，稍微带一点点灰，体现质感 */
+  border: 1px solid rgba(0,0,0,0.06);
+  /* 柔和的投影，让它浮起来 */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  }
+
+  // 1. 顶部封面
+  .share-cover {
+    width: 100%;
+    height: 150px; /* 4:5 或 长方形比例，显得时尚 */
+    background-color: #f7f7f7;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    
+    // 可选：加一个内阴影，增加层次
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+    }
+  }
+
+  // 2. 中部信息
+  .share-info {
+    padding: 10px 10px 4px;
+    background: #fff;
+    
+    .share-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+      line-height: 1.4;
+      // 限制两行
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .share-meta {
+      display: flex;
+      align-items: baseline;
+      color: #000;
+      
+      .currency {
+        font-size: 12px;
+        margin-right: 2px;
+        font-weight: 500;
+      }
+      .price {
+        font-family: 'Didot', 'Times New Roman', serif; /* 衬线体，时尚感 */
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+    }
+  }
+
+  // 3. 底部 Footer
+  .share-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: #fff;
+    border-top: 1px solid #f9f9f9;
+    
+    .brand {
+      font-size: 10px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .icon-wrap {
+      width: 24px;
+      height: 24px;
+      background: #000; /* 纯黑背景 */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      svg {
+        width: 12px;
+        height: 12px;
+        fill: #fff; /* 白色图标 */
+      }
+    }
+  }
+}
+/* ===============================================
+   ▼▼▼ 【新增】精致商品分享卡片 (Product Share Card) ▼▼▼
+   =============================================== */
+
+// 1. 重置气泡容器
+.message-bubble.is-product-share {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 220px; 
+  overflow: visible;
+}
+
+// 2. 卡片主体
+.product-share-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  /* 极其微弱的边框，增加实体感 */
+  border: 1px solid rgba(0,0,0,0.04);
+  /* 高级感阴影：垂直方向偏移大，模糊半径大，透明度极低 */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: relative;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // 3. 顶部封面图 (4:3 比例)
+  .share-cover {
+    width: 100%;
+    height: 165px; 
+    background-color: #f4f4f4;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    
+    // 内阴影：让图片边缘不那么生硬
+    box-shadow: inset 0 -10px 20px -10px rgba(0,0,0,0.05);
+  }
+
+  // 4. 中部信息区
+  .share-info {
+    padding: 12px 14px 4px; // 下方留白给 Price
+    background: #fff;
+    
+    .share-title {
+      font-size: 13px;
+      font-weight: 500; // 不用太粗
+      color: #333;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      
+      // 限制显示 2 行，超出省略
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .share-meta {
+      display: flex;
+      align-items: baseline;
+      color: #000;
+      
+      .currency {
+        font-size: 12px;
+        margin-right: 1px;
+        font-weight: 600;
+        transform: translateY(-1px); // 视觉微调
+      }
+      .price {
+        // 使用衬线体显示价格，显得更像杂志
+        font-family: 'Didot', 'Times New Roman', serif; 
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+    }
+  }
+
+  // 5. 底部 Footer (极简黑白)
+  .share-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px 12px; // 底部稍微宽一点
+    background: #fff;
+    
+    .brand {
+      font-size: 9px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .icon-wrap {
+      width: 20px;
+      height: 20px;
+      background: #000; // 纯黑圆底
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      
+      // ▼▼▼ 这里把 path 换回购物袋 ▼▼▼
+      svg {
+        width: 10px;
+        height: 10px;
+        fill: #fff; 
+        /* 购物袋图标路径 */
+        path {
+            d: "M16 6V4a4 4 0 0 0-8 0v2H4v16h16V6h-4zm-6-2a2 2 0 0 1 4 0v2h-4V4z";
+        }
+      }
+    }
+
+  }
+  
+  // 悬停效果 (如果是电脑端)
+  &:hover .icon-wrap {
+      transform: translateX(2px);
+  }
+}
+/* ===============================================
+   ▼▼▼ 【新增】购物代付卡片样式 (黑白极简版) ▼▼▼
+   =============================================== */
+
+/* 1. 调整气泡宽度，比普通气泡稍宽 */
+.message-bubble.is-pay-request:has(.style-shop-minimal) {
+    width: 260px !important;
+}
+
+.pay-request-card.style-shop-minimal {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08); /* 极细灰边框 */
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06); /* 柔和投影 */
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #333;
+    position: relative;
+
+    /* 顶部标签栏 */
+    .shop-card-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 14px 8px;
+        
+        .brand-tag {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #000;
+        }
+        .req-tag {
+            font-size: 10px;
+            color: #999;
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    }
+
+    /* 中间内容区 */
+    .shop-card-body {
+        padding: 0 14px 12px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+
+        .shop-img {
+            width: 70px;
+            height: 70px;
+            background-color: #f9f9f9;
+            background-size: cover;
+            background-position: center;
+            border-radius: 6px;
+            flex-shrink: 0;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .shop-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden; /* 防止文字溢出 */
+
+            .shop-title {
+                font-size: 13px;
+                font-weight: 600;
+                color: #000;
+                line-height: 1.4;
+                margin-bottom: 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .shop-specs {
+                font-size: 10px;
+                color: #999;
+                margin-bottom: 6px;
+            }
+
+            .shop-price-row {
+                .currency { font-size: 12px; font-weight: 600; color: #000; }
+                .amount { 
+                    font-size: 18px; 
+                    font-weight: 700; 
+                    color: #000; 
+                    font-family: 'Didot', serif; /* 时尚衬线体 */
+                }
+            }
+        }
+    }
+
+    /* 装饰分割线 (带半圆缺口) */
+    .shop-divider {
+        position: relative;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        background: #fff;
+
+        .dashed-line {
+            width: 100%;
+            height: 1px;
+            border-top: 1px dashed #ddd;
+            margin: 0 10px;
+        }
+
+        .half-circle {
+            position: absolute;
+            width: 12px; 
+            height: 12px;
+            background-color: #f2f2f2; /* 应该匹配聊天背景色，这里暂用浅灰 */
+            border-radius: 50%;
+            top: 2px;
+            
+            /* 适配气泡背景色 */
+            &.left { left: -6px; box-shadow: inset -1px 0 2px rgba(0,0,0,0.05); }
+            &.right { right: -6px; box-shadow: inset 1px 0 2px rgba(0,0,0,0.05); }
+        }
+    }
+
+    /* 底部按钮区 */
+    .shop-card-footer {
+        padding: 4px 14px 14px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+
+        /* 复用按钮样式，但微调 */
+        button {
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s;
+
+            &:active { transform: scale(0.96); }
+
+            &.btn-pay {
+                background: #000;
+                color: #fff;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            }
+            &.btn-reject {
+                background: #fff;
+                color: #999;
+                border: 1px solid #eee;
+            }
+        }
+        
+        .status-text {
+            font-size: 11px;
+            color: #aaa;
+            letter-spacing: 1px;
+        }
+    }
+
+    /* 完成状态：变灰 */
+    &.status-completed {
+        opacity: 0.8;
+        .shop-title, .amount { color: #666; }
+        .btn-pay { background: #ccc; box-shadow: none; pointer-events: none;}
+    }
+}
+/* ===============================================
+   ▼▼▼ 【重制】多商品购物小票 (Multi-Item Receipt) ▼▼▼
+   =============================================== */
+
+// 1. 气泡容器
+.message-bubble.is-receipt-message {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 270px; // 宽度适中
+  overflow: visible !important;
+  perspective: 1000px; // 3D透视效果
+  margin-top: 10px;
+}
+
+// 2. 卡片主体 (3D翻转结构)
+.receipt-card-3d {
+  width: 100%;
+  height: auto;
+  min-height: 220px; // 给个最小高度
+  position: relative;
+  transform-style: preserve-3d; // 关键：保留3D空间
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); // 弹性动画
+  cursor: pointer;
+  will-change: transform; /* 告诉浏览器这个元素会变，请提前准备好显卡资源 */
+  z-index: 1;             /* 提升层级，防止被背景融合 */
+  &.flipped {
+    transform: rotateY(180deg);
+  }
+
+  // --- 通用面样式 ---
+  .card-face {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    backface-visibility: hidden; // 背面不可见
+    -webkit-backface-visibility: hidden;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: translateZ(0); 
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    image-rendering: -webkit-optimize-contrast;
+  }
+
+  // === 正面：购物清单 ===
+  .face-front {
+    z-index: 2;
+    transform: rotateY(0deg);
+    
+    // 顶部：品牌头
+    .front-header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px dashed #eee;
+      display: flex; justify-content: space-between; align-items: baseline;
+      .brand { font-family: 'Didot', serif; font-weight: 800; font-size: 14px; letter-spacing: 1px;}
+      .title { font-size: 10px; color: #999; text-transform: uppercase; }
+    }
+
+    // 中间：滚动列表 (关键)
+    .front-list-area {
+      flex: 1;
+      overflow-y: auto; // 内容多了可以滚
+      padding: 10px 16px;
+      max-height: 180px; // 限制列表最大高度
+      
+      // 隐藏滚动条但保留功能
+      &::-webkit-scrollbar { display: none; }
+      
+      .list-item {
+        display: flex; justify-content: space-between; align-items: flex-start;
+        margin-bottom: 12px;
+        &:last-child { margin-bottom: 0; }
+
+        .item-info {
+          display: flex; flex-direction: column; gap: 2px;
+          .name { font-size: 13px; font-weight: 600; color: #333; line-height: 1.3;}
+          .specs { font-size: 10px; color: #999; background: #f5f5f5; width: fit-content; padding: 1px 4px; border-radius: 4px;}
+        }
+        
+        .item-cost {
+          text-align: right; margin-left: 10px;
+          .price { font-size: 13px; font-weight: 600; color: #000; }
+          .count { font-size: 10px; color: #999; }
+        }
+      }
+    }
+
+    // 底部：总价
+    .front-footer {
+      padding: 12px 16px;
+      background: #fafafa;
+      border-top: 1px solid #f0f0f0;
+      display: flex; justify-content: space-between; align-items: center;
+      
+      .hint { font-size: 10px; color: #bbb; display: flex; align-items: center; gap: 4px; }
+      .total-price { font-size: 16px; font-weight: 800; color: #000; }
+    }
+  }
+
+  // === 背面：配送信息 ===
+  .face-back {
+    transform: rotateY(180deg);
+    z-index: 1;
+    background-image: repeating-linear-gradient(45deg, #fcfcfc 25%, transparent 25%, transparent 75%, #fcfcfc 75%, #fcfcfc), repeating-linear-gradient(45deg, #fcfcfc 25%, #fff 25%, #fff 75%, #fcfcfc 75%, #fcfcfc);
+    background-position: 0 0, 10px 10px;
+    background-size: 20px 20px;
+
+    .back-content {
+      padding: 20px;
+      display: flex; flex-direction: column; gap: 16px; height: 100%;
+      justify-content: center;
+    }
+
+    .info-group {
+      .label { font-size: 10px; color: #999; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px;}
+      .value { 
+        font-size: 13px; color: #333; font-weight: 600; line-height: 1.4;
+        word-break: break-all;
+        &.large { font-size: 16px; color: #000; } // 配送时间大一点
+      }
+    }
+
+    .back-stamp {
+      position: absolute; bottom: 15px; right: 15px;
+      width: 60px; height: 60px;
+      border: 3px double #ddd;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #ddd; font-size: 10px; font-weight: 900;
+      transform: rotate(-20deg);
+      opacity: 0.5;
+    }
+  }
+}
+/* --- 购物车多商品代付卡片样式 --- */
+.pay-request-card.style-shop-list {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    overflow: hidden;
+    width: 260px;
+    font-family: -apple-system, sans-serif;
+
+    .list-card-header {
+        padding: 12px 14px;
+        background: #fcfcfc;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .title { font-size: 13px; font-weight: 600; color: #333; }
+        .total-badge { 
+            font-size: 14px; font-weight: 700; color: #000; 
+            font-family: 'Didot', serif; 
+        }
+    }
+
+    .list-card-body {
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .shop-list-item {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+
+        .item-thumb {
+            width: 40px; height: 40px;
+            border-radius: 6px;
+            background-color: #f5f5f5;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .item-details {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            .item-title {
+                font-size: 12px; color: #333;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+                margin-bottom: 2px;
+            }
+            .item-meta {
+                display: flex; justify-content: space-between;
+                font-size: 10px; color: #999;
+                
+                .item-price { color: #666; font-weight: 500; }
+            }
+        }
+    }
+
+    .shop-list-more {
+        text-align: center;
+        font-size: 10px;
+        color: #bbb;
+        padding-top: 4px;
+    }
+
+    .list-card-footer {
+        padding: 10px 14px 14px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+
+        /* 复用现有按钮样式 */
+        button {
+            border: none;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.1s;
+            &:active { transform: scale(0.96); }
+        }
+        .btn-pay { background: #000; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .btn-reject { background: #f5f5f5; color: #666; }
+        .status-text { font-size: 12px; color: #999; }
+    }
+    
+    /* 支付成功后变灰 */
+    &.status-completed {
+        .list-card-header, .list-card-body { opacity: 0.6; }
+        .btn-pay { background: #ccc; box-shadow: none; pointer-events: none; }
+    }
+}
+/* ===============================================
+   ▼▼▼ 【新增】分享密码卡片 (日杂文艺风) ▼▼▼
+   =============================================== */
+.message-bubble.is-password-card {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 220px;
+}
+
+.password-card {
+  background: #fdfbf7; // 偏暖的纸张底色
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 4px; // 接近直角的微小圆角，更有纸质感
+  padding: 16px 16px 14px;
+  box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+
+  // 点击时的按压回馈
+  &:active { 
+    transform: scale(0.97); 
+    box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.02);
+  }
+
+  // 侧边装饰虚线 (模拟票据撕边)
+  &::before {
+    content: ''; 
+    position: absolute; 
+    left: 10px; 
+    top: 0; 
+    bottom: 0;
+    width: 1px; 
+    border-left: 1px dashed rgba(0, 0, 0, 0.15);
+  }
+
+  // 1. 顶部小标题
+  .pwd-header {
+    font-size: 9px; 
+    color: #999; 
+    letter-spacing: 1.5px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    padding-bottom: 8px; 
+    margin-bottom: 14px; 
+    margin-left: 14px; // 避开虚线
+  }
+
+  // 2. 中间密码和暗示
+  .pwd-body {
+    text-align: center; 
+    margin-bottom: 16px; 
+    margin-left: 14px;
+
+    .pwd-number {
+      font-family: 'Courier New', Courier, monospace; // 打字机字体
+      font-size: 26px; 
+      font-weight: 700; 
+      color: #1a1a1a;
+      letter-spacing: 4px; 
+      margin-bottom: 8px;
+    }
+    
+    .pwd-hint { 
+      font-size: 11px; 
+      color: #777; 
+      font-family: "Songti SC", "Noto Serif CJK SC", serif; // 衬线体显文艺
+      font-style: italic; 
+    }
+  }
+
+  // 3. 底部条形码和操作提示
+  .pwd-footer {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-end;
+    margin-left: 14px; 
+    border-top: 1px dashed rgba(0,0,0,0.06); 
+    padding-top: 10px;
+    
+    .pwd-barcode { 
+      font-size: 12px; 
+      color: #ccc; 
+      letter-spacing: -1.5px; 
+      transform: scaleY(1.6); // 拉长条形码效果
+      transform-origin: bottom; 
+    }
+    
+    span { 
+      font-size: 8px; 
+      color: #1a1a1a; 
+      background: #f0f0f0; 
+      padding: 3px 6px; 
+      border-radius: 2px; 
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+/* ===============================================
+   ▼▼▼ 【新增】LoverSync 悬浮备忘录卡片 ▼▼▼
+   =============================================== */
+.sync-memo-widget {
+    position: absolute;
+    top: 70px; /* 停靠在聊天页 Header 下方 */
+    right: 20px;
+    width: 240px;
+    background: rgba(253, 251, 247, 0.95); /* 呼应系统的奶油白底色 */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    z-index: 1000; 
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transform-origin: top right;
+    opacity: 1;
+
+    &.hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(0.95);
+    }
+
+    &.collapsed {
+        width: 120px;
+        .sync-memo-body {
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .sync-memo-header {
+            border-bottom-color: transparent;
+            .chevron { transform: rotate(180deg); }
+        }
+    }
+
+    .sync-memo-header {
+        padding: 10px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        transition: background 0.2s;
+
+        &:active { background: rgba(0,0,0,0.03); }
+
+        .left {
+            display: flex; align-items: center; gap: 8px;
+            .dot { width: 6px; height: 6px; background: #1a1a1a; border-radius: 50%; }
+            .title { font-size: 10px; font-weight: 800; color: #1a1a1a; letter-spacing: 1px; font-family: "Helvetica Neue", Arial, sans-serif;}
+        }
+        .right { display: flex; align-items: center; }
+        .chevron { width: 14px; height: 14px; color: #888; transition: transform 0.4s; }
+    }
+
+    .sync-memo-body {
+        max-height: 350px;
+        opacity: 1;
+        transition: all 0.4s ease;
+        display: flex;
+        flex-direction: column;
+
+        ul {
+            list-style: none; padding: 12px 14px; margin: 0;
+            overflow-y: auto; max-height: 250px;
+            &::-webkit-scrollbar { display: none; }
+            
+            li {
+                font-size: 12px; color: #333; line-height: 1.6;
+                padding-left: 12px; position: relative; margin-bottom: 10px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                
+                &::before {
+                    content: '•'; position: absolute; left: 0; top: 0; 
+                    color: #999; font-weight: bold; font-size: 14px;
+                }
+                &:last-child { margin-bottom: 0; }
+            }
+        }
+
+        .sync-memo-footer {
+            padding: 10px 14px 14px;
+            display: flex; justify-content: flex-end;
+            
+            button {
+                background: #f5f5f5; border: 1px solid rgba(0,0,0,0.04);
+                padding: 6px 14px; border-radius: 6px; 
+                font-size: 10px; color: #666; font-weight: 600; letter-spacing: 0.5px;
+                cursor: pointer; transition: all 0.2s;
+                &:active { background: #e8e8e8; color: #1a1a1a; transform: scale(0.96); }
+            }
+        }
+    }
+}
+/* ===============================================
+   ▼▼▼ 【升级版】日杂文艺风音乐分享卡片 ▼▼▼
+   =============================================== */
+.message-bubble.is-music-share {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 250px; // 稍微加宽一点点，更有画幅感
+  overflow: visible;
+}
+
+.music-share-card {
+  background: #fdfbf7; // 偏暖的奶油纸张色
+  border: 1px solid rgba(212, 175, 55, 0.2); // 极淡的金色描边
+  border-radius: 12px;
+  padding: 16px 16px 14px;
+  box-shadow: 
+    0 4px 15px rgba(0,0,0,0.03),
+    inset 0 0 20px rgba(255,255,255,0.5); // 内发光增加实体质感
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", serif;
+  transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  }
+
+  // 1. 顶部排版装饰 (新增)
+  .music-top-deco {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    .deco-text {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 9px;
+      color: #a39586; // 拿铁色
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+    .deco-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, rgba(212, 175, 55, 0.3), transparent);
+    }
+  }
+
+  // 2. 封面与信息区
+  .music-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 2;
+
+    .music-cover-wrap {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      flex-shrink: 0;
+
+      .music-cover {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+        position: relative;
+        z-index: 3;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.15);
+      }
+
+      // 叠加在封面上的播放小图标 (新增)
+      .play-icon-overlay {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 22px; height: 22px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 4;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        
+        svg {
+          width: 10px; height: 10px;
+          fill: #333;
+          margin-left: 2px; // 视觉居中修正
+        }
+      }
+
+      // 黑胶唱片 (升级：密纹反光感)
+      .vinyl-record-deco {
+        position: absolute;
+        top: 2px;
+        right: -14px; // 露出更多
+        width: 50px;
+        height: 50px;
+        background: repeating-radial-gradient(circle, #111 0px, #111 2px, #262626 3px, #262626 4px);
+        border-radius: 50%;
+        z-index: 1;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); 
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          width: 16px; height: 16px;
+          background: #d43c33; // 经典的红心内圈
+          border-radius: 50%;
+          border: 1px solid #000;
+        }
+      }
+    }
+
+    .music-info-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+
+      .music-title {
+        font-family: "Songti SC", "SimSun", serif; // 换成中文衬线体更有文艺感
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .music-artist {
+        font-family: -apple-system, sans-serif;
+        font-size: 11px;
+        color: #8b8b8b;
+        font-style: italic; // 斜体字
+      }
+    }
+  }
+
+  // 3. 歌词展开区 (带引号水印)
+  .music-lyrics-collapse {
+    max-height: 0; 
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    
+    .lyrics-content {
+      position: relative;
+      margin-top: 16px;
+      padding: 16px 20px;
+      border-top: 1px dashed rgba(212, 175, 55, 0.25); // 金色虚线
+      font-size: 11px;
+      color: #666;
+      line-height: 1.8;
+      font-family: "Songti SC", "SimSun", serif; 
+      text-align: center;
+      
+      // 巨大透明引号装饰
+      &::before, &::after {
+        position: absolute;
+        font-family: "Georgia", serif;
+        font-size: 40px;
+        color: rgba(212, 175, 55, 0.15);
+        line-height: 1;
+      }
+      &::before { content: '“'; top: 10px; left: 5px; }
+      &::after { content: '”'; bottom: -5px; right: 5px; }
+
+      max-height: 120px;
+      overflow-y: auto;
+      &::-webkit-scrollbar { display: none; }
+    }
+  }
+
+  // 4. 底部提示文字
+  .music-card-footer {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 10px;
+    color: #c4b9a9; // 奶茶色
+    letter-spacing: 2px;
+    transition: color 0.2s;
+  }
+  // 展开状态动画
+  &.expanded {
+    .music-lyrics-collapse {
+      max-height: 160px; 
+      opacity: 1;
+    }
+    .music-card-footer {
+      color: #8b7d6b; 
+    }
+  }
+}
+
+/* ===============================================
+   ▼▼▼ 【新增】海报风歌单分享卡片 ▼▼▼
+   =============================================== */
+.message-bubble.is-playlist-share {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 260px; // 比单曲卡片稍微宽一点，凸显分量
+  overflow: visible;
+}
+
+.playlist-share-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.04);
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // 1. 顶部海报区
+  .playlist-card-hero {
+    width: 100%;
+    height: 140px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    
+    .hero-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.75) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 14px 16px;
+      box-sizing: border-box;
+
+      .hero-tag {
+        font-family: 'Times New Roman', serif;
+        font-size: 9px;
+        color: rgba(255,255,255,0.85);
+        letter-spacing: 2px;
+        margin-bottom: 4px;
+        font-weight: 600;
+      }
+      .hero-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+      .hero-desc {
+        font-size: 11px;
+        color: rgba(255,255,255,0.7);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  // 2. 展开的歌曲列表
+  .playlist-songs-collapse {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    background: #fafafa;
+
+    .songs-list-container {
+      padding: 12px 16px;
+      
+      .playlist-song-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        &:last-child { margin-bottom: 0; }
+
+        .idx {
+          width: 22px;
+          font-size: 11px;
+          color: #bbb;
+          font-family: monospace;
+        }
+        .song-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+
+          .title {
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .artist {
+            font-size: 10px;
+            color: #999;
+          }
+        }
+      }
+      .more-hint {
+        text-align: center;
+        font-size: 10px;
+        color: #bbb;
+        margin-top: 12px;
+        letter-spacing: 1px;
+      }
+    }
+  }
+
+  // 3. 底部提示
+  .playlist-card-actions {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px 0;
+    background: #ffffff;
+
+    button {
+      flex: 1;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 0;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #f5f5f5;
+      color: #555;
+    }
+
+    .playlist-play-btn {
+      background: #fff1f1;
+      color: #ff6b6b;
+    }
+  }
+
+  .playlist-card-footer {
+    text-align: center;
+    padding: 10px 0;
+    background: #ffffff;
+    font-size: 11px;
+    color: #999;
+    letter-spacing: 1px;
+    border-top: 1px solid rgba(0,0,0,0.03);
+    transition: background 0.3s;
+  }
+
+  // 展开动画
+  &.expanded {
+    .playlist-songs-collapse {
+      max-height: 250px; 
+      opacity: 1;
+      overflow-y: auto;
+      &::-webkit-scrollbar { display: none; }
+    }
+    .playlist-card-footer {
+      background: #fafafa;
+      color: #666;
+    }
+  }
+}
+/* ===============================================
+   ▼▼▼ 【全新设计】AI主动邀请听歌卡片 (明亮氧气风) ▼▼▼
+   =============================================== */
+.message-bubble.is-music-invite {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 250px;
+  overflow: visible;
+}
+
+.music-invite-card {
+  background: #ffffff; /* 纯净白底 */
+  border-radius: 14px;
+  overflow: hidden;
+  /* 高级柔和的弥散阴影 */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  color: #333;
+  /* 极细的灰色边框，增加实体感 */
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: transform 0.2s, opacity 0.3s, filter 0.3s;
+  
+  &:active {
+    transform: scale(0.98);
+  }
+
+  /* 当用户点击接受或拒绝后，卡片变灰变暗 */
+  &.processed {
+    opacity: 0.65;
+    transform: scale(0.98);
+    pointer-events: none;
+    .mi-cover { filter: grayscale(80%); }
+    .mi-header .mi-tag { background: #f0f0f0; color: #999; }
+  }
+
+  /* 顶部状态栏 */
+  .mi-header {
+    padding: 14px 16px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .mi-tag {
+      font-size: 10px;
+      /* 充满活力的橘红色渐变字 */
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+      font-weight: 800;
+    }
+    
+    /* 右侧跳动的音乐小波形装饰 */
+    &::after {
+      content: 'ılıılı';
+      font-size: 12px;
+      color: #FF8E53;
+      letter-spacing: 1px;
+      font-weight: bold;
+      opacity: 0.7;
+    }
+  }
+
+  /* 歌曲信息区 */
+  .mi-body {
+    padding: 6px 16px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .mi-cover {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px; /* 稍微大一点的圆角 */
+      object-fit: cover;
+      /* 给封面加一点阴影让它浮起来 */
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+    
+    .mi-info {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      
+      .mi-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .mi-artist {
+        font-size: 11px;
+        color: #888;
+      }
+    }
+  }
+
+  /* 底部操作区：双按钮设计 */
+  .mi-footer {
+    display: flex;
+    border-top: 1px solid rgba(0,0,0,0.04);
+    background: #fafafa; /* 底部使用极淡的灰色区分层级 */
+    
+    button {
+      flex: 1;
+      padding: 12px 0;
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      
+      /* 婉拒按钮：低调的灰色 */
+      &.btn-reject-music {
+        color: #999;
+        border-right: 1px solid rgba(0,0,0,0.04);
+        &:active { background: rgba(0,0,0,0.05); }
+      }
+      
+      /* 接受按钮：活泼的主题色 */
+      &.btn-accept-music {
+        color: #FF6B6B; 
+        &:active { background: rgba(255, 107, 107, 0.08); }
+      }
+    }
+    
+    /* 处理后的状态文字 */
+    .status-text {
+      width: 100%;
+      text-align: center;
+      padding: 12px 0;
+      font-size: 12px;
+      color: #999;
+    }
+  }
+}
+// ===============================================
+// ▼▼▼ 【新增】QQ群聊专属样式 (气泡颜色与头衔面板) ▼▼▼
+// ===============================================
+
+// 1. 覆盖群聊模式下气泡的颜色
+.message-wrapper.is-group-chat {
+  &.received .message-bubble {
+    background-color: #ffffff; // 别人发的是白色
+    color: #333333;
+  }
+  
+  &.sent .message-bubble {
+    background-color: #000000; // 调整为更可爱的天空蓝
+    color: #ffffff;
+  }
+}
+// 2. 群员名牌与等级头衔样式
+.group-message-nameplate {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+
+  // 等级头衔小标签 (极淡奶油马卡龙色系)
+  .group-level {
+    padding: 3px 7px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    // 群主：极淡奶黄
+    &.role-owner { 
+      background-color: #FFF8D6; 
+      color: #D4A017; 
+    } 
+    // 管理员：极淡薄荷
+    &.role-admin { 
+      background-color: #E8F8F0; 
+      color: #5C9E7D; 
+    } 
+    // 群员：极淡云灰
+    &.role-member { 
+      background-color: #F4F7FA; 
+      color: #8C9BAE; 
+    } 
+  }
+
+  .group-name {
+    white-space: nowrap;
+    font-weight: 500;
+  }
+}
+/* ===============================================
+   ▼▼▼ 【新增】群聊专属：黑白灰极简红包气泡 (竖长精致比例) ▼▼▼
+   =============================================== */
+.message-bubble.is-red-packet {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 170px; 
+  overflow: visible;
+}
+
+.red-packet-bubble-card {
+  background: #ffffff; /* 【修改】纯白底色，带来清透的高级感 */
+  border-radius: 8px; 
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, 0.2); /* 【修改】极淡的香槟金外边框 */
+  box-shadow: 0 12px 35px rgba(0,0,0,0.06); /* 【修改】极其柔和透明的阴影，让卡片悬浮 */
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s;
+  
+  display: flex;
+  flex-direction: column;
+  height: 240px; 
+  position: relative;
+
+  /* 高级邀请函特有的内嵌压纹虚线 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 6px; left: 6px; right: 6px; bottom: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.03); /* 【修改】变成淡淡的灰色内框 */
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+  &.opened {
+    opacity: 0.65;
+    .rp-icon svg { opacity: 0.5; }
+  }
+  
+  /* 封面变体：如果用户选了另一种颜色，给个清冷的月光银配色 */
+  &.cover-grey {
+    background: #fdfdfd;
+    border: 1px solid #e5e5e5;
+    .rp-top .rp-info .rp-greeting { color: #333; }
+    .rp-top .rp-info .rp-status { color: #aaa; }
+    .rp-top .rp-icon { 
+      border-color: #ccc;
+      &::after { border-color: rgba(0,0,0,0.15); }
+      svg { stroke: #999; } 
+    }
+  }
+  
+  .rp-top {
+    padding: 30px 16px; 
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex: 1; 
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    
+    .rp-icon {
+      width: 54px;
+      height: 54px;
+      background: transparent; 
+      border: 1px solid #D4AF37; /* 【修改】外圈实线香槟金 */
+      border-radius: 50%; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+
+      /* 模拟火漆印章的双圈细致效果 */
+      &::after {
+        content: '';
+        position: absolute;
+        top: 4px; left: 4px; right: 4px; bottom: 4px;
+        border: 1px dashed rgba(212, 175, 55, 0.5); /* 【修改】内圈虚线香槟金 */
+        border-radius: 50%;
+      }
+
+      svg {
+        width: 22px;
+        height: 22px;
+        fill: none; 
+        stroke: #D4AF37; /* 【修改】图标本身变成香槟金色 */
+        stroke-width: 1.5;
+        z-index: 2;
+      }
+    }
+    .rp-info {
+      width: 100%;
+      overflow: hidden;
+      .rp-greeting {
+        font-family: "Songti SC", "Noto Serif CJK SC", "Times New Roman", serif; 
+        font-size: 16px;
+        /* 【优化】深金棕色 (复古烫金褐)，自带奢华暖调，告别死黑 */
+        color: #5C4A3D; 
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 8px;
+        /* 【优化】字间距稍微拉大，增加呼吸感 */
+        letter-spacing: 2px; 
+        /* 【优化】模拟高级名片上烫金文字的微凸反光质感 */
+        text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(212, 175, 55, 0.15);
+      }
+
+      .rp-status {
+        font-size: 10px;
+        color: #A39586; /* 【修改】拿铁色/浅金灰，搭配金色主调 */
+        letter-spacing: 2px;
+        text-transform: uppercase; 
+      }
+    }
+  }
+  
+  .rp-bottom {
+    background: transparent; 
+    padding: 12px;
+    font-size: 9px;
+    color: #B5A8A0; /* 【修改】底部英文落款颜色也变成淡奶茶色 */
+    font-family: 'Didot', 'Times New Roman', serif; 
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-align: center;
+    text-transform: uppercase;
+    border-top: 1px solid rgba(0, 0, 0, 0.04); /* 【修改】极淡的灰色顶线 */
+    position: relative;
+    z-index: 1;
+  }
+}
+.message-bubble.is-vault-bank-card {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  width: 240px;           /* 新增：给外层气泡限定宽度，推开距离 */
+  overflow: visible;      /* 新增：防止内容被异常截断 */
+
+  .vault-bank-card {
+    width: 238px;
+    border-radius: 16px;
+    padding: 14px;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+  }
+  .vbc-top, .vbc-main, .vbc-bottom { display: flex; align-items: center; justify-content: space-between; }
+  .vbc-top {
+    margin-bottom: 18px;
+    span { font-size: 10px; font-weight: 800; letter-spacing: 1.6px; }
+    em { font-style: normal; font-size: 9px; font-weight: 800; letter-spacing: 1px; }
+  }
+  .vbc-main { justify-content: flex-start; gap: 10px; margin-bottom: 18px; }
+  .vbc-icon {
+    width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
+    svg { width: 18px; height: 18px; }
+  }
+  .vbc-title { font-size: 14px; font-weight: 800; letter-spacing: 0; margin-bottom: 3px; }
+  .vbc-desc { font-size: 11px; line-height: 1.35; opacity: 0.72; }
+  .vbc-bottom {
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 12px;
+    strong { font-size: 22px; letter-spacing: 0; }
+    span { font-size: 9px; font-weight: 800; letter-spacing: 1.4px; opacity: 0.62; }
+  }
+  .vault-bank-card-send {
+    color: #fff;
+    background: linear-gradient(135deg, #19191b 0%, #050506 100%);
+    .vbc-top span { color: rgba(255,255,255,0.72); }
+    .vbc-top em { color: #D4AF37; }
+    .vbc-icon { color: #111; background: #D4AF37; }
+  }
+  .vault-bank-card-request {
+    color: #111;
+    background: linear-gradient(135deg, #ffffff 0%, #eef3f1 100%);
+    border: 1px solid rgba(0,0,0,0.06);
+    .vbc-top span { color: #8A948F; }
+    .vbc-top em { color: #6AA489; }
+    .vbc-icon { color: #fff; background: #6AA489; }
+    .vbc-bottom { border-top-color: rgba(0,0,0,0.08); }
+  }
+}
+
+.forwarded-card-center-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  clear: both;
+}
+
+.forwarded-card-center-wrapper.selected .forwarded-card-standalone {
+  border-color: #222;
+  box-shadow: 0 0 0 2px #222, 0 5px 16px rgba(0, 0, 0, 0.06);
+}
+
+.forwarded-card-standalone {
+  position: relative;
+  display: block;
+  width: min(68vw, 220px);
+  max-width: 220px;
+  box-sizing: border-box;
+  padding: 11px 12px 9px 14px;
+  overflow: hidden;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  background: #fff;
+  color: #1d1d1f;
+  cursor: pointer;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 0;
+    width: 2px;
+    border-radius: 0 2px 2px 0;
+    background: #222;
+  }
+
+  &:hover {
+    background: #fafafa;
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.08);
+  }
+
+  &:active {
+    background: #f4f4f4;
+  }
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 7px;
+    color: #171717;
+    font-size: calc(11px * var(--looky-font-scale, 1));
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    word-break: break-word;
+
+    .forwarded-card-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+      border-radius: 50%;
+      background: #171717;
+      color: #fff;
+
+      svg {
+        display: block;
+        width: 10px;
+        height: 10px;
+      }
+  }
+}
+}
+
+.npc-chat-forward-center-wrapper,
+.chat-forward-center-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  clear: both;
+}
+
+.npc-chat-forward-card,
+.chat-forward-card {
+  position: relative;
+  display: block;
+  width: min(68vw, 220px);
+  max-width: 220px;
+  box-sizing: border-box;
+  padding: 11px 12px 9px 14px;
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #fff;
+  color: #1d1d1f;
+  cursor: pointer;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 0;
+    width: 2px;
+    border-radius: 0 2px 2px 0;
+    background: #222;
+  }
+
+  &:hover {
+    background: #fafafa;
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.08);
+  }
+
+  &:active {
+    background: #f4f4f4;
+  }
+}
+
+.npc-fw-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 7px;
+  color: #171717;
+  font-size: calc(11px * var(--looky-font-scale, 1));
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+}
+
+.npc-fw-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  border-radius: 50%;
+  background: #171717;
+  color: #fff;
+
+  svg {
+    display: block;
+    width: 10px;
+    height: 10px;
+  }
+}
+
+.npc-fw-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.npc-fw-card-line {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  color: #6f6f6f;
+  font-size: calc(10px * var(--looky-font-scale, 1));
+  line-height: 1.35;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  strong {
+    flex: 0 0 auto;
+    color: #333;
+    font-weight: 600;
+  }
+
+  span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.npc-fw-card-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid #eeeeee;
+  color: #a0a0a0;
+  font-size: calc(9px * var(--looky-font-scale, 1));
+  line-height: 1.2;
+}
+
+#npc-chat-forward-viewer {
+  display: none !important;
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  flex-direction: column;
+  background: #fdfbf7;
+  color: #222;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+#npc-chat-forward-viewer.visible {
+  display: flex !important;
+}
+
+.npc-fw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top, 10px) + 24px) 15px 10px;
+  border-bottom: 1px solid #f0ebe4;
+  background: #fdfbf7;
+  flex-shrink: 0;
+}
+
+.npc-fw-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.04);
+  color: #333;
+  cursor: pointer;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.npc-fw-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.npc-fw-title-avatar {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border: 1px solid #eee;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.npc-fw-title-name {
+  overflow: hidden;
+  color: #333;
+  font-size: calc(16px * var(--looky-font-scale, 1));
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.npc-fw-header-spacer {
+  width: 36px;
+  flex: 0 0 36px;
+}
+
+.npc-fw-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 16px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.npc-fw-msg {
+  display: flex;
+  max-width: 85%;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  &.is-char {
+    align-self: flex-end;
+    justify-content: flex-end;
+  }
+
+  &.is-npc {
+    align-self: flex-start;
+  }
+
+  &.has-avatar.is-char {
+    flex-direction: row-reverse;
+  }
+
+  &.has-avatar.is-npc {
+    flex-direction: row;
+  }
+
+  &.has-avatar {
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+.npc-fw-msg-content {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex-direction: column;
+}
+
+.npc-fw-message-avatar {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  margin-top: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #666;
+  object-fit: cover;
+}
+
+.npc-fw-message-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.npc-fw-msg-speaker {
+  margin: 0 4px 4px;
+  color: #888;
+  font-size: calc(10px * var(--looky-font-scale, 1));
+  line-height: 1.2;
+}
+
+.npc-fw-msg.is-char .npc-fw-msg-speaker {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+.npc-fw-msg.is-npc .npc-fw-msg-speaker {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.fw-msg-bubble {
+  max-width: 100%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  color: #333;
+  font-size: calc(14px * var(--looky-font-scale, 1));
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.npc-fw-msg.is-char .fw-msg-bubble {
+  border-bottom-right-radius: 4px;
+  background: #e8e8e8;
+}
+
+.npc-fw-msg.is-npc .fw-msg-bubble {
+  border: 1px solid #f0ebe4;
+  border-bottom-left-radius: 4px;
+  background: #fff;
+}
+
+.npc-fw-msg .npc-fw-msg-translation {
+  display: block !important;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed #e0e0e0;
+  color: #999;
+  font-size: calc(12px * var(--looky-font-scale, 1));
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.npc-fw-typing-indicator {
+  display: flex;
+  align-self: flex-start;
+  gap: 4px;
+  padding: 12px 16px;
+
+  span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ccc;
+    animation: npcFwTypingDot 1.2s infinite;
+  }
+
+  span:nth-child(2) { animation-delay: 0.2s; }
+  span:nth-child(3) { animation-delay: 0.4s; }
+}
+
+.npc-fw-input-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.npc-fw-input-icon,
+.npc-fw-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #222;
+}
+
+.npc-fw-input-icon svg,
+.npc-fw-send svg {
+  width: 20px;
+  height: 20px;
+}
+
+.npc-fw-input-icon:disabled,
+.npc-fw-send:disabled {
+  opacity: 0.42;
+}
+
+.npc-fw-input-shell {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  background: #f5f5f5;
+  box-sizing: border-box;
+}
+
+.npc-fw-input {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #666;
+  font: inherit;
+  font-size: calc(14px * var(--looky-font-scale, 1));
+  line-height: 1.35;
+}
+
+.npc-fw-input::placeholder {
+  color: #aaa;
+}
+
+@keyframes npcFwTypingDot {
+  0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+  30% { opacity: 1; transform: scale(1); }
+}
+
+.forwarded-card-standalone {
+  .forwarded-card-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 4px !important;
+
+    .forwarded-card-line {
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden;
+      color: #6f6f6f;
+      font-size: calc(10px * var(--looky-font-scale, 1)) !important;
+      line-height: 1.35 !important;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .forwarded-card-footer {
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px solid #eeeeee;
+    color: #a0a0a0;
+    font-size: calc(9px * var(--looky-font-scale, 1));
+    line-height: 1;
+    text-align: right;
+  }
+}
+.message-dream-card {
+  position: relative;
+  inline-size: min(100%, 330px);
+  max-inline-size: 100%;
+  margin: var(--space-md) auto;
+  border: 1px solid rgba(84, 84, 84, .18);
+  border-radius: 16px;
+  color: #4b4b4d;
+  background: #f7f7f6;
+  box-shadow: 0 5px 16px rgba(50, 50, 50, .07);
+  box-sizing: border-box;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.message-dream-card:hover { background: #fafafa; border-color: rgba(84, 84, 84, .28); box-shadow: 0 7px 20px rgba(50, 50, 50, .1); }
+.dream-card-summary { display: grid; grid-template-columns: minmax(0, 1fr) 78px; min-height: 126px; }
+.dream-card-copy { min-width: 0; padding: 15px 14px 13px 16px; }
+.dream-card-kicker { display: flex; align-items: center; gap: 8px; margin-bottom: 13px; color: #707075; font: 500 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 1.4px; }
+.dream-card-kicker i { display: block; width: 25px; height: 1px; background: #9b9b9d; }
+.dream-card-kicker span:last-child { margin-left: auto; color: #a2a2a5; letter-spacing: .4px; }
+.dream-card-title { margin-bottom: 9px; color: #5d5d60; font-size: 12px; font-weight: 500; letter-spacing: .7px; }
+.dream-card-preview { display: -webkit-box; min-width: 0; max-height: 3.6em; overflow: hidden; color: #464649; font-size: 13px; line-height: 1.8; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.dream-card-image { min-width: 0; overflow: hidden; background: #d9d9d8; }
+.dream-card-image img { display: block; width: 100%; height: 100%; min-height: 126px; object-fit: cover; object-position: 78% center; pointer-events: none; user-select: none; }
+.dream-card-toggle { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; padding: 0; border: 0; background: transparent; color: #77777b; font-size: 10px; line-height: 1.4; cursor: pointer; }
+.dream-card-toggle::after { content: '⌄'; font-size: 12px; line-height: 1; transition: transform .22s ease; }
+.message-dream-card.is-expanded .dream-card-toggle::after { transform: rotate(180deg); }
+.dream-card-toggle:hover { color: #3e3e41; }
+.dream-card-expanded { max-height: 0; overflow: hidden; padding: 0 16px; border-top: 1px solid transparent; opacity: 0; visibility: hidden; transition: max-height .28s ease, padding .28s ease, border-color .28s ease, opacity .2s ease, visibility 0s linear .28s; }
+.message-dream-card.is-expanded .dream-card-expanded { max-height: 1200px; padding: 14px 16px 16px; border-top-color: rgba(84, 84, 84, .14); opacity: 1; visibility: visible; transition: max-height .32s ease, padding .32s ease, border-color .32s ease, opacity .22s ease; }
+.dream-card-expanded-text { color: #454548; font-size: 13px; line-height: 1.85; overflow-wrap: anywhere; word-break: break-word; }
+.dream-card-note { margin-top: 13px; padding-top: 9px; border-top: 1px solid rgba(84, 84, 84, .12); color: #969699; font-size: 10px; line-height: 1.55; letter-spacing: .2px; }
+.dream-card-collapse-toggle { margin-top: 9px; }

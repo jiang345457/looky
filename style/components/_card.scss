@@ -1,0 +1,67 @@
+// 文件路径: styles/components/_card.scss
+// 描述: 通用的卡片容器样式。
+
+.settings-card {
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-md);
+  overflow: hidden;
+}
+/* ==========================================================================
+   ▼▼▼ 【新增】历史记录弹窗里的卡片样式 ▼▼▼
+   ========================================================================== */
+
+.history-record-card {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #F0F0F0; // 卡片之间的细微分割线
+  gap: 12px; // 头像和内容之间的间距
+
+  &:last-child {
+    border-bottom: none; // 最后一张卡片不需要分割线
+  }
+
+  // 头像样式
+  .history-card-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0; // 防止头像被压缩
+  }
+
+  // 右侧内容区
+  .history-card-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px; // 名字、内容、时间之间的垂直间距
+  }
+
+  // 名字和时间那一行
+  .history-card-header {
+    display: flex;
+    justify-content: space-between; // 让名字和时间分居两侧
+    align-items: center;
+  }
+
+  .history-card-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .history-card-time {
+    font-size: 12px;
+    color: #999;
+  }
+
+  // 消息内容
+  .history-card-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
+    margin: 0;
+    word-break: break-word; // 长单词自动换行
+  }
+}

@@ -1,0 +1,159 @@
+/* ================================================== */
+/* =========   全局样式重置 (Global Reset)    ========= */
+/* ================================================== */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  
+  /* 这是我们的第一道防线：直接禁止页面本身滚动和回弹 */
+  overflow: hidden;
+  overscroll-behavior: none;
+  
+  /* 恢复默认定位，不再使用 fixed */
+  position: static; 
+  
+  background-color: #000;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 仅在桌面端 (宽度大于 600px) 应用居中效果 */
+@media (min-width: 601px) {
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1a1a1a; 
+  }
+}
+
+/* ================================================== */
+/* =========      核心布局 (Core Layout)      ========= */
+/* ================================================== */
+
+/* 1. 主容器 #flj8W 的通用样式 */
+#flj8W {
+  margin: 0;
+  padding: 0;
+  background-color: var(--c-bg-primary, #ffffff); 
+  
+  /* 确保容器内部也剪裁溢出，防止子元素撑大容器 */
+  overflow: hidden; 
+  z-index: 1;
+}
+
+/* 2. 手机端：让主容器 #flj8W 成为“钉死”的那个 */
+@media (max-width: 600px) {
+  #flj8W {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    
+    width: 100vw;
+    
+    /* ▼▼▼ 修改这里：改成 100% ▼▼▼ */
+    /* 因为我们在 base.scss 里把 body 设为了 fixed，这里用 100% 就最稳 */
+    height: 100%; 
+    /* ▲▲▲ 修改结束 ▲▲▲ */
+    
+    border-radius: 0;
+    box-shadow: none;
+    
+    /* 建议加上层级，确保在最上层 */
+    z-index: 1;
+  }
+}
+
+/* 3. 桌面端：恢复主容器 #flj8W 为普通块，以便居中 */
+@media (max-width: 600px) {
+  body.android-viewport-sync #flj8W {
+    height: var(--looky-app-height, 100%) !important;
+  }
+
+  body.android-viewport-sync .phone-screen {
+    height: var(--looky-display-height, 100%) !important;
+  }
+}
+
+@media (min-width: 601px) {
+  #flj8W {
+    /* 在桌面端，它是一个相对定位的普通盒子 */
+    position: relative; 
+    width: 390px;
+    height: 844px;
+    border-radius: 40px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.6); 
+  }
+}
+/* 4. 平板/电脑全屏模式覆盖 */
+body.force-fullscreen #flj8W {
+  width: 100vw !important;
+  height: 100dvh !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Android resizes the visible window while the keyboard is open. Keep the
+   inner phone surface tied to that resized parent to avoid a black/white gap. */
+html.looky-native body.android-pwa-keyboard-open #flj8W,
+html:not(.looky-native) body.android-pwa-keyboard-open #flj8W {
+  height: var(--looky-app-height, 100%) !important;
+}
+
+// The native WebView keeps its full viewport when adjustNothing is enabled.
+// Use a height already corrected for the user's display scale so the keyboard
+// does not introduce a white gap or resize the input area a second time.
+html.looky-native body.android-pwa-keyboard-open .phone-screen {
+  height: var(--looky-native-app-height, var(--looky-display-height, 100%)) !important;
+}
+
+// Keep the native WebView frame fixed while Android resizes the window for IME.
+// Without this, the browser can pan the whole document when the chat textarea
+// receives focus, which makes the page appear draggable and leaves a top gap.
+html.looky-native,
+html.looky-native body {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* 页面内部容器 */
+.phone-screen {
+  width: var(--looky-display-width, 100%);
+  height: var(--looky-display-height, 100%);
+  background-color: var(--c-bg-primary);
+  background-size: cover;
+  background-position: center;
+  
+  /* 确保内部滚动不会影响外部 */
+  overflow: hidden; 
+  
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  transform: scale(var(--looky-display-scale, 1));
+  transform-origin: top left;
+}
+
+/* 桌面端特有的圆角 */
+@media (min-width: 601px) {
+  .phone-screen {
+    border-radius: inherit; /* 继承父容器 #flj8W 的圆角 */
+  }
+}
+
+/* 防止滚动穿透到 body 导致页面乱飞 */
+.modal-card, 
+.app-content, 
+.add-food-content,
+.settings-modal-content {
+    /* 这一行非常重要：告诉浏览器，这里的滚动到头了就停下，不要去滚动父级body */
+    overscroll-behavior: contain; 
+ 
+}

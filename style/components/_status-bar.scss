@@ -1,0 +1,41 @@
+// 文件路径: styles/components/_status-bar.scss
+// 描述: 手机顶部的状态栏，显示时间、信号、电量等。
+
+.status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  padding: 0 var(--space-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 110;
+  pointer-events: none;
+  color: var(--c-text-primary);
+&.hidden {
+    display: none !important;
+  }
+  .status-time,
+  .battery-percentage {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .status-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    // 状态栏图标对齐修正
+    svg:first-of-type {
+      position: relative;
+      top: -1.5px;
+    }
+  }
+
+  .battery-percentage {
+    margin-left: 4px;
+  }
+}

@@ -1,0 +1,71 @@
+// ===============================================
+// === 主样式入口文件 (main.scss)
+// ===============================================
+
+// -----------------------------------------------
+// --- 1. 基础 (Base)
+// -----------------------------------------------
+@use 'base/variables';
+@use 'base/base';
+
+// -----------------------------------------------
+// --- 2. 布局 (Layout)
+// -----------------------------------------------
+@use 'layout/scaffold';
+@use 'layout/page'; // <-- 新增
+
+// -----------------------------------------------
+// --- 3. 组件 (Components)
+// -----------------------------------------------
+@use 'components/app-dock';
+@use 'components/app-icon';
+@use 'components/bottom-nav';
+@use 'components/button';
+@use 'components/card'; 
+@use 'components/chat-input';
+@use 'components/conversation-item';
+@use 'components/fab'; 
+@use 'components/function-panel';        // <-- 新增
+@use 'components/list-item';
+@use 'components/message-bubble';  
+@use 'components/message-folder';
+@use 'components/modal';
+@use 'components/exit-confirmation-modal'; 
+@use 'components/popover'; 
+@use 'components/status-bar';
+@use 'components/sticker-picker'; 
+@use'components/dropdown';
+@use'components/timestamp';
+// -----------------------------------------------
+// --- 4. 页面 (Pages)
+// -----------------------------------------------
+@use 'pages/home-screen'; // <-- 新增
+@use 'pages/settings';   
+@use 'pages/github-backup';
+@use 'pages/mcp';
+@use 'pages/chat';  
+@use 'pages/chat-detail';           // <-- 新增
+@use 'pages/chat-settings';         // <-- 新增
+@use 'pages/call';  
+@use 'pages/memory'; 
+@use 'pages/offline-mode';
+@use 'pages/transfer'; 
+@use  'pages/world-book';
+@use  'pages/gallery';
+@use 'pages/moments';
+@use 'pages/profile';
+@use 'pages/chat-beautify';
+@use 'pages/diary';
+@use 'pages/life';
+@use 'pages/check-phone';
+@use 'pages/music';
+@use 'pages/couple-space'; 
+@use 'pages/life-sync';
+@use 'pages/group-chat'; 
+@use 'pages/bonds';
+@use 'pages/sms';
+@use 'pages/looky-pay';
+@use 'pages/forum';
+@use 'pages/character-library';
+@use 'pages/character-add';
+@use 'pages/new-friends';

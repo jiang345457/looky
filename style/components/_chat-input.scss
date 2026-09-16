@@ -1,0 +1,410 @@
+// 文件路径: styles/components/_chat-input.scss
+// 描述: 聊天详情页底部的输入区域，包括文本框、按钮和引用预览。
+
+// --- 引用消息预览条 ---
+#chat-reply-preview {
+  background-color: var(--c-bg-tertiary);
+  margin: 0 var(--space-md) var(--space-sm);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border-left: 3px solid #1b1b1b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-sm);
+  transition: all 0.2s ease-in-out;
+  &.hidden {
+    display: none;
+  }
+}
+.reply-preview-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-grow: 1;
+  span {
+    font-weight: 600;
+    color: #1b1b1b;
+    display: block;
+    margin-bottom: 2px;
+    font-size: var(--font-sm);
+  }
+  p {
+    margin: 0;
+    color: var(--c-text-secondary);
+    font-size: var(--font-xs);
+  }
+}
+.reply-preview-close {
+  font-size: 24px;
+  color: var(--c-text-tertiary);
+  cursor: pointer;
+  padding: 0 8px;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
+// --- 输入区整体容器 ---
+// --- 输入区整体容器 ---
+.chat-input-container {
+  flex-shrink: 0;
+  background-color: transparent; // 如果觉得字看不清，可以改成 var(--c-bg-primary)
+  box-shadow: none;
+  
+  /* ✅ 关键修改：底部增加安全距离 */
+  padding: 8px 0; 
+   padding-bottom: 11px;
+  
+  display: flex;
+  flex-direction: column;
+  border-top: none;
+  z-index: 50; /* 提高层级 */
+  width: 100%; /* 确保不被挤压 */
+}
+
+// Only native Android with a visible three-button navigation bar receives a
+// non-zero value. Web/PWA and gesture-navigation layouts keep the same spacing.
+html.looky-native body.android-viewport-sync #page-chat-detail .chat-input-container {
+  padding-bottom: calc(11px + var(--looky-native-navigation-bar-height, 0px));
+}
+
+// --- 输入区内层布局 ---
+.chat-input-area {
+  background-color: transparent;
+  border-top: none;
+  padding: 0 var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  
+  position: relative;
+}
+
+.chat-sticker-match-panel {
+  position: absolute;
+  bottom: 100%;
+  left: var(--space-md);
+  right: var(--space-md);
+  z-index: 110;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  overflow-x: auto;
+  background: var(--c-bg-primary);
+  border: 1px solid var(--c-border-light);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.08);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+
+  &[hidden] { display: none; }
+}
+
+.chat-sticker-match-item {
+  flex: 0 0 72px;
+  min-width: 72px;
+  padding: 5px;
+  border: 1px solid var(--c-border-light);
+  border-radius: var(--radius-md);
+  background: var(--c-bg-secondary);
+  color: var(--c-text-secondary);
+  cursor: pointer;
+  text-align: center;
+  touch-action: manipulation;
+
+  &:active { transform: scale(0.96); }
+
+  img {
+    display: block;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 4px;
+    object-fit: contain;
+  }
+
+  span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+}
+
+// Keep the inline sticker suggestions above the message list and keyboard
+// viewport in native Android. The web layout keeps the existing positioning.
+html.looky-native body.android-pwa-keyboard-open .chat-input-container {
+  z-index: 300;
+}
+
+html.looky-native .chat-sticker-match-panel {
+  position: fixed !important;
+  bottom: auto;
+  z-index: 1000 !important;
+  display: flex !important;
+  align-items: center;
+  flex-wrap: nowrap;
+  max-height: calc(180px * var(--looky-display-scale, 1));
+  padding: calc(8px * var(--looky-display-scale, 1));
+  gap: calc(8px * var(--looky-display-scale, 1));
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  transform: translateX(-50%) !important;
+  background: var(--c-bg-primary, #fff) !important;
+  border-radius: calc(12px * var(--looky-display-scale, 1)) calc(12px * var(--looky-display-scale, 1)) 0 0;
+}
+
+html.looky-native .chat-sticker-match-item {
+  flex: 0 0 calc(72px * var(--looky-display-scale, 1));
+  min-width: calc(72px * var(--looky-display-scale, 1));
+  width: calc(72px * var(--looky-display-scale, 1));
+  padding: calc(5px * var(--looky-display-scale, 1));
+  box-sizing: border-box;
+  border-radius: calc(12px * var(--looky-display-scale, 1));
+  transform: none !important;
+}
+
+html.looky-native .chat-sticker-match-item img {
+  width: calc(48px * var(--looky-display-scale, 1));
+  height: calc(48px * var(--looky-display-scale, 1));
+  margin: 0 auto calc(4px * var(--looky-display-scale, 1));
+}
+
+html.looky-native .chat-sticker-match-item span {
+  font-size: calc(10px * var(--looky-display-scale, 1));
+  line-height: 10px;
+}
+
+html.looky-native .chat-sticker-match-panel[hidden] {
+  display: none !important;
+}
+
+// --- 输入框包裹容器 ---
+.text-input-wrapper {
+  background-color: var(--c-bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex-grow: 1;
+  min-width: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 8;
+
+  &.expanded {
+    margin-right: calc(-28px - 8px - var(--space-sm) - 36px - 8px - var(--space-sm));
+    padding-right: calc(12px + 44px);
+  }
+  &.has-text .send-to-screen-btn {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+    pointer-events: auto;
+  }
+}
+
+// --- 输入框 ---
+#chat-input-field {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--font-md);
+  font-family: inherit;
+  padding: 11px 0;
+  line-height: 1.5;
+  -webkit-appearance: none;
+  appearance: none;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+  z-index: 10;
+  resize: none;
+  overflow-y: auto;
+  max-height: 120px;
+  min-height: 0;
+  box-sizing: border-box;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  &::placeholder {
+    color: var(--c-text-tertiary);
+  }
+}
+// --- 各类按钮 ---
+.chat-grid-btn {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  z-index: 10;
+  svg {
+    width: 26px;
+    height: 26px;
+    stroke: var(--c-text-secondary);
+  }
+}
+
+.chat-emoji-btn {
+  flex-shrink: 0;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 5;
+  svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--c-text-secondary);
+  }
+  &.fade-out {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+  }
+}
+
+#send-message-btn {
+  background-color: #000000;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(14, 14, 14, 0.3);
+  flex-shrink: 0;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 5;
+  svg {
+    stroke: white;
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+  }
+  &.fade-out {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+  }
+}
+
+.send-to-screen-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.8);
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(34, 34, 34, 0.2);
+  z-index: 10;
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke: #050505;
+    stroke-width: 2;
+  }
+}
+
+
+// --- 响应式调整：针对移动端优化 ---
+// 当屏幕宽度小于或等于 768px 时，应用以下样式
+@media (max-width: 768px) {
+
+  // --- 引用消息预览条 ---
+  #chat-reply-preview {
+    margin: 0 12px var(--space-sm);
+  }
+
+
+  
+  // --- 输入区内层布局 ---
+  .chat-input-area {
+    // 减小左右内边距
+    padding: 0 12px;
+    // 减小元素之间的间距
+    gap: 6px;
+  }
+
+  // --- 输入框 ---
+  #chat-input-field {
+    /* 
+     * ▼▼▼【核心修改2】▼▼▼
+     * 为了让移动端更紧凑，我们将垂直 padding 从 10px 进一步减小到 8px。
+     * 这会比桌面端的 9px 更矮，符合移动端的设计原则。
+    */
+    padding: 9px 0; 
+    font-size: 15px;
+  }
+  
+  // --- 输入框包裹容器（当展开时） ---
+  .text-input-wrapper.expanded {
+    // 因为我们修改了 gap，需要重新计算这里的负边距
+    // (emoji-btn-width:36px) + (gap:6px) + (send-btn-width:36px)
+    margin-right: calc(-36px - 6px - 36px);
+  }
+}
+
+/* --- 发送按钮加载状态样式 --- */
+@keyframes spin-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+#send-message-btn {
+  /* 确保图标居中 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.loading {
+    pointer-events: none; /* 加载中禁止再次点击 */
+    opacity: 1 !important; /* 强制显示，防止被 fade-out 覆盖 */
+    
+    .arrow-icon {
+      display: none; /* 隐藏箭头 */
+    }
+    
+    .loading-icon {
+      display: block !important; /* 显示转圈 */
+      width: 20px;
+      height: 20px;
+      animation: spin-rotate 1s linear infinite; /* 旋转动画 */
+    }
+  }
+}
+
+#send-message-btn.loading {
+  pointer-events: auto; /* 允许生成中再次点击，用于打断 */
+}

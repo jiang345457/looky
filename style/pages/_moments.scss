@@ -1,0 +1,1960 @@
+// style/pages/_moments.scss
+
+// 引入项目定义的变量，比如颜色、间距等
+@use '../base/variables' as *;
+
+// style/pages/_moments.scss
+
+.moments-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-sizing: border-box;
+  padding: var(--status-bar-height, 44px) 8px 12px;
+  height: calc(var(--status-bar-height, 44px) + 52px);
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+
+  // ▼▼▼【最终修复版】▼▼▼
+
+  // 1. 通用按钮容器样式 (只负责定位和基础布局)
+  .header-button {
+    position: static;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px; // 提供足够的热区，但不限制死尺寸
+  }
+
+  // 2. 精准控制返回按钮图标的尺寸
+  .back-button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  // 3. 精准控制相机按钮图标的尺寸
+  .moments-header__actions svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  // 4. 控制图标的填充颜色和动画 (从 svg path 改为 svg)
+  svg {
+    // 这里只控制颜色，不控制尺寸
+    fill: white;
+    transition: fill 0.3s ease;
+    
+    // 文字阴影还是加在 path 上效果更好
+    path {
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    }
+  }
+  // ▲▲▲【最终修复版结束】▲▲▲
+}
+
+/* 提高选择器优先级，避免后续通用 media-item 规则把任务卡强制成正方形。 */
+.moment-card__body .media-grid .media-item.moment-image-task {
+  width: min(100%, 210px);
+  height: auto;
+  min-height: 0;
+  aspect-ratio: auto;
+  justify-self: start;
+  gap: 7px;
+  padding: 10px;
+
+  .moment-image-task-detail p {
+    -webkit-line-clamp: 3;
+  }
+
+  .moment-image-task-actions {
+    margin-top: 0;
+  }
+}
+
+.moment-card__body .media-grid.grid-2 .media-item.moment-image-task {
+  width: min(100%, 190px);
+}
+
+/* 朋友圈生图任务卡：交互结构与聊天生图卡一致，仅适配朋友圈媒体网格。 */
+.moment-card__body .media-grid .moment-image-task {
+  grid-column: 1 / -1;
+  width: min(100%, 220px);
+  min-height: 176px;
+  aspect-ratio: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.05);
+
+  .moment-image-task-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .moment-image-task-spinner {
+    display: block;
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid #d9d9d9;
+    border-top-color: #111;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    animation: moment-image-gen-spin 0.8s linear infinite;
+  }
+
+  &.is-error .moment-image-task-spinner,
+  &.is-stopped .moment-image-task-spinner {
+    animation: none;
+    border-color: #d1d1d6;
+  }
+
+  .moment-image-task-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+
+    strong {
+      color: #222;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    span {
+      color: #aaa;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+  }
+
+  .moment-image-task-detail {
+    min-height: 0;
+    padding: 8px 9px;
+    overflow: hidden;
+    border: 1px solid #ededed;
+    border-radius: 8px;
+    background: #f8f8f8;
+
+    > span {
+      display: block;
+      margin-bottom: 5px;
+      color: #8c8c8c;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    p {
+      display: -webkit-box;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      color: #666;
+      font-size: 11px;
+      line-height: 1.45;
+      word-break: break-word;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
+    }
+  }
+
+  &.is-error .moment-image-task-detail p {
+    color: #c62828;
+  }
+
+  .moment-image-task-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: auto;
+
+    button {
+      min-width: 48px;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid #e1e1e1;
+      border-radius: 7px;
+      background: #fff;
+      color: #333;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:active {
+        background: #f2f2f2;
+      }
+    }
+  }
+}
+
+@keyframes moment-image-gen-spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* ==========================================================================
+   动态页 - 个人信息头部样式
+   ========================================================================== */
+
+.moments-profile {
+  // 使用相对定位，作为内部绝对定位元素的“锚点”
+  position: relative;
+   margin-top: -20px; 
+   margin-bottom: 40px;
+}
+
+.moments-profile__cover {
+  height: 280px; 
+  background-color: #eee;
+  background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
+  background-size: cover;
+  background-position: center;
+
+  // ▼▼▼【核心修改】在这里添加下面两行代码 ▼▼▼
+ margin-left: -20px;
+  margin-right: -20px;
+}
+
+
+.moments-profile__user {
+  // 使用绝对定位，让它“浮”在封面图上
+  position: absolute;
+  // 定位到右下角
+  right:8px; 
+  // 往下偏移20px，让头像一部分在封面下方，制造层次感
+  bottom: -20px; 
+
+  display: flex; // 使用Flex布局来排列昵称和头像
+  align-items: center; // 让昵称和头像底部对齐
+}
+
+.moments-profile__name {
+  color: white; // 昵称文字为白色
+  font-size: 20px; // 字体稍大
+  font-weight: bold; // 加粗
+  margin-right: 16px; // 和头像之间留出一些间距
+
+  // 添加文字阴影，保证在任何背景下都能看清
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.moments-profile__avatar {
+  width: 72px;  // 头像宽度
+  height: 72px; // 头像高度
+  border-radius: 8px; // 轻微的圆角
+  border: 3px solid white; // 加上白色边框
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); // 添加一点阴影，让它更立体
+  object-fit: cover; // 确保图片填充整个头像框而不变形
+}
+
+/*
+ * 关键修正：
+ * 因为个人信息头部占用了空间，我们需要把下面的动态内容往下推
+ * 否则会被遮住
+ */
+.moments-content {
+  background: white; // 动态列表区域使用白色背景
+  padding-bottom: 90px;
+  overflow-x: hidden; /* 强制裁剪横向溢出的内容 */
+  width: 100%;        /* 确保宽度不超过父级 */
+  box-sizing: border-box; /* 确保 padding 不会撑大宽度 */
+}
+/* ==========================================================================
+   动态页 - 动态卡片样式 (杂志风 + 微信九宫格)
+   ========================================================================== */
+
+.moment-card {
+  background-color: #fff;
+  padding: 24px 0 12px 0; // 上下留白，左右由子元素控制
+  border-bottom: 1px solid #f2f2f2;
+  // 屏幕外的动态卡片不参与绘制，进入长列表时减少布局和绘制压力
+  contain: layout paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 420px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+/* --- 1. 头部 (头像与名字) --- */
+.moment-card__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  // 【关键】统一左右内边距，确保头像贴着左边距参考线
+  padding: 0 5px; 
+
+  .avatar-wrapper {
+    position: relative;
+    margin-right: 12px;
+    
+    .avatar-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+  }
+
+  .meta-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .author-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #000;
+      line-height: 1.2;
+      margin-bottom: 3px;
+    }
+
+    .meta-info {
+      font-size: 12px;
+      color: #999;
+      display: flex;
+      align-items: center;
+      
+      .separator {
+        margin: 0 4px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .more-btn {
+    background: none;
+    border: none;
+    color: #ccc;
+    padding: 8px;
+    margin-right: -8px; // 修正视觉平衡，让按钮靠最右
+    cursor: pointer;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+/* --- 2. 内容区 (左对齐头像，方块图) --- */
+.moment-card__body {
+  margin-bottom: 5px;
+  // 【关键】左边距设为 20px，与 Header 保持完全一致！
+  // 这样内容的左边缘就会和头像的左边缘垂直对齐
+  padding: 0 5px; 
+
+  .content-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 16px; // 文字和图片稍微拉开一点距离
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: justify; // 两端对齐更像杂志
+  }
+
+  // 图片网格系统 (微信风格：方正、无圆角、紧凑)
+  .media-grid {
+    display: grid;
+    gap: 4px; // 极小间距
+    border-radius: 0; // 无圆角
+    overflow: hidden;
+    max-width: 100%; // 允许占满宽度 (或者是固定宽度，看你喜好)
+
+    .media-item {
+      position: relative;
+      width: 100%;
+      // 强制正方形
+      aspect-ratio: 1 / 1; 
+      background-color: #f7f7f7;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+        display: block;
+        border-radius: 0; // 无圆角
+      }
+    }
+
+    // 单张图片：稍微大一点
+    &.grid-1 {
+      grid-template-columns: 1fr;
+      max-width: 200px; // 例如，单张图最大宽度为 200px
+      // 删除了内部的 .media-item 覆盖规则，
+      // 它现在会自动继承父级的 aspect-ratio: 1 / 1，保持为正方形。
+    }
+   
+
+    // 2张
+    &.grid-2 {
+      grid-template-columns: 1fr 1fr;
+      max-width: 80%; 
+    }
+
+    // 3张
+    &.grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    // 4张 (2x2)
+    &.grid-4 {
+      grid-template-columns: 1fr 1fr;
+      max-width: 60%; // 缩小总宽形成紧凑感
+    }
+    
+    // 5-9张
+    &.grid-5, &.grid-6, &.grid-7, &.grid-8, &.grid-9 {
+       grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+/* --- 3. 底部操作栏 (图标靠右，不分离) --- */
+.moment-card__footer {
+  display: flex;
+  align-items: center;
+  padding-top: 4px;
+  // 【关键】内边距也保持 20px，视觉统一
+  padding-right: 5px; 
+  padding-left: 5px;
+
+  // 让所有元素都靠右
+  justify-content: flex-end; 
+  // 图标组之间的间距
+  gap: 24px; 
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    padding: 0; 
+    cursor: pointer;
+    color: #555; 
+    transition: all 0.2s;
+
+    svg {
+      width: 20px; 
+      height: 20px;
+      stroke-width: 1.5px;
+    }
+
+    .count {
+      margin-left: 5px;
+      font-size: 13px;
+      color: #777;
+      font-weight: 400;
+      min-width: 10px;
+    }
+
+    &:active { transform: scale(0.9); }
+    
+    &.liked {
+      svg { fill: #ff4d4f; stroke: #ff4d4f; }
+      .count { color: #ff4d4f; }
+    }
+  }
+}
+
+/* --- 4. 模拟文字图片 (无圆角方块 + 遮罩交互) --- */
+.simulated-image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 0; // 无圆角
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #f0f0f0; 
+  
+  // 1. 底层：文字内容
+  .simulated-content {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff; // 深色背景
+    color: #040404;
+    
+    // ▼▼▼ 【修改开始】 ▼▼▼
+    // 原来的 flex 居中会导致长文无法滚动，改为 block 并开启滚动
+    display: block; 
+    overflow-y: auto;
+    // 隐藏滚动条，保持美观
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    // ▲▲▲ 【修改结束】 ▲▲▲
+
+    padding: 8px;
+    box-sizing: border-box;
+    font-size: 13px;
+    line-height: 1.3;
+    text-align: center;
+    word-break: break-all;
+  }
+
+
+  // 2. 顶层：遮盖层 (默认显示)
+  .spoiler-overlay {
+    position: absolute;
+    top: -1.5px;
+    left: -1px;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    background-color: #ecebeb; // 纯黑遮罩
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      color: #141414; // 图标灰一点
+      margin-bottom: 4px;
+    }
+    span {
+      font-size: 10px;
+      color: #111010;
+      letter-spacing: 1px;
+      font-weight: bold;
+    }
+  }
+
+   // 3. 交互状态
+  &.is-revealed {
+    .spoiler-overlay {
+      opacity: 0;
+      
+      // ▼▼▼ 【在这里加这一行】 ▼▼▼
+      // 关键：变成透明后，让鼠标/手指能穿透过去，否则会挡住下面文字的滑动
+      pointer-events: none;
+      // ▲▲▲
+    }
+  }
+
+}
+
+// 手机端适配
+@media (max-width: 600px) {
+  .moment-card__header,
+  .moment-card__body,
+  .moment-card__footer {
+     padding-left: 0vw; // 20px
+     padding-right: 0vw; // 20px
+  }
+  
+  .moment-card__body .media-grid {
+    gap: 1vw; // 手机上间距更小
+  }
+}
+
+/* ==========================================================================
+   动态页 - 滚动后导航栏的样式
+   ========================================================================== */
+
+// 这是我们刚才在HTML里新增的标题的样式
+.moments-header__title {
+  position: absolute; // 绝对定位，让它不占位置
+  left: 50%;
+  transform: translateX(-50%); // 这一套组合拳是让标题完美水平居中的方法
+  
+  // 这两个属性让标题垂直居中在安全区内
+  top: var(--status-bar-height, 44px);
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  
+  font-size: 18px;
+  font-weight: 600;
+  color: #000; // 标题文字是黑色
+
+  // 关键：默认状态下完全透明，看不见
+  opacity: 0;
+  // 让透明度变化也产生0.3秒的动画
+  transition: opacity 0.3s ease;
+}
+
+// 这是最关键的：当导航栏有了 .is-scrolled 这个类之后的新样式
+.moments-header.is-scrolled {
+  // 背景从透明变成白色
+  background-color: white;
+  // 底部加一个淡淡的阴影，更有层次感
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  // 让标题显示出来（从透明度0变成1）
+  .moments-header__title {
+    opacity: 1;
+  }
+  
+  // 把左右两个图标的颜色变成黑色
+  svg path {
+    fill: black;
+    filter: none; // 顺便去掉白色时用的阴影
+  }
+}
+
+// 让封面图和头像在鼠标悬停时，显示“小手”光标，告诉用户这里可以点
+#moments-cover-image,
+#moments-user-avatar {
+  cursor: pointer;
+  transition: filter 0.2s ease-in-out;
+
+  &:hover {
+    filter: brightness(0.9); // 鼠标放上去时变暗一点点，增加交互感
+  }
+}
+
+// 当我们点击昵称进行编辑时...
+#moments-user-name {
+  cursor: text; // 鼠标放上去时显示文本输入光标
+
+  // :focus 表示正在编辑的状态
+  &:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.7); // 加一个白色半透明的轮廓
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1); // 加一点点暗色背景
+  }
+}
+
+// 用来隐藏文件选择框的通用样式
+// 如果你的项目别的地方已经有这个类了，就不用重复加了
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+/* ==========================================================================
+   【重构】发布动态弹窗样式 (极简黑白杂志风)
+   ========================================================================== */
+
+.create-moment-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff; /* 纯白画布 */
+  z-index: 2000;
+  overflow-x: hidden; 
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  &.active {
+    transform: translateY(0);
+  }
+}
+
+.create-moment-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-top: var(--status-bar-height, 44px);
+}
+
+/* 1. 顶部导航 - 极简 */
+.create-moment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: 60px;
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  
+  .header-icon-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    margin-left: -8px;
+    cursor: pointer;
+    color: #333;
+    
+    svg {
+      width: 28px; 
+      height: 28px;
+      transition: transform 0.2s;
+    }
+    
+    &:active svg {
+      transform: scale(0.9);
+    }
+  }
+
+  .header-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+    font-family: 'Helvetica Neue', sans-serif; /* 英文字体更时尚 */
+    letter-spacing: 0.5px;
+  }
+
+  .post-btn {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background-color: #000; /* 极致纯黑 */
+    border: none;
+    border-radius: 20px; /* 药丸形状 */
+    padding: 8px 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* 淡淡的投影 */
+    transition: transform 0.1s, box-shadow 0.2s;
+
+    &:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+/* 滚动区域容器 */
+.create-moment-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px; /* 两侧留白，增加精致感 */
+}
+
+/* 2. 内容编辑区 */
+.create-moment-body {
+  margin-top: 10px;
+
+  textarea {
+    width: 100%;
+    min-height: 140px; /* 更高一点 */
+    border: none;
+    resize: none;
+    font-size: 18px; /* 字号更大 */
+    line-height: 1.6;
+    color: #000;
+    outline: none;
+    font-family: inherit;
+    background: transparent;
+    
+    &::placeholder {
+      color: #ccc;
+      font-weight: 300;
+    }
+  }
+}
+
+/* 图片九宫格 - 圆角更大 */
+.moment-media-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px; /* 间距更大 */
+  margin-top: 20px;
+  margin-bottom: 40px; /* 和下方选项拉开距离 */
+
+  .add-media-btn, .media-item {
+    width: 100px;
+    height: 100px;
+    border-radius: 16px; /* 大圆角，类似 iOS */
+    overflow: hidden;
+  }
+
+  .add-media-btn {
+    background-color: #f5f5f5;
+    border: 1px dashed #e0e0e0; /* 虚线边框增加设计感 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    
+    svg {
+      width: 32px;
+      height: 32px;
+      stroke: #bbb;
+    }
+
+    &:active {
+      background-color: #eee;
+    }
+  }
+  
+  .media-item {
+    object-fit: cover;
+    background-color: #eee;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+}
+
+/* 3. 选项控制面板 - 悬浮卡片风格 */
+.create-moment-options-card {
+  background-color: #fafafa; /* 极淡的灰，区分于背景白 */
+  border-radius: 20px;
+  padding: 8px 20px;
+  border: 1px solid #f0f0f0; /* 极细的边框 */
+}
+
+.moment-option-row {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px; /* 每一行更高，利于点击 */
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  /* 左侧：图标+文字 */
+  .option-left {
+    display: flex;
+    align-items: center;
+    
+    .icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03); /* 图标微投影 */
+      
+      svg {
+        width: 18px;
+        height: 18px;
+        color: #333;
+      }
+    }
+
+    .option-label {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+  }
+
+  /* 右侧：状态+箭头 */
+  .option-right {
+    display: flex;
+    align-items: center;
+
+    .option-placeholder {
+      font-size: 14px;
+      color: #bbb;
+      margin-right: 8px;
+    }
+
+    .option-value {
+      font-size: 14px;
+      color: #000; /* 选中值黑色高亮 */
+      font-weight: 500;
+      margin-right: 8px;
+    }
+
+    .arrow {
+      width: 16px;
+      height: 16px;
+      color: #ddd;
+    }
+  }
+
+  /* 隐藏的原生选择器覆盖层 */
+  .hidden-select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+/* ========================================================== */
+/* == 【新增】动态页面在手机端的响应式调整 == */
+/* ========================================================== */
+@media (max-width: 600px) {
+  
+  .moments-header {
+    padding-top: var(--status-bar-height, 11.28vw); /* 44px */
+    padding-bottom: 3.07vw; /* 12px */
+    padding-left: 2.05vw; /* 8px */
+    padding-right: 2.05vw; /* 8px */
+    height: calc(var(--status-bar-height, 11.28vw) + 13.33vw); /* 44px + 52px */
+  }
+
+  /* --- 个人信息头部 --- */
+  .moments-profile {
+    margin-top: -5.12vw; /* -20px */
+    margin-bottom: 10.25vw; /* 40px */
+  }
+  .moments-profile__cover {
+    height: 71.79vw; /* 280px */
+    margin-left: -5.12vw; /* -20px */
+    margin-right: -5.12vw; /* -20px */
+  }
+  .moments-profile__user {
+    right: 2.05vw; /* 8px */
+    bottom: -5.12vw; /* -20px */
+  }
+  .moments-profile__name {
+    font-size: 5.12vw; /* 20px */
+    margin-right: 4.1vw; /* 16px */
+  }
+  .moments-profile__avatar {
+    width: 18.46vw; /* 72px */
+    height: 18.46vw; /* 72px */
+    border-radius: 2.05vw; /* 8px */
+    border-width: 0.76vw; /* 3px */
+  }
+
+  /* --- 动态卡片 --- */
+  .moment-card {
+  padding-top: 4.1vw; /* 16px */
+  /* 如果你想要一个8px的间隙，请使用 margin-bottom */
+  margin-bottom: 2.05vw; /* 约等于 8px */
+  /* 同时将边框宽度改回固定的 1px */
+  border-bottom-width: 1px;
+}
+  .moment-card__header {
+    margin-bottom: 3.07vw; /* 12px */
+  }
+  .moment-card__avatar {
+    width: 10.76vw; /* 42px */
+    height: 10.76vw; /* 42px */
+    margin-right: 3.07vw; /* 12px */
+  }
+  .moment-card__text {
+    margin-bottom: 2.05vw; /* 8px */
+  }
+  .moment-card__gallery {
+    gap: 1.02vw; /* 4px */
+  }
+  .moment-card__footer {
+    margin-top: 3.07vw; /* 12px */
+  }
+  .moment-card__actions button {
+    width: 9.23vw; /* 36px */
+    height: 6.15vw; /* 24px */
+    margin-left: 2.05vw; /* 8px */
+    svg {
+      width: 4.61vw; /* 18px */
+      height: 4.61vw; /* 18px */
+    }
+  }
+  .moment-card__interactions {
+    margin-top: 2.56vw; /* 10px */
+    padding: 1.02vw 3.07vw; /* 4px 12px */
+    .likes-section, .comments-section {
+      padding: 1.02vw 0; /* 4px 0 */
+      svg {
+        margin-right: 1.53vw; /* 6px */
+      }
+    }
+  }
+  .moments-header__title {
+    top: var(--status-bar-height, 11.28vw); /* 44px */
+  }
+
+  /* --- 发布动态弹窗 --- */
+  .create-moment-wrapper {
+    padding-top: var(--status-bar-height, 11.28vw); /* 44px */
+  }
+  .create-moment-header {
+    padding: 0 5.12vw; /* 0 20px */
+    height: 15.38vw; /* 60px */
+    .header-icon-btn {
+      padding: 2.05vw; /* 8px */
+      margin-left: -2.05vw; /* -8px */
+      svg {
+        width: 7.17vw; /* 28px */
+        height: 7.17vw; /* 28px */
+      }
+    }
+    .post-btn {
+      border-radius: 5.12vw; /* 20px */
+      padding: 2.05vw 5.12vw; /* 8px 20px */
+    }
+  }
+  .create-moment-scroll-container {
+    padding: 0 6.15vw; /* 0 24px */
+  }
+  .create-moment-body {
+    margin-top: 2.56vw; /* 10px */
+    textarea {
+      min-height: 35.89vw; /* 140px */
+    }
+  }
+  .moment-media-grid {
+    gap: 3.07vw; /* 12px */
+    margin-top: 5.12vw; /* 20px */
+    margin-bottom: 10.25vw; /* 40px */
+    .add-media-btn, .media-item {
+      width: 25.64vw; /* 100px */
+      height: 25.64vw; /* 100px */
+      border-radius: 4.1vw; /* 16px */
+    }
+    .add-media-btn svg {
+      width: 8.2vw; /* 32px */
+      height: 8.2vw; /* 32px */
+    }
+  }
+  .create-moment-options-card {
+    border-radius: 5.12vw; /* 20px */
+    padding: 2.05vw 5.12vw; /* 8px 20px */
+  }
+  .moment-option-row {
+    height: 16.41vw; /* 64px */
+  }
+}
+/* ==========================================================================
+   ▼▼▼ 【新增】自定义隐私选择面板样式 (底部弹窗) ▼▼▼
+   ========================================================================== */
+
+// 1. 遮罩层：全屏半透明黑色
+.privacy-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  background-color: rgba(0, 0, 0, 0.5); // 半透明黑
+  z-index: 3000; // 确保在最上层
+  
+  // 默认隐藏
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  
+  // 使用 Flex 布局让内容在底部
+  align-items: flex-end;
+  justify-content: center;
+
+  &.visible {
+    display: flex;
+    opacity: 1;
+    
+    // 让卡片滑上来
+    .privacy-sheet-card {
+      transform: translateY(0);
+    }
+  }
+}
+
+// 2. 面板卡片：白色背景，圆角
+.privacy-sheet-card {
+  width: 100%;
+  background-color: #ffffff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding-bottom: env(safe-area-inset-bottom, 20px); // 适配 iPhone 底部黑条
+  
+  // 动画初始状态：藏在屏幕下面
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+  max-height: 70vh; // 最大高度70%
+  display: flex;
+  flex-direction: column;
+}
+
+// 3. 标题栏
+.privacy-sheet-header {
+  padding: 16px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #888; // 浅灰色标题
+  border-bottom: 1px solid #f5f5f5;
+}
+
+// 4. 选项列表容器
+.privacy-sheet-list {
+  overflow-y: auto;
+  padding: 0 16px;
+}
+
+// 5. 单个选项
+// ▼▼▼ 【新增】分类小标题样式 ▼▼▼
+.privacy-section-header {
+  padding: 8px 20px;
+  background-color: #f7f7f7; // 浅灰背景区分
+  color: #8e8e93;            // 灰色文字
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-top: -1px; // 修正边框重叠
+}
+// ▼▼▼ 【修改】列表项样式 (增加图标支持) ▼▼▼
+.privacy-sheet-item {
+  display: flex;
+  align-items: center; // 垂直居中
+  padding: 14px 20px;  // 增加左右内边距
+  border-bottom: 1px solid #f9f9f9;
+  cursor: pointer;
+  background-color: #fff;
+  transition: background-color 0.2s;
+  &:active {
+    background-color: #f5f5f5;
+  }
+  // 1. 左侧图标/头像容器
+  .item-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    margin-right: 12px; // 和文字的间距
+    border-radius: 6px; // 分组用方圆角，角色用圆形
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f2f5; // 默认底色
+    flex-shrink: 0;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: #333;
+    }
+  }
+  // 2. 角色头像特有样式 (圆形)
+  &.type-char .item-icon-wrapper {
+    border-radius: 50%; 
+    border: 1px solid rgba(0,0,0,0.05); // 极细边框
+  }
+  // 3. 中间文字区域
+  .item-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    
+    .item-label {
+      font-size: 16px;
+      color: #000;
+      font-weight: 500;
+    }
+    
+    // (可选) 如果有副标题描述
+    .item-sub-label {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+  }
+  // 4. 右侧勾选图标
+  .item-check {
+    width: 20px;
+    height: 10px;
+    border-left: 2px solid #000;   // 黑色勾
+    border-bottom: 2px solid #000;
+    transform: rotate(-45deg) translate(2px, -2px);
+    opacity: 0; 
+    transition: opacity 0.2s;
+  }
+  // 选中状态
+  &.selected {
+    background-color: #fafafa; // 选中后背景微变
+    .item-check {
+      opacity: 1; 
+    }
+  }
+}
+
+
+// 6. 取消按钮
+.privacy-sheet-cancel {
+  margin-top: 8px;
+  padding: 16px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  color: #000;
+  border-top: 8px solid #f5f5f5; // 粗分割线区分
+  background: #fff;
+  cursor: pointer;
+  
+  &:active {
+    background-color: #f0f0f0;
+  }
+}
+/* ==========================================================================
+   ▼▼▼ 【新增】媒体选择动作面板 (Action Sheet) ▼▼▼
+   ========================================================================== */
+
+
+.action-sheet-card {
+  width: 100%;
+  background-color: #f0f0f0; // 稍微深一点的底色，区分按钮
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+// 每一个操作按钮
+.action-sheet-item {
+  background-color: #fff;
+  padding: 18px 0;
+  text-align: center;
+  font-size: 17px;
+  color: #000;
+  font-weight: 500;
+  border-bottom: 1px solid #f0f0f0; // 细分割线
+  cursor: pointer;
+
+  &:active {
+    background-color: #e5e5e5;
+  }
+
+  // “取消”按钮单独样式，有顶部粗分割
+  &.type-cancel {
+    margin-top: 8px;
+    border-bottom: none;
+    font-weight: 600;
+  }
+}
+
+/* ==========================================================================
+   ▼▼▼ 【修改】九宫格图片样式 (防变形) ▼▼▼
+   ========================================================================== */
+.moment-media-grid .media-item-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background-color: #f0f0f0; // 添加背景色，防止图片加载慢时空白
+  border-radius: 4px;       // 轻微圆角
+  overflow: hidden;         // ▲ 关键：确保 wrapper 本身也裁剪内容
+  .media-item {
+    width: 100%;
+    height: 100%;
+    
+    // 针对真实图片 <img>
+    &[data-type="real"] {
+      object-fit: cover; // ▲ 关键：裁剪并填充，保持图片比例不失真
+    }
+    // 针对模拟文字图片 <div>
+    &.simulated-img {
+      background-color: #1a1a1a;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px;
+      text-align: center;
+      line-height: 1.4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box; // ▲ 确保 padding 不会撑大盒子
+      overflow: hidden;       // ▲ 关键：文字太多时直接截断，防止撑开盒子
+      word-wrap: break-word; 
+      white-space: pre-wrap;
+    }
+  }
+  // 删除按钮 (右上角小叉叉)
+  .delete-media-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    color: white;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 2px solid #fff; // 白色描边防止背景混淆
+    z-index: 2;
+  }
+}
+
+// 适配手机端响应式 (你之前的代码里有类似的，这里补充wrapper的适配)
+@media (max-width: 600px) {
+  .moment-media-grid .media-item-wrapper {
+    width: 25.64vw; 
+    height: 25.64vw;
+  }
+}
+/* ==========================================================================
+   ▼▼▼ 【重做】媒体选择弹窗 (中央卡片式) ▼▼▼
+   ========================================================================== */
+
+.media-select-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); // 半透明背景
+  z-index: 3200;
+  display: none;
+  align-items: center; // 垂直居中
+  justify-content: center; // 水平居中
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  &.visible {
+    display: flex;
+    opacity: 1;
+    .media-select-card { transform: scale(1); }
+  }
+}
+
+.media-select-card {
+  width: 85%;
+  max-width: 320px;
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 24px 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  transform: scale(0.9);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 24px; // ▲ 增大了整体间距，让布局更舒展
+  h3 {
+    margin: 0 0 4px 0; // ▲ 底部增加一点间距
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #000;
+  }
+}
+// 选项组样式 (现在不再需要 group-label 了)
+.media-option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// 1. 相册按钮样式
+.btn-select-album {
+  background-color: #f5f5f5;
+  color: #000;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+
+  &:hover { background-color: #e0e0e0; }
+  svg { width: 20px; height: 20px; fill: #333; }
+}
+
+// 2. 模拟图片输入区域样式
+.simulated-input-row {
+  display: flex;
+  gap: 8px;
+
+  input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    
+    &:focus { border-color: #000; }
+  }
+
+  button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    
+    &:active { transform: scale(0.95); }
+  }
+}
+
+// 关闭按钮
+.btn-media-close {
+  margin-top: 4px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+
+/* ==========================================================================
+   ▼▼▼ 【新增】提醒谁看 (Remind Sheet) 特有样式 ▼▼▼
+   ========================================================================== */
+
+// 1. 针对“提醒谁看”的头部布局微调
+#custom-remind-sheet .privacy-sheet-header {
+  // 覆盖默认标题的居中样式，改为两端对齐
+  display: flex !important; 
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px; 
+}
+
+// 2. “完成”按钮样式
+.btn-text-link {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  // 优先使用你的主题色变量，如果没有则使用微信绿
+  color: #000000;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-right: -8px; // 稍微向右靠一点
+  outline: none;
+  
+  // 点击时的反馈效果
+  &:active {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+
+  // 禁用状态（虽然目前没用到，预留）
+  &:disabled {
+    color: #ccc;
+    pointer-events: none;
+  }
+}
+
+// 3. 多选框样式 (修正复选框的位置和大小)
+.item-check-custom {
+  margin-left: auto; // 确保挤到最右边
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+
+  // 针对 JS 中生成的圆圈 div
+  div {
+    box-sizing: border-box; 
+    transition: border-color 0.2s;
+  }
+  
+  // 针对 JS 中生成的 SVG 勾选
+  svg {
+    width: 24px;
+    height: 24px;
+    // 添加一个弹出的动画效果
+    animation: check-pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+}
+
+// 定义勾选时的弹出动画
+@keyframes check-pop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   ▼▼▼ 【重构】评论区样式 (极简黑白风格 - 边距对齐修正版) ▼▼▼
+   ========================================================================== */
+.moment-card__comments {
+  // 默认隐藏，JS控制显示
+  display: none;
+  // 与上方内容的间距
+  margin-top: 10px;
+  
+  // ▼▼▼【核心修改】将左右内边距改为 5px，与上面的 Body/Header 保持一致 ▼▼▼
+  padding: 0 5px 12px 5px;
+  
+  // 出现时的淡入动画
+  animation: fadeIn 0.3s ease;
+
+  // 1. 灰色气泡容器
+  .comments-box {
+    background-color: #f7f7f7; // 极浅的灰色背景
+    border-radius: 8px;        // 圆角稍微大一点
+    padding: 12px;             // 盒子内部内容的间距
+    font-size: 14px;
+    position: relative;
+    
+    // 上方的小三角 (气泡引脚)
+    &::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 14px; // 三角形距离左边的位置
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid #f7f7f7; // 颜色必须和背景一致
+    }
+  }
+
+  // 2. 点赞列表
+  .likes-list {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0,0,0,0.05); // 极淡的分割线
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    color: #333; // 深灰色文字
+    font-size: 13px;
+    font-weight: 600; // 字体加粗
+    line-height: 1.4;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      fill: #333; // 心形图标也是深灰色
+      margin-right: 6px;
+      transform: translateY(1px); // 视觉微调
+    }
+  }
+
+  // 3. 评论列表
+  .comment-list {
+    .comment-item {
+      margin-bottom: 6px;
+      line-height: 1.5;
+      color: #444; // 正文颜色
+      font-size: 14px;
+      word-break: break-all;
+
+      &:last-child { margin-bottom: 0; }
+
+      // 评论者名字
+      .comment-user {
+        color: #000; // 纯黑
+        font-weight: 700; // 加粗
+        margin-right: 4px;
+        cursor: pointer;
+        
+        // 点击后的效果
+        &:active { opacity: 0.6; }
+      }
+      
+      // 评论内容
+      .comment-content {
+        color: #333;
+      }
+    }
+  }
+
+  // 4. 底部输入区 (胶囊风格)
+  .comment-input-wrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    background-color: #fff; // 白色输入框
+    border: 1px solid rgba(0,0,0,0.08); // 极细的边框
+    border-radius: 20px; // 胶囊圆角
+    padding: 4px 6px 4px 12px; // 内边距
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02); // 极淡的阴影
+
+    input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      color: #000;
+      padding: 6px 0;
+      outline: none; 
+
+      &::placeholder {
+        color: #bbb;
+        font-size: 13px;
+      }
+    }
+    
+    // 发送按钮 (纯文字风格)
+    button {
+      margin-left: 8px;
+      padding: 6px 12px;
+      background-color: #000; // 纯黑按钮
+      color: #fff;            // 白色文字
+      border: none;
+      border-radius: 16px;    // 也是胶囊形
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s;
+
+      &:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+// 出现动画
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// 手机端适配微调
+@media (max-width: 600px) {
+  .moment-card__comments {
+     // ▼▼▼【核心修改】手机端也对齐，设为 0vw (或者如果你 header 是 0vw 的话)
+     padding-left: 0vw; 
+     padding-right: 0vw;
+     padding-bottom: 3.2vw;
+  }
+}
+/* ==========================================================================
+   ▼▼▼ 【新增】动态卡片操作菜单样式 ▼▼▼
+   ========================================================================== */
+
+.moment-action-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent; // 透明遮罩，点击可关闭菜单
+  z-index: 1500;
+}
+
+.moment-action-menu {
+  position: absolute;
+  min-width: 100px;
+  background-color: #333; // 深色背景，更有质感
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 6px;
+  z-index: 1501; // 比遮罩层高
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: scale(0.9);
+  transform-origin: top right; // 从右上角弹出
+  animation: menu-pop-in 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover, &:active {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    // 删除按钮用红色突出
+    &.danger {
+      color: #ff4d4f;
+      svg { stroke: #ff4d4f; }
+      &:hover, &:active {
+        background-color: rgba(255, 77, 79, 0.15);
+      }
+    }
+  }
+}
+
+@keyframes menu-pop-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+/* --- 朋友圈评论样式增强 --- */
+.comment-item {
+    cursor: pointer; /* 鼠标放上去显示可点击的手指 */
+    padding: 2px 4px;
+    margin: 1px 0;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.comment-item:hover {
+    background-color: #f0f0f0; /* 鼠标悬停时有背景色，提示可以点击 */
+}
+
+.reply-indicator {
+    color: #888;
+    font-size: 0.9em;
+    margin: 0 4px;
+}
+// style/pages/_moments.scss
+
+/* ... 放在文件最末尾 ... */
+
+// 【新增】朋友圈图片点击显示描述的样式
+.image-reveal-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  overflow: hidden; // 确保内容不溢出
+
+  // 图片默认状态
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease; // 加个微小的缩放动画
+  }
+
+  // 隐藏的文字层
+  .hidden-desc-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.95); // 改得稍微不那么透，字看得清楚点
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    // 2. 取消 Flex 居中，改用 Block 布局，让文字从顶部开始
+    display: block; 
+    padding: 12px; // 稍微增加一点内边距
+    box-sizing: border-box;
+    
+    // 默认是完全透明的（看不见）
+    opacity: 0; 
+    transition: opacity 0.2s ease; // 淡入淡出效果
+    pointer-events: none; // 没显示的时候不阻挡点击
+
+    p {
+      color: rgb(4, 4, 4);
+      font-size: 14px; // 字体稍微大一点点
+      line-height: 1.5;
+      text-align: left; // 【建议修改】长文字用左对齐阅读体验更好，原来是 center
+      margin: 0;
+      word-break: break-all;
+    }
+  }
+
+  // 【激活状态】当JS加上 .show-desc 类名时
+  &.show-desc {
+    .hidden-desc-overlay {
+      opacity: 1; // 文字层显示
+      pointer-events: auto;
+    }
+    img {
+      transform: scale(1.05); // 图片稍微放大一点点作为反馈
+    }
+  }
+}
+/* --- 评论长按菜单样式 --- */
+
+// 防止手机上长按选中文字
+.comment-item {
+  -webkit-user-select: none; /* Safari / Chrome */
+  user-select: none;         /* 标准 */
+  -webkit-touch-callout: none; /* 禁用系统默认菜单 */
+}
+
+// 菜单卡片 (居中弹出)
+.comment-action-card {
+  background-color: #fff;
+  border-radius: 12px;
+  width: 200px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  overflow: hidden;
+  animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-menu-title {
+  padding: 12px;
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.comment-menu-btn {
+  padding: 14px;
+  text-align: center;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    background-color: #f5f5f5;
+  }
+
+  // 红色删除
+  &.danger {
+    color: #ff4d4f;
+    
+    svg { stroke: #ff4d4f; }
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+// ===============================================
+// ▼▼▼ 【新增】转发好友选择弹窗样式 ▼▼▼
+// ===============================================
+
+.forward-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  &.visible {
+    display: flex;
+    opacity: 1;
+  }
+
+  .forward-modal-card {
+    width: 80%;
+    max-width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 70vh;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+    h3 {
+      margin: 0;
+      padding: 16px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fafafa;
+    }
+
+    .friend-list-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .forward-friend-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border-bottom: 1px solid #f9f9f9;
+
+      &:hover { background: #f5f5f5; }
+      
+      img {
+        width: 36px; height: 36px;
+        border-radius: 6px;
+        margin-right: 12px;
+        object-fit: cover;
+      }
+      
+      span {
+        font-size: 15px;
+        color: #333;
+        font-weight: 500;
+      }
+    }
+
+    .modal-cancel-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      background: #fff;
+      border-top: 1px solid #f0f0f0;
+      font-size: 15px;
+      color: #666;
+      cursor: pointer;
+      
+      &:active { background: #f0f0f0; }
+    }
+  }
+}

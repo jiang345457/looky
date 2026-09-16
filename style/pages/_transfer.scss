@@ -1,0 +1,175 @@
+/* ========================================================================== */
+/* === 【新增】新的全屏收款页面 (#page-transfer-detail) === */
+/* ========================================================================== */
+#page-transfer-detail {
+    background-color: #fff;
+}
+.transfer-detail-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* 从顶部开始 */
+    padding: 36px 28px 24px;
+    height: 100%;
+    box-sizing: border-box;
+}
+#transfer-detail-icon-container {
+    margin-top: 20px;
+    margin-bottom: 16px;
+}
+.transfer-status-icon {
+    width: 64px;
+    height: 64px;
+}
+#transfer-detail-status {
+    font-size: 18px;
+    color: #222;
+    margin: 0;
+}
+#transfer-detail-amount {
+    font-size: 48px;
+    font-weight: 800;
+    color: #000;
+    margin: 10px 0 30px 0;
+    letter-spacing: 0;
+}
+.transfer-receive-block {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+.transfer-receive-label {
+    color: #8a8a8a;
+    font-size: 15px;
+    margin-bottom: 12px;
+}
+.transfer-target-list {
+    background: #f7f7f7;
+    border-radius: 12px;
+    overflow-y: auto;
+    max-height: 40vh;
+}
+.transfer-target-option {
+    width: 100%;
+    min-height: 68px;
+    border: none;
+    border-bottom: 1px solid #e4e4e4;
+    background: transparent;
+    display: grid;
+    grid-template-columns: 38px 1fr 28px;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    text-align: left;
+    cursor: pointer;
+}
+.transfer-target-option:last-child { border-bottom: none; }
+.transfer-target-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ffd233;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+.transfer-target-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.transfer-target-text strong {
+    font-size: 15px;
+    color: #222;
+    font-weight: 650;
+}
+.transfer-target-text small {
+    font-size: 12px;
+    color: #888;
+}
+.transfer-target-check {
+    color: #0bbf63;
+    font-size: 28px;
+    line-height: 1;
+    opacity: 0;
+}
+.transfer-target-option.active .transfer-target-check { opacity: 1; }
+.transfer-target-option.active {
+    background: rgba(255,255,255,0.45);
+}
+.transfer-info-line {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 300px;
+    padding: 0;
+    border-top: none;
+    font-size: 14px;
+}
+.transfer-info-line span:first-child {
+    color: #888;
+}
+.transfer-info-line span:last-child {
+    color: #000;
+}
+.transfer-actions-footer {
+    margin-top: auto; /* 将这部分推到底部 */
+    text-align: center;
+    padding-bottom: 20px;
+}
+.transfer-actions-footer .confirm-btn {
+    width: 280px;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
+    background-color: #07C160;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: background-color 0.2s;
+}
+.transfer-actions-footer .confirm-btn:hover {
+    background-color: #06AD56;
+}
+.transfer-actions-footer p {
+    font-size: 14px;
+    color: #888;
+}
+.transfer-actions-footer p a {
+    color: #576B95;
+    text-decoration: none;
+    margin-left: 4px;
+}
+/* ========================================================== */
+/* == 【精修版】转账页面在手机端的响应式微调 == */
+/* ========================================================== */
+@media (max-width: 600px) {
+
+  /*
+   * 特别说明：此页面中的常规字体（如“收款金额”、“收款说明”）
+   * 在原始样式中已是固定的 px 值，无需修改。
+   * 我们唯一保留缩放的是那个超大的金额数字，因为它更像一个装饰元素。
+  */
+  .transfer-detail-content { padding: 10.25vw 5.12vw; }
+  #transfer-detail-icon-container { margin-top: 5vw; margin-bottom: 4vw; }
+  .transfer-status-icon { width: 16.41vw; height: 16.41vw; }
+  #transfer-detail-amount {
+    /* 【保持】这个超大金额数字，必须让它缩放以适应屏幕，所以保留 vw */
+    font-size: 12vw;
+    margin: 3vw 0 8vw 0;
+  }
+  .transfer-receive-block,
+  .transfer-info-line { max-width: 80vw; }
+  .transfer-actions-footer { padding-bottom: 5.12vw; }
+  .transfer-actions-footer .confirm-btn {
+    width: 71.79vw;
+    padding: 3.07vw;
+    border-radius: 2.05vw;
+    margin-bottom: 4.1vw;
+  }
+  .transfer-actions-footer p a { margin-left: 1.02vw; }
+}

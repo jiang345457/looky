@@ -1,0 +1,237 @@
+// 文件路径: styles/components/_conversation-item.scss
+// 描述: 用于聊天列表和好友列表的列表项组件。
+
+.conversation-list {
+  display: flex;
+  flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 10px var(--space-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  // 为悬浮动画添加平滑过渡，动画时间可以稍长一些，感觉更柔和
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+
+  // --- 状态 ---
+  // =======================================================
+  // |                👇 这里是修改的核心区域 👇               |
+  // =======================================================
+  &.is-pinned {
+    background-color: #f8f8fa;
+    border-left: none;
+
+    // --- 重点：使用分层阴影来创建强烈的悬浮感 ---
+    // 第一层: 一个靠近的、较清晰的阴影，用于定义边缘轮廓。
+    // 第二层: 一个更远、更模糊、更宽的阴影，用于营造“悬浮”的氛围光。
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.07), 
+                0 12px 28px rgba(0, 0, 0, 0.15);
+
+    // (可选但强烈推荐) 在 Y 轴上微移，物理上“抬起”元素，进一步强化悬浮感
+    transform: translateY(-3px);
+
+    // 提升层级，确保它在所有普通列表项之上，阴影不会被遮挡
+    position: relative;
+    z-index: 10;
+  }
+
+  &.delete-mode {
+    transform: none !important;
+    .friend-pin-btn,
+    .friend-delete-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  // --- 内部结构 ---
+  .chat-avatar-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+  }
+  .chat-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .online-indicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background-color: var(--c-accent-green);
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+
+  .chat-details {
+    flex: 1;
+    min-width: 0; // 防止内容溢出
+  }
+  .chat-name-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: 2px;
+    white-space: nowrap;
+  }
+  .chat-name {
+    font-weight: bold;
+    font-size: var(--font-md);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 60%;
+  }
+  .chat-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    // 标签颜色
+    &.tag-green { background-color: #d4f8e5; color: #34c759; }
+    &.tag-orange { background-color: #fff0e0; color: #ff9500; }
+    &.tag-purple { background-color: #f0eaff; color: #af52de; }
+  }
+  .chat-preview {
+    font-size: var(--font-sm);
+    color: var(--c-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chat-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .timestamp {
+    font-size: var(--font-xs);
+    color: var(--c-text-tertiary);
+  }
+  .unread-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--c-accent-red);
+    border-radius: 50%;
+  }
+  
+  // --- 交互元素 ---
+  .friend-item-checkbox {
+    display: none;
+    margin-right: var(--space-sm);
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+  }
+  
+  .chat-actions-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+  
+  .friend-pin-btn,
+  .friend-delete-btn {
+    position: relative;
+    right: auto;
+    transform: none;
+    margin-left: 8px;
+  }
+}
+
+// 选择模式
+.friend-selection-mode .conversation-item {
+  background-color: #f5f3ff;
+  .friend-item-checkbox {
+    display: block;
+  }
+}
+
+// 通讯录中的列表项 (作为变体)
+.contacts-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 12px var(--space-md);
+  border-bottom: 1px solid var(--c-border);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    background-color: #eef5ff;
+    transform: scale(0.98);
+  }
+  &.item-selected {
+    background-color: #eef5ff;
+  }
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    svg {
+      width: 24px;
+      height: 24px;
+      stroke: white;
+    }
+    &.icon-bg-blue { background-color: #5ac8fa; }
+    &.icon-bg-green { background-color: #34c759; }
+  }
+  
+  .contact-item-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  
+  .item-text {
+    font-size: var(--font-md);
+    font-weight: 500;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  input[type="checkbox"] {
+    display: none;
+    margin-right: var(--space-sm);
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.selection-mode .contacts-list-item input[type="checkbox"] {
+  display: block;
+}

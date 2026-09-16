@@ -1,0 +1,933 @@
+// 文件路径: styles/pages/_chat.scss
+// 描述: 聊天主界面的整体布局，包括顶部区域、搜索、Tabs 和通讯录结构。
+
+// --- 聊天、动态、个人中心页面的通用框架 ---
+#page-chat,
+
+#page-profile {
+ 
+
+  .app-header {
+    background: transparent;
+    justify-content: space-between;
+    padding: 0;
+    height: 50px;
+
+    .app-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  .app-content {
+    background-color: transparent;
+    padding: var(--space-lg) var(--space-lg) 10vh; // 底部为 bottom-nav 留出空间
+  }
+  
+  .back-button {
+    left: var(--space-xs);
+  }
+}
+
+body.chat-home-style-ins {
+  #page-chat {
+    color: #171717;
+
+    .chat-top-area {
+      padding: 38px 14px 8px;
+    }
+
+    .app-header {
+      height: 48px;
+    }
+
+    .app-header .app-title {
+      font-size: 0;
+      color: transparent;
+    }
+
+    .app-header .app-title::after {
+      content: 'LOOKY CHAT';
+      display: block;
+      font-family: 'Times New Roman', Georgia, serif;
+      font-size: 18px;
+      line-height: 1;
+      color: #111;
+      font-weight: 600;
+    }
+
+    .app-content {
+      padding: 10px 14px 96px;
+    }
+  }
+
+  #page-chat .chat-search-bar {
+    margin: -5px auto 8px;
+    width: 44%;
+    max-width: 148px;
+
+    input {
+      height: 26px;
+      padding: 4px 6px 4px 24px;
+      border-radius: 0;
+      border: 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.26);
+      background: transparent;
+      box-shadow: none;
+      color: #191919;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    svg {
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      stroke: rgba(0, 0, 0, 0.42);
+    }
+  }
+
+  #page-chat .chat-home-ins-segment {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 2px 12px;
+    padding: 6px;
+    min-height: 36px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: rgba(255, 255, 255, 0.64);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.045);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    button {
+      flex: 0 0 auto;
+      min-width: 72px;
+      height: 26px;
+      padding: 0 11px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(0, 0, 0, 0.62);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      letter-spacing: 0;
+      cursor: pointer;
+    }
+
+    .chat-home-ins-segment-label {
+      max-width: 82px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .chat-home-ins-segment-deco {
+      max-width: 72px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 7px;
+      line-height: 1;
+      font-family: 'Times New Roman', Georgia, serif;
+      color: rgba(0, 0, 0, 0.34);
+    }
+
+    button.active {
+      background: #111;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+    }
+
+    button.active .chat-home-ins-segment-deco {
+      color: rgba(255, 255, 255, 0.58);
+    }
+  }
+
+  &.chat-home-contacts-active {
+    #page-chat .chat-search-bar,
+    #page-chat .chat-home-ins-segment {
+      display: none;
+    }
+  }
+
+  #page-chat .conversation-list {
+    gap: 10px;
+    overflow: visible;
+    padding: 0 0 18px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  #page-chat .conversation-list > .conversation-item + .conversation-item {
+    border-top: 1px solid rgba(0, 0, 0, 0.025);
+  }
+
+  #page-chat .chat-friend-section {
+    overflow: hidden;
+    padding: 6px 12px 5px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.045);
+    background: rgba(255, 255, 255, 0.64);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.055);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  #page-chat .chat-home-ins-companion-widget {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+    margin: 0 2px 2px;
+    padding: 6px 8px 6px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    background: rgba(255, 255, 255, 0.56);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.34),
+      0 8px 18px rgba(0, 0, 0, 0.045);
+    color: #171717;
+  }
+
+  #page-chat .chat-home-ins-companion-avatar {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  #page-chat .chat-home-ins-companion-main {
+    min-width: 0;
+    flex: 1;
+  }
+
+  #page-chat .chat-home-ins-companion-line {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    min-width: 0;
+  }
+
+  #page-chat .chat-home-ins-companion-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    line-height: 1.15;
+    font-weight: 800;
+    color: rgba(0, 0, 0, 0.82);
+  }
+
+  #page-chat .chat-home-ins-companion-rule {
+    width: 100%;
+    height: 1px;
+    margin: 5px 0 4px;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.035));
+  }
+
+  #page-chat .chat-home-ins-companion-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  #page-chat .chat-home-ins-companion-days {
+    flex: 0 0 auto;
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 17px;
+    line-height: 0.9;
+    font-weight: 700;
+    color: #111;
+  }
+
+  #page-chat .chat-home-ins-companion-deco,
+  #page-chat .chat-home-ins-companion-mark {
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 7px;
+    line-height: 1;
+    letter-spacing: 0.12em;
+    color: rgba(0, 0, 0, 0.38);
+  }
+
+  #page-chat .chat-home-ins-companion-time {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 9px;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.48);
+  }
+
+  #page-chat .chat-home-ins-companion-mark {
+    flex: 0 0 auto;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    padding: 0 9px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  #page-chat .chat-friend-section--pinned {
+    background: rgba(255, 255, 255, 0.64);
+    border-color: rgba(0, 0, 0, 0.045);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.055);
+  }
+
+  #page-chat .chat-friend-section--fallback {
+    background: rgba(255, 255, 255, 0.64);
+  }
+
+  #page-chat .chat-friend-section-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #page-chat .chat-friend-section-list .conversation-item + .conversation-item {
+    border-top: 1px solid rgba(0, 0, 0, 0.025);
+  }
+
+  #page-chat .conversation-item {
+    min-height: 52px;
+    padding: 8px 2px;
+    border-radius: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    gap: 11px;
+    transform: none;
+
+    &.is-pinned {
+      background: transparent;
+      position: relative;
+      z-index: auto;
+    }
+
+    .chat-avatar-wrapper {
+      width: 38px;
+      height: 38px;
+    }
+
+    .chat-avatar {
+      border-radius: 50%;
+      filter: saturate(0.96) contrast(1.02);
+    }
+
+    .online-indicator {
+      background-color: rgba(17, 17, 17, 0.76);
+      border-color: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+
+    .chat-details {
+      min-width: 0;
+    }
+
+    .chat-time {
+      flex: 0 0 46px;
+      margin-left: auto;
+      padding-top: 2px;
+      text-align: right;
+      white-space: nowrap;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.32);
+    }
+
+    .chat-name {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0;
+      max-width: none;
+      color: #111;
+    }
+
+    .chat-name-row {
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+
+    .chat-tag {
+      padding: 1px 0;
+      border: 0;
+      background: transparent;
+      color: rgba(0, 0, 0, 0.34);
+      max-width: 96px;
+      white-space: nowrap;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .chat-preview {
+      color: rgba(0, 0, 0, 0.34);
+      font-size: 12px;
+      font-weight: 600;
+    }
+  }
+
+  #page-chat .chat-friends-empty {
+    padding: 28px 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.42);
+    text-align: center;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.045);
+  }
+
+  #page-chat #contacts-content > .contacts-section {
+    margin-bottom: 12px;
+    padding: 4px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.055);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.64);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+      0 8px 18px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+
+  #page-chat #contacts-content > .contacts-section .contacts-list-item {
+    padding: 8px 2px;
+  }
+
+  #page-chat #contacts-content .contacts-list-item .item-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    filter: grayscale(1);
+    color: #111;
+
+    svg {
+      width: 19px;
+      height: 19px;
+      stroke: currentColor;
+    }
+  }
+
+  #page-chat #contacts-content .contacts-list-item .item-icon.icon-bg-blue {
+    background: #111;
+    color: #fff;
+  }
+
+  #page-chat #contacts-content .contacts-list-item .item-icon.icon-bg-green {
+    background: rgba(255, 255, 255, 0.72);
+    color: #111;
+  }
+
+  #page-chat #character-contacts-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #page-chat #character-contacts-list-container .contacts-group {
+    margin: 0;
+    border: 1px solid rgba(0, 0, 0, 0.055);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.64);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+      0 8px 18px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+
+    summary {
+      min-height: 34px;
+      box-sizing: border-box;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.035);
+      color: rgba(0, 0, 0, 0.78);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: none;
+
+      &::after {
+        content: 'GROUP';
+        margin-left: auto;
+        font-family: 'Times New Roman', Georgia, serif;
+        font-size: 8px;
+        font-weight: 400;
+        letter-spacing: 0.12em;
+        color: rgba(0, 0, 0, 0.32);
+      }
+    }
+
+    .contacts-section {
+      margin-bottom: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .contacts-list-item {
+      min-height: 44px;
+      padding: 7px 12px;
+      border-bottom-color: rgba(0, 0, 0, 0.035);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      .contact-item-avatar {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 50%;
+      }
+
+      .item-text {
+        font-size: 13px;
+        font-weight: 700;
+      }
+    }
+  }
+
+  #page-chat .contacts-group summary {
+    &::before {
+      color: rgba(0, 0, 0, 0.44);
+    }
+  }
+
+  #page-chat .contacts-group {
+    margin-bottom: 12px;
+
+    summary {
+      padding: 8px 14px;
+      color: rgba(0, 0, 0, 0.45);
+      font-family: Georgia, 'Times New Roman', serif;
+      letter-spacing: 0;
+    }
+  }
+
+  #page-chat .contacts-list-item {
+    padding: 10px 12px;
+    border-bottom-color: rgba(0, 0, 0, 0.055);
+
+    .contact-item-avatar,
+    .item-icon {
+      border-radius: 13px;
+      filter: grayscale(0.16);
+    }
+
+    .item-text {
+      font-size: 14px;
+    }
+  }
+
+  #page-chat #add-friend-btn,
+  #page-chat #contacts-more-btn {
+    width: 34px;
+    height: 34px;
+    padding: 6px;
+    box-sizing: border-box;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(0, 0, 0, 0.075);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.055);
+    line-height: 0;
+
+    svg {
+      width: 16px !important;
+      height: 16px !important;
+      min-width: 16px !important;
+      max-width: 16px !important;
+      min-height: 16px !important;
+      max-height: 16px !important;
+      display: block;
+      flex: 0 0 16px !important;
+    }
+  }
+
+  &:not(.chat-home-contacts-active) #page-chat #add-friend-btn,
+  &.chat-home-contacts-active #page-chat #contacts-more-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.chat-home-contacts-active #page-chat #add-friend-btn {
+    display: none !important;
+  }
+
+  #page-chat .chat-bottom-nav,
+  #page-dynamics .chat-bottom-nav,
+  #page-profile .chat-bottom-nav {
+    left: 34px;
+    right: 34px;
+    bottom: max(12px, calc(18px - var(--app-page-offset-pull-up, 0px)));
+    height: 56px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.13);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    contain: layout paint;
+    transform: translateZ(0);
+
+    .nav-item {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      justify-content: center;
+      align-items: center;
+      gap: 0;
+      color: #111;
+
+      svg {
+        width: 21px;
+        height: 21px;
+        stroke: #111;
+        stroke-width: 2;
+      }
+
+      span {
+        display: none;
+      }
+
+      &.active {
+        background: rgba(245, 245, 243, 0.96);
+        color: #111;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+
+        svg {
+          stroke: #111;
+          fill: none;
+        }
+      }
+    }
+  }
+}
+#page-chat {
+  display: flex;
+  flex-direction: column; // 让里面的元素垂直排列
+  .chat-main-area {
+    flex-grow: 1; // 让“外套”填满除了底部导航栏之外的所有空间
+    overflow: hidden; // 防止内容溢出
+    // 把原来的背景放到这里，并为自定义壁纸做好准备
+    background: linear-gradient(180deg, #f4f0ff 0%, #e9efff 100%);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-main-area .app-content {
+    flex-grow: 1; // 让内容区可以滚动
+    overflow-y: auto; // 内容多了就出现滚动条
+    padding-bottom: 10vh; // 确保底部有足够空间
+  }
+}
+// --- 页面顶部区域 ---
+.chat-top-area {
+  position: relative; // 新增
+  z-index: 2;         // 新增
+  background-color: transparent;
+  padding: 32px var(--space-lg) 8px;
+  flex-shrink: 0;
+}
+// 搜索框
+.chat-search-bar {
+  position: relative;
+  margin-top: -10px;
+  margin-bottom: var(--space-lg); 
+
+  svg {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    stroke: #b2b2b7;
+    stroke-width: 2;
+  }
+
+  // =======================================================
+  // |                👇 这里是修改的核心区域 👇               |
+  // =======================================================
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 15px 12px 40px;
+    border-radius: var(--radius-md);
+    
+    // 1. 使用非常精细的边框来定义轮廓
+    border: 1px solid rgba(0, 0, 0, 0.05);
+
+    // 2. 将背景改为不透明的纯白色，增加对比度
+    background-color: white;
+    
+    // 3. 添加一个微妙的阴影，增加立体感和精致感
+    box-shadow: 0 2px 8px rgba(138, 109, 255, 0.08);
+
+    // 4. (可选) 添加过渡效果，让交互更平滑
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+    font-size: var(--font-sm);
+    &::placeholder {
+      color: #b2b2b7;
+    }
+    
+    // (可选) 当用户聚焦输入框时，给一个更明显的视觉反馈
+    &:focus {
+      outline: none;
+      border-color: rgba(138, 109, 255, 0.5);
+      box-shadow: 0 4px 12px rgba(138, 109, 255, 0.12);
+    }
+  }
+}
+
+// 标签页
+.chat-tabs {
+  display: flex;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  font-weight: 600;
+  font-size: var(--font-md);
+}
+
+#page-chat .chat-tabs[aria-hidden="true"] {
+  display: none;
+}
+
+.tab-item {
+  color: var(--c-text-secondary);
+  cursor: pointer;
+  padding-bottom: var(--space-xs);
+  position: relative;
+
+  &.active {
+    color: #8a6dff;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #8a6dff;
+    }
+  }
+}
+
+// --- 通讯录 (好友列表) 特有结构 ---
+.contacts-section {
+  background-color: white;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-md);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(32, 31, 35, 0.08);
+}
+
+.contacts-group {
+  margin-bottom: var(--space-md);
+  summary {
+    padding: 10px var(--space-md);
+    font-size: var(--font-xs);
+    color: var(--c-text-secondary);
+    text-transform: uppercase;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::before {
+      content: '▶';
+      display: inline-block;
+      margin-right: var(--space-sm);
+      transition: transform 0.2s;
+      font-size: 7px;
+    }
+  }
+  &[open] > summary::before {
+    transform: rotate(90deg);
+  }
+  .contacts-section {
+    margin-bottom: 0;
+  }
+}
+
+// ... (文件其余部分保持不变)
+#add-friend-btn,
+#contacts-more-btn {
+  display: none; // JS controlled
+  position: absolute;
+  right: var(--space-xs);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  font-size: 0;
+  line-height: 0;
+  svg {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    max-width: 16px !important;
+    min-height: 16px !important;
+    max-height: 16px !important;
+    flex: 0 0 16px !important;
+    stroke: #333;
+    fill: #333;
+  }
+}
+
+#contacts-menu {
+  display: none; // JS controlled
+  position: absolute;
+  top: 45px;
+  right: var(--space-md);
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 120;
+  overflow: hidden;
+  width: 156px;
+  .menu-item {
+    padding: 12px var(--space-md);
+    font-size: var(--font-sm);
+    cursor: pointer;
+    border-bottom: 1px solid var(--c-border);
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background-color: var(--c-bg-tertiary);
+    }
+  }
+}
+#add-friend-list-container {
+  max-height: 40vh; /* Limit height to allow scrolling */
+  overflow-y: auto;
+  padding: 0 8px;
+}
+
+.add-friend-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-friend-item:hover {
+  background-color: var(--c-bg-secondary);
+}
+
+.add-friend-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+}
+/* ========================================================== */
+/* == 【新增】聊天页面在手机端的响应式调整 == */
+/* ========================================================== */
+@media (max-width: 600px) {
+  #page-chat .app-header {
+    height: 12.8vw; /* 50px */
+  }
+
+  .chat-top-area {
+    padding: 9vw var(--space-lg) 2.05vw; /* 32px var(--space-lg) 8px */
+  }
+
+  .chat-search-bar {
+    margin-top: -2.56vw; /* -10px */
+
+    svg {
+      left: 3.84vw; /* 15px */
+      width: 4.61vw;  /* 18px */
+      height: 4.61vw; /* 18px */
+    }
+
+    input {
+      padding: 3.07vw 3.84vw 3.07vw 10.25vw; /* 12px 15px 12px 40px */
+      box-shadow: 0 0.51vw 2.05vw rgba(138, 109, 255, 0.08); /* 0 2px 8px ... */
+
+      &:focus {
+        box-shadow: 0 1.02vw 3.07vw rgba(138, 109, 255, 0.12); /* 0 4px 12px ... */
+      }
+    }
+  }
+
+  .tab-item.active::after {
+    width: 1.53vw;  /* 6px */
+    height: 1.53vw; /* 6px */
+  }
+
+  .contacts-group summary {
+    padding: 2.56vw var(--space-md); /* 10px ... */
+    &::before {
+      font-size: 1.8vw; /* 7px */
+    }
+  }
+  
+  #contacts-menu {
+      top: 11.5vw; /* 45px */
+      width: 40vw; /* 156px */
+      .menu-item {
+          padding: 3.07vw var(--space-md); /* 12px ... */
+      }
+  }
+
+  .add-friend-item {
+      padding: 2.56vw; /* 10px */
+      img {
+          width: 10.25vw; /* 40px */
+          height: 10.25vw; /* 40px */
+          margin-right: 3.07vw; /* 12px */
+      }
+  }
+}
+
+// Android APK draws under the transparent system status bar. Keep the native
+// status bar visible and reserve its real inset only in the native runtime.
+html.looky-native {
+  .status-bar {
+    display: none !important;
+  }
+
+  #page-chat .chat-top-area {
+    padding-top: var(--looky-native-status-bar-height, 24px);
+  }
+}

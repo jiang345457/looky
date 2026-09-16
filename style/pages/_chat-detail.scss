@@ -1,0 +1,738 @@
+// 文件路径: styles/pages/_chat-detail.scss
+// 描述: 聊天详情页面的整体布局、特殊头部和内容区域。
+
+#page-chat-detail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden; 
+  .app-header {
+    display: flex;
+    align-items: center;
+    padding: 44px 8px 8px;
+    background-color: transparent;
+    border-bottom: none;
+    position: relative;
+    min-height: auto;
+  }
+
+  .back-button,
+  .header-button {
+    position: static;
+    left: auto;
+    right: auto;
+  }
+
+  .back-button {
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg {
+      width: 28px;
+      height: 28px;
+      stroke: #1c1c1e;
+      stroke-width: 2.5;
+    }
+  }
+  
+.chat-detail-content {
+    /* ▼▼▼ 修改：内容区域也要变成弹性盒子 ▼▼▼ */
+    flex: 1 1 0%;
+    min-height: 0;
+    background-color: transparent;
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    display: flex;        /* 新增 */
+    flex-direction: column; /* 新增 */
+    /* ▲▲▲ 修改结束 ▲▲▲ */
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  
+  /* ▼▼▼ 修改：让消息列表负责滚动和伸缩 ▼▼▼ */
+  .chat-message-list {
+    flex: 1 1 0%; /* 占据剩余空间 */
+    min-height: 0;
+    overflow-y: auto; /* 允许内部滚动 */
+    height: auto; /* 配合 flex 使用，防止被内容撑开 */
+    position: relative;
+    z-index: 1;
+    -webkit-overflow-scrolling: touch; /* 增加 iOS 惯性滚动 */
+  }
+  /* ▲▲▲ 修改结束 ▲▲▲ */
+}
+
+// --- 聊天详情页头部 ---
+.chat-detail-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.chat-detail-header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+  .header-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg {
+      width: 28px;
+      height: 28px;
+      stroke: #1c1c1e;
+      stroke-width: 2;
+      fill: none;
+    }
+  }
+}
+.chat-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.chat-detail-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+#chat-detail-char-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1c1c1e;
+  white-space: nowrap;
+}
+
+// 多选模式下的头部
+.chat-header-content-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#page-chat-detail.multiselect-active {
+  #chat-header-normal {
+    display: none;
+  }
+  #chat-header-multiselect {
+    display: flex;
+  }
+}
+.multiselect-action-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#chat-header-multiselect button {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--c-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  &:disabled {
+    color: var(--c-text-tertiary);
+    cursor: not-allowed;
+  }
+}
+
+// --- 响应式调整：针对移动端优化 ---
+// 当屏幕宽度小于或等于 768px 时（典型的手机和平板竖屏宽度），应用以下样式
+@media (max-width: 768px) {
+  
+  // 调整聊天详情页头部内边距和最小高度
+  #page-chat-detail .app-header {
+    // min-height: 70px; // 你可以设置一个固定的最小高度，也可以让内容自适应
+    padding-top: 47px;    // 保持为状态栏预留的空间
+    padding-bottom: 6px;  // 减少下内边距，让底部更紧凑
+  }
+  
+  // 调整标题组（头像+名字）的间距
+  .chat-title-group {
+    gap: 8px; // 减小头像和名字之间的距离
+  }
+
+  // 缩小头像尺寸
+  .chat-detail-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  // 调整名字的字体大小
+  #chat-detail-char-name {
+    font-size: 16px;
+  }
+  
+  // 如果需要，也可以调整右侧图标的间距
+  .chat-detail-header-right {
+    gap: 12px; // 减小右侧图标之间的间距
+  }
+}
+
+
+#page-chat-detail .chat-detail-content {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative; // 这是为了让下面的伪元素能定位
+
+  // 添加一个半透明的白色遮罩层，让文字更清晰
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    // 你可以调整这里的透明度，0.7 是比较柔和的效果
+    background-color: rgba(255, 255, 255, 0); 
+    // z-index: 0 确保遮罩层在消息列表下面
+    z-index: 0;
+  }
+  
+  // 确保消息列表在遮罩层之上
+  .chat-message-list {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// ▲▲▲ 复制到这里结束 ▲▲▲
+
+.message-bubble.is-phone-npc-chat-card {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  max-width: min(336px, 86vw);
+}
+.message-bubble.is-friend-request-card {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  max-width: min(336px, 86vw);
+}
+.phone-npc-card-center-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 16px 0;
+  clear: both;
+}
+.friend-request-card-center-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 14px 0;
+  clear: both;
+}
+.phone-npc-chat-card {
+  width: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #fbfbfb;
+  border: 1px solid rgba(18,18,18,0.1);
+  box-shadow: 0 18px 42px rgba(0,0,0,0.1);
+  color: #111;
+}
+.phone-npc-chat-card summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+.phone-npc-chat-card summary::-webkit-details-marker { display: none; }
+.phone-npc-card-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.phone-npc-card-icon svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.phone-npc-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.phone-npc-chat-card .card-kicker {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #777;
+  font-weight: 800;
+}
+.phone-npc-chat-card .card-status {
+  font-size: 9px;
+  color: #111;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 999px;
+  padding: 4px 8px;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+.phone-npc-chat-card strong {
+  font-size: 16px;
+  color: #1f1f1f;
+  line-height: 1.35;
+}
+.phone-npc-chat-card small {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.5;
+}
+.phone-npc-chat-card .card-open-hint {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #111;
+  letter-spacing: 1.6px;
+  font-weight: 800;
+}
+.phone-npc-chat-card[open] .card-open-hint {
+  display: none;
+}
+.phone-npc-chat-lines {
+  border-top: 1px solid rgba(0,0,0,0.08);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  background:
+    linear-gradient(#fff, #fff),
+    repeating-linear-gradient(0deg, transparent 0, transparent 25px, rgba(0,0,0,0.035) 26px);
+}
+.phone-npc-line {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.phone-npc-line span {
+  font-size: 9px;
+  color: #888;
+  letter-spacing: 1.4px;
+  font-weight: 800;
+}
+.phone-npc-line p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #222;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 9px 11px;
+}
+.phone-npc-line.owner p {
+  background: #f1f1f1;
+  border-color: rgba(0,0,0,0.1);
+  color: #111;
+}
+
+.friend-request-chat-card {
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(18,18,18,0.1);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.09);
+  color: #111;
+}
+.friend-request-chat-card summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+.friend-request-chat-card summary::-webkit-details-marker { display: none; }
+.friend-request-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111;
+  color: #fff;
+}
+.friend-request-card-icon svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.friend-request-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.friend-request-chat-card .card-kicker {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+  color: #777;
+  font-weight: 800;
+}
+.friend-request-chat-card .card-status {
+  font-size: 10px;
+  color: #111;
+  background: #f6f6f6;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 999px;
+  padding: 4px 8px;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.friend-request-chat-card strong {
+  font-size: 15px;
+  color: #151515;
+  line-height: 1.35;
+}
+.friend-request-chat-card small {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.55;
+}
+.friend-request-chat-card .card-open-hint {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #111;
+  letter-spacing: 1.4px;
+  font-weight: 800;
+}
+.friend-request-chat-card[open] .card-open-hint {
+  display: none;
+}
+.friend-request-card-lines {
+  border-top: 1px solid rgba(0,0,0,0.08);
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+.friend-request-card-line {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.friend-request-card-line span {
+  font-size: 9px;
+  color: #8a8a8a;
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+.friend-request-card-line p {
+  margin: 0;
+  width: fit-content;
+  max-width: 88%;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #222;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 8px 10px;
+}
+.friend-request-card-line.owner {
+  align-items: flex-end;
+}
+.friend-request-card-line.owner p {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.message-bubble.is-char-interaction-card {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  max-width: min(358px, calc(100vw - 34px));
+}
+
+.char-interaction-card-center-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 14px 0;
+  clear: both;
+}
+/* ▼▼▼ 轻量化极致细腻 Ins 风格 ▼▼▼ */
+.ci-ins-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 16px; /* 缩小圆角，去粗犷感 */
+  border: 1px solid rgba(0, 0, 0, 0.05); /* 极细极淡的边框 */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03); /* 轻盈的阴影 */
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 4px 0;
+}
+
+.ci-ins-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px; /* 缩减 padding，显得更精致紧凑 */
+  background: #fff;
+  transition: background 0.2s ease;
+}
+.ci-ins-summary:active { background: #fcfcfc; }
+.ci-ins-summary::-webkit-details-marker { display: none; }
+
+.ci-ins-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ci-ins-avatars {
+  display: flex;
+  position: relative;
+}
+.ci-ins-avatars img {
+  width: 36px; /* 头像稍微缩小 */
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  background: #f5f5f5;
+}
+.ci-ins-avatars .ava-1 {
+  position: relative;
+  z-index: 2;
+}
+.ci-ins-avatars .ava-2 {
+  margin-left: -12px;
+  position: relative;
+  z-index: 1;
+}
+
+.ci-ins-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ci-ins-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+.ci-ins-sub {
+  font-size: 10px;
+  color: #999;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.ci-ins-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bcbcbc; /* 纯粹的极简箭头，无框 */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ci-ins-card[open] .ci-ins-arrow {
+  transform: rotate(180deg);
+  color: #666;
+}
+
+.ci-ins-body {
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+  background: #fafafa; /* 对话区有一点点浅灰底，区分层次 */
+}
+
+.ci-ins-thread {
+  padding: 10px 12px 12px; /* 减小卡片内部的整体留白 */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* 缩减消息之间的间距 */
+  max-height: 320px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ci-ins-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px; /* 拉近小头像和气泡的距离 */
+}
+.ci-ins-msg.speaker2 {
+  flex-direction: row-reverse;
+}
+
+.ci-ins-avatar {
+  width: 22px; /* 小头像再缩小一点，增加精致感 */
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ci-ins-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 72%;
+}
+.ci-ins-msg.speaker1 .ci-ins-content { align-items: flex-start; }
+.ci-ins-msg.speaker2 .ci-ins-content { align-items: flex-end; }
+
+.ci-ins-name {
+  font-size: 9px;
+  color: #999;
+  line-height: 1.2;
+  margin-bottom: 2px; /* 缩减名字和气泡的间距 */
+  padding: 0 2px;
+  transform: scale(0.9); /* 弱化名字显示 */
+  transform-origin: left bottom;
+}
+.ci-ins-msg.speaker2 .ci-ins-name {
+  transform-origin: right bottom;
+}
+
+/* ▼▼▼ 核心修改：极致紧凑的小气泡 ▼▼▼ */
+.ci-ins-bubble {
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 7px 9px; /* 小气泡留白，不吃全局消息气泡的 padding */
+  font-size: 11px; /* 比正文小一级 */
+  line-height: 1.45;
+  color: #333;
+}
+.ci-ins-msg.speaker1 .ci-ins-bubble {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px 12px 12px 2px; /* 更锐利的水滴角 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+.ci-ins-msg.speaker2 .ci-ins-bubble {
+  background: #f0f0f0; /* 非常淡的浅灰 */
+  border: 1px solid transparent;
+  border-radius: 12px 12px 2px 12px;
+}
+.message-bubble.is-char-interaction-card .ci-ins-text { 
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  line-height: inherit;
+  word-break: break-word; 
+}
+.ci-ins-trans {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #999;
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+.ci-ins-footer {
+  text-align: center;
+  font-size: 9px;
+  color: #ccc;
+  padding: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+/* ▲▲▲ 架构结束 ▲▲▲ */
+
+@media (max-width: 380px) {
+  .message-bubble.is-char-interaction-card {
+    max-width: calc(100vw - 24px);
+  }
+
+  .ci-card summary {
+    gap: 8px;
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .ci-avatar {
+    width: 31px;
+    height: 31px;
+  }
+
+  .ci-card-title {
+    font-size: 12px;
+  }
+
+  .ci-card-thread {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+}
+
+// The Android system status bar is transparent, so the chat detail header
+// needs the actual inset instead of the fixed web/PWA spacing.
+html.looky-native #page-chat-detail .app-header {
+  padding: var(--looky-native-status-bar-height, 24px) 8px 8px;
+}
+
+// Native Android keeps the transparent system bars outside the WebView.
+// Keep the chat header, message list, and input area in one stable flex column.
+html.looky-native #page-chat-detail {
+  min-height: 0;
+}
+
+html.looky-native #page-chat-detail .app-header {
+  flex: 0 0 auto;
+}
+
+html.looky-native #page-chat-detail .chat-detail-content {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+html.looky-native #page-chat-detail .chat-message-list,
+html.looky-native #page-chat-detail #chat-message-list {
+  flex: 1 1 0%;
+  min-height: 0;
+  height: auto;
+}
+
+html.looky-native #page-chat-detail .chat-input-container {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 0;
+  margin-top: 0;
+}

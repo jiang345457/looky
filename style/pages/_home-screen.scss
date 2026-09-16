@@ -1,0 +1,1338 @@
+// 文件路径: styles/pages/_home-screen.scss
+// 描述: 主屏幕的整体布局和其上的所有小组件样式。
+
+#home-screen-wrapper {
+  padding: var(--space-lg);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+    width: 100%;
+  height: 100%; /* 跟随 .phone-screen，避免整体缩放后底部露白 */
+  min-height: 100%;
+  
+  /* ▼▼▼【修改】移除这里的 background 属性，改由独立层负责 ▼▼▼ */
+  background-color: transparent; 
+  /* background-size: cover; */ /* 移除 */
+  /* background-position: center center; */ /* 移除 */
+  /* transition: background-image 0.5s ease-in-out; */ /* 移动到下面 */
+  
+  position: relative; /* 确保子元素绝对定位以此为基准 */
+  z-index: 1; /* 确保内容在壁纸之上 */
+  overflow-y: auto; /* 【新增】确保内容多时可以滚动，而不是卡住 */
+  overflow-x: hidden;
+}
+/* ▼▼▼【新增】独立的壁纸层样式 ▼▼▼ */
+#home-wallpaper-layer {
+ position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;         /* 放在内容最底层 */
+  
+  background-color: var(--c-bg-primary); /* 默认背景色 */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transition: background-image 0.5s ease-in-out;
+  
+  /* 强制消除任何边距 */
+  margin: 0;
+  padding: 0;
+  border: none;
+  pointer-events: none;
+}
+// --- 主屏幕内的模块 ---
+
+// 时间显示模块 - 微调精致版
+.time-module {
+  color: var(--c-text-primary);
+  /* 保持与原版接近的边距 (原版55px)，避免下方内容大幅跳动 */
+  margin-top: 50px; 
+  /* 稍微调整左右内边距，跟下方的 App 图标对齐 */
+  padding: 0 20px; 
+  box-sizing: border-box;
+  flex-shrink: 0;
+  /* 确保文字阴影轻柔，提升质感 */
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); 
+margin-bottom: 40px; 
+  .time {
+    /* 原版 88px -> 微调至 76px，保留大气的视觉重心 */
+    font-size: 76px; 
+    /* 保持极细字体，还原你要的轻盈感 */
+    font-weight: 200; 
+    line-height: 1;
+    /* 稍微收紧字间距，这是让大号细字体显精致的关键 */
+    letter-spacing: -2.5px; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .date-line {
+    display: flex;
+    align-items: center;
+    /* 控制日期距离时间的间隙 */
+    margin-top: 8px; 
+    /* 元素间距 */
+    gap: 12px; 
+
+    .day-period,
+    .date {
+      /* 原版 28px -> 微调至 20px，既不喧宾夺主，又清晰可见 */
+      font-size: 20px; 
+      /* 稍微比时间粗一点点(300)，增加层级对比 */
+      font-weight: 300; 
+      /* 增加字间距，提升高级感 */
+      letter-spacing: 1px; 
+      /* 颜色稍微淡一点，突出时间 */
+      opacity: 0.85; 
+    }
+
+    .separator {
+      font-size: 14px;
+      opacity: 0.3; /* 分隔符做得很淡，起装饰作用 */
+      transform: translateY(-1px); /* 微调垂直对齐 */
+    }
+  }
+}
+
+
+// 主内容区
+.main-content-area {
+  margin-top: var(--space-xl);
+  flex-grow: 1;
+}
+
+// 顶部区域 (照片小组件和应用网格的容器)
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+// 中间区域 (新增图标和Ticket的容器)
+.middle-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 55px;
+
+}
+
+// 应用网格
+.main-apps-grid,
+.secondary-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 64px);
+  gap: var(--space-lg) 18px;
+}
+
+.secondary-apps-grid {
+  padding-left: 10px;
+}
+
+
+// --- 主屏幕上的小组件 (Widgets) ---
+
+// 大照片小组件
+.large-photo-widget {
+  width: 168px;
+  height: 168px;
+  background-color: var(--c-bg-tertiary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// 票券小组件
+.ticket-widget {
+  width: 160px;
+  position: relative; /* 【修改】确保它是子元素定位的锚点 */
+}
+/* ▲▲▲ 修改结束 ▲▲▲ */
+
+
+/* ▼▼▼ 用这段代码替换你原来的 .ticket-widget 样式 ▼▼▼ */
+.ticket-widget {
+  width: 160px;
+  position: relative;
+  /* 【核心修改】给它一个内边距，为悬浮的插槽腾出一点空间 */
+  padding-top: 5px; 
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+
+.ticket-header-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ▼▼▼ 用这段代码【替换】你原来的 .ticket-slot 样式 ▼▼▼ */
+.ticket-slot {
+  height: 15px;
+  background-color: #e0e0e0;
+  border-radius: 3px 3px 0 0;
+  
+  /* --- 【核心修改】 --- */
+  position: absolute; /* 让它脱离文档流，悬浮起来 */
+  top: -5px;          /* 向上移动5px，制造重叠效果 */
+  left: 50%;          /* 水平居中的第一步 */
+  transform: translateX(-50%); /* 水平居中的第二步 */
+  width: 180px;         /* 【关键】给它一个比父容器更宽的固定宽度 */
+  z-index: 1;           /* 确保它在票身的下方（视觉上） */
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 95%; /* 让黑条充满父容器(ticket-slot)的宽度 */
+    height: 6px;
+    background-color: #2c2c2e;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 99px;
+  }
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+
+
+/* ▼▼▼ 用这段代码【替换】你原来的 .ticket-body 样式 ▼▼▼ */
+.ticket-body {
+  background-color: white;
+  padding: 8px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--c-border);
+  border-radius: 0 0 10px 10px;
+  position: relative; /* 必须有定位才能让 z-index 生效 */
+  z-index: 2;         /* 【关键】让票身在票槽之上，盖住它 */
+  /* margin-top: -10px; <-- 确保这一行被彻底删除 */
+  -webkit-mask:
+    radial-gradient(circle 7px at 0 144px, transparent 100%, black 0),
+    radial-gradient(circle 7px at 100% 144px, transparent 100%, black 0);
+  mask:
+    radial-gradient(circle 7px at 0 144px, transparent 100%, black 0),
+    radial-gradient(circle 7px at 100% 144px, transparent 100%, black 0);
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+
+.ticket-photo-label {
+  display: block;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+#ticket-photo-img {
+  display: block;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.perforation-line {
+  border-top: 2px dashed #ddd;
+  margin: 0 0 8px 0;
+}
+
+#ticket-stub-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  text-align: center;
+  color: #555;
+  box-sizing: border-box;
+  cursor: text;
+
+  &::placeholder {
+    color: #999;
+    opacity: 1;
+  }
+}
+
+// 隐藏的文件上传 input
+.hidden-upload {
+  display: none;
+}
+
+/* ▼▼▼ 请用这段代码替换你文件中【整个】的 @media (max-width: 600px) 代码块 ▼▼▼ */
+
+// --- 响应式布局: 移动端适配 (屏幕宽度小于等于 600px) ---
+@media (max-width: 600px) {
+
+  // --- 所有手机端样式现在都在这个大括号里面了 ---
+
+  // 时间模块 (保持不变)
+  .time-module {
+    margin-top: 13.3vw;
+    padding: 0 5.3vw;
+    margin-bottom: 10.7vw;
+    
+    .time {
+      font-size: 20.2vw;
+      letter-spacing: -0.67vw;
+    }
+    .date-line {
+      .day-period,
+      .date {
+        font-size: 5.3vw;
+      }
+    }
+  }
+
+  // 中间区域 (保持不变)
+  .middle-section {
+    margin-top: 14.7vw;
+  }
+
+  // 应用网格 (保持不变)
+  .main-apps-grid,
+  .secondary-apps-grid {
+    grid-template-columns: repeat(2, 17vw);
+    gap: var(--space-lg) 4.8vw;
+  }
+
+  .secondary-apps-grid {
+    padding-left: 2.7vw;
+  }
+
+  // 大照片小组件 (保持不变)
+  .large-photo-widget {
+    width: 44.8vw;
+    height: 44.8vw;
+  }
+
+  // 票券小组件 (根据您的最终方案进行修改)
+  // Wrapper保持不变，只调整内边距
+  .ticket-widget-wrapper {
+    padding-right: 2.56vw;
+  }
+
+  // 组件主体
+  .ticket-widget {
+    /* (160px / 375px) * 100vw ≈ 42.7vw */
+    width: 42.7vw;
+    /* (5px / 375px) * 100vw ≈ 1.33vw */
+    padding-top: 1.33vw;
+  }
+  
+  // 标题
+  .ticket-header-title {
+    font-size: 5vw;
+    letter-spacing: 0.5vw;
+    margin-bottom: 2vw;
+  }
+
+  // 插槽部分 (核心修改)
+  .ticket-slot {
+    /* 【修改】应用您的最终方案，替换掉旧的 margin 写法 */
+    height: 5vw;           /* 15px -> 4vw */
+       /* -5px -> -1.33vw */
+    width: 48vw;           /* 180px -> 48vw */
+    border-radius: 0.8vw 0.8vw 0 0; /* 3px -> 0.8vw */
+    
+    /* 【删除】旧的 margin 属性，因为它已经被 absolute 定位替代 */
+    // margin: 0 -4vw; /* <-- 已删除 */
+
+    &::after {
+      /* 【保持】您的 95% 宽度方案，这是最完美的响应式做法 */
+      width: 95%;
+      height: 1.6vw;        /* 6px -> 1.6vw */
+      border-radius: 99px;  /* 无需转换 */
+    }
+  }
+
+  // 票身部分 (核心修改)
+  .ticket-body {
+    padding: 2.1vw;       /* 8px -> 2.1vw */
+    border-radius: 0 0 2.7vw 2.7vw; /* 10px -> 2.7vw */
+
+    /* 【删除】旧的 margin-top 属性，现在用 z-index 控制堆叠 */
+    // margin-top: 1vw; /* <-- 已删除 */
+    
+    /* 【修正】mask 的垂直位置，以精确匹配桌面版比例 */
+    /* 桌面版图片高120px + padding 8px*2 + line 2px + input 11px ≈ 149px。mask在144px。*/
+    /* 移动端图片高29vw, 144/149 ≈ 0.96。 29vw * 0.96 ≈ 28vw。所以mask位置应在33vw左右。我们用更精确的计算。*/
+    /* (144px / 160px) * 42.7vw (票身宽度) = 38.4vw */
+    -webkit-mask:
+      radial-gradient(circle 1.8vw at 0 38.4vw, transparent 100%, black 0),
+      radial-gradient(circle 1.8vw at 100% 38.4vw, transparent 100%, black 0);
+    mask:
+      radial-gradient(circle 1.8vw at 0 38.4vw, transparent 100%, black 0),
+      radial-gradient(circle 1.8vw at 100% 38.4vw, transparent 100%, black 0);
+  }
+
+  // 内部元素 (保持不变)
+  .ticket-photo-label {
+    margin-bottom: 2.05vw;
+  }
+
+  #ticket-photo-img {
+    height: 32vw; /* 120px -> 32vw */
+  }
+
+  .perforation-line {
+    border-top-width: 0.51vw;
+    margin-bottom: 2.05vw;
+  }
+
+  #ticket-stub-input {
+    font-size: 2.9vw; /* 11px -> 2.9vw */
+  }
+}
+
+
+/* --- 新增小组件的通用样式 --- */
+.widget-style-id-card,
+.widget-style-player {
+  display: none; 
+}
+
+/* --- 样式1：证件卡片 (ID Card) - 已根据您的图片重制 --- */
+
+/* 1. 组件总容器：横向拉长 */
+.id-card-widget {
+  /* ▼▼▼ 核心修改：在缩放的基础上，增加位移 ▼▼▼ */
+  transform: scale(0.7) translate(-40px, -45px); 
+   width: 250px;
+  height: 180px;
+  position: relative;
+  padding-top: 10px;
+  box-sizing: border-box;
+}
+
+
+/* 2. 夹子：样式微调以匹配图片 */
+.id-card-clip {
+  position: absolute;
+  top: -10px; 
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 45px;
+  background: linear-gradient(to bottom, #EAEAEA, #FEFEFE);
+  border: 1px solid #C5C5C5;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  z-index: 2; /* 确保在卡片之上 */
+}
+.id-card-clip::before {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #B0B1B3;
+  background-color: #F0F1F3;
+}
+.id-card-clip::after {
+  content: '';
+  position: absolute;
+  bottom: 10.5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #929395;
+}
+
+/* 3. 卡片主体：模仿塑料卡套质感 */
+.id-card-body {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9); /* 轻微透明 */
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* 柔和阴影 */
+  backdrop-filter: blur(15px); /* 毛玻璃效果 */
+  -webkit-backdrop-filter: blur(15px);
+  padding: 12px;
+  box-sizing: border-box;
+  
+  /* 模仿卡套的虚线边框 */
+  border: 1.5px dashed rgba(200, 200, 200, 0.6); 
+  
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+/* 4. 左侧照片 */
+.id-card-photo-wrapper {
+  position: absolute; /* 新增：开启绝对定位 */
+  top: 42px;          /* 新增：距离顶部的位置 */
+  left: 12px;         /* 新增：距离左边的位置 */
+  z-index: 2;         /* 新增：确保照片在背景之上 */
+  width: 90px;
+  height: 120px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.id-card-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 5. 右侧信息行 */
+.id-card-info-lines {
+  margin-left: 95px;
+  flex-grow: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+.info-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.info-icon {
+  width: 16px;
+  height: 16px;
+  fill: #888; /* 图标颜色 */
+  flex-shrink: 0;
+}
+.info-icon.headphone {
+  fill: none;
+  stroke: #888;
+  stroke-width: 1.5px;
+}
+.info-text {
+  font-size: 13px;
+  color: #555;
+  font-family: 'SF Mono', 'Courier New', monospace; /* 像素风/等宽字体 */
+  white-space: nowrap; /* 防止文字换行 */
+}
+.info-text.decorative {
+  letter-spacing: 1px; /* 给特殊符号增加一点间距 */
+}
+
+/* --- 样式2：音乐播放器 (Music Player) --- */
+.player-widget {
+  width: 168px; /* 宽度保持不变，对齐大组件 */
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* 稍微增加间距，让布局更舒展 */
+  transform: translateX(7px); 
+}
+
+.player-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 2.4px; /* 微调左侧留白 */
+}
+
+.player-avatar-container {
+  position: relative;
+  width: 52px; /* 稍微调小一点点头像，更精致 */
+  height: 52px;
+  flex-shrink: 0;
+}
+
+.player-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+ border: 2px solid rgba(255, 255, 255, 0.9); /* 白边更亮一点 */
+  /* 加强阴影扩散范围，看起来更立体 */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); 
+}
+
+.player-add-btn,
+.player-headphone-icon {
+  position: absolute;
+  background-color: #fff; /* 纯白背景 */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 2;
+}
+
+.player-add-btn {
+  width: 18px;
+  height: 18px;
+  bottom: -2px;
+  right: -2px;
+  font-size: 14px;
+  color: #1b1b1b; 
+  font-weight: bold;
+}
+
+.player-headphone-icon {
+  width: 20px;
+  height: 20px;
+  top: -4px;
+  left: -4px;
+  font-size: 11px;
+}
+
+.player-header-text {
+  font-size: 12px;
+  color: #333;
+}
+.player-header-text p {
+  font-size: 15px;
+  font-weight: 700; /* 加粗颜文字/名字 */
+  margin: 0 0 2px 0;
+  color: #1c1c1e;
+}
+.player-header-text span {
+  font-size: 10px;
+  color: #8e8e93; /* 经典的iOS灰色 */
+  display: block;
+  transform: scale(0.95); /* 稍微缩小一点日期 */
+  transform-origin: left;
+}
+
+.player-body {
+  /* 背景保持磨砂感，但稍微调亮一点以适应图片 */
+  background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(242,242,247,0.8));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 18px;
+  padding: 14px;
+  box-sizing: border-box;
+  color: #1c1c1e;
+  border: 1px solid rgba(255,255,255,0.6);
+  
+  /* === 1. 盒子阴影：加深，让卡片更明显 === */
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.12), /* 外部大投影 */
+    inset 0 1px 0 rgba(255,255,255,0.9); /* 顶部高光 */
+
+  /* === 2. 文字阴影：关键！给所有文字加一层白边 === */
+  /* 这样当你上传深色或花哨的背景图时，黑色文字依然清晰可见 */
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9), 0 0 5px rgba(255, 255, 255, 0.6);
+}
+
+.player-body .music-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #8e8e93;
+  letter-spacing: 0.5px;
+}
+
+.player-body .music-title {
+  font-size: 13px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  font-weight: 600; /* 加粗歌名 */
+  color: #000;
+}
+
+/* 进度条美化：做成渐变色 */
+.player-body .music-progress-bar {
+  font-family: 'Menlo', 'Courier New', monospace; /* 等宽字体让竖线对齐 */
+  background: linear-gradient(90deg, #1c1c1c 0%, #67828f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; /* 文字镂空显示背景渐变 */
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.player-body .music-battery {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #aeaeb2;
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+
+.player-body .player-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(0,0,0,0.06); /* 更淡的分割线 */
+  padding-top: 10px;
+  font-size: 9px;
+  color: #8e8e93;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 按钮间距拉大一点 */
+}
+
+.player-controls svg {
+  width: 14px;
+  height: 14px;
+  fill: #1c1c1e; /* 深黑色图标 */
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.player-controls svg:hover {
+  opacity: 1;
+}
+/* --- 双屏滑动核心逻辑 --- */
+#home-screen-wrapper {
+  padding: 0 !important; // 取消原有边距，交给内部页面处理
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // 禁止外层滚动
+}
+
+.home-pager-container {
+  display: flex;
+  flex: 1;
+  overflow-x: auto; // 开启横向滚动
+  scroll-snap-type: x mandatory; // 关键：自动对齐屏幕
+  scrollbar-width: none; // 隐藏滚动条 (火狐)
+  &::-webkit-scrollbar { display: none; } // 隐藏滚动条 (谷歌/苹果)
+  
+  /* 确保滑动时不会卡到底栏 */
+  margin-bottom: 0; 
+}
+
+.home-page {
+  flex: 0 0 100%; // 每一屏宽度占 100%
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start; // 滑动停止时自动对齐起点
+  padding: var(--space-lg); // 把刚才取消的边距补回来
+  box-sizing: border-box;
+}
+
+/* 调整底栏位置，确保它浮在最上面 */
+.app-dock {
+  position: absolute;
+  bottom: 30px;
+  left: var(--space-lg);
+  right: var(--space-lg);
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+}
+/* --- 双屏滑动核心样式 --- */
+#home-screen-wrapper {
+  padding: 0 !important; /* 边距交给内部页面处理 */
+  overflow: hidden;
+  position: relative;
+}
+
+.home-pager-container {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory; /* 自动吸附对齐 */
+  scrollbar-width: none; /* 隐藏滚动条 */
+  &::-webkit-scrollbar { display: none; }
+}
+
+.home-page {
+  flex: 0 0 100%; /* 每页占满宽度 */
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  padding: var(--space-lg); /* 补回原来的内边距 */
+  box-sizing: border-box;
+}
+
+/* --- 页面指示器（切换条）样式 --- */
+.home-page-indicator {
+  position: absolute;
+  bottom: 116px; /* 位于底栏上方 */
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none; /* 不遮挡点击 */
+  z-index: 5;
+}
+
+.home-page-indicator .dot {
+  width: 6px;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 平滑缩放动画 */
+}
+
+.home-page-indicator .dot.active {
+  background-color: #fff;
+  transform: scale(1.3); /* 激活时放大 */
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* 确保底栏浮在最上层 */
+.app-dock {
+  position: absolute;
+  bottom: 25px;
+  left: 20px;
+  right: 20px;
+  z-index: 10;
+}
+/* ========================================= */
+/* == Top Widgets+ 日杂风小组件样式 == */
+/* ========================================= */
+.top-widget-card {
+  // ▼▼▼【修改】在这里自由调整你想要的宽度和高度 ▼▼▼
+  width: 340px;      /* 比如，改成你想要的宽度，单位是 px */
+  height: 170px;     /* 比如，改成你想要的高度，单位是 px */
+  align-self: center;/* 新增：确保组件在页面上水平居中 */
+ position: relative; /* 新增：必须加这一行 */
+  z-index: 1;        /* 新增：确保内容在背景上方 */
+  border-radius: 20px;
+  padding: 14px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+  // 新增背景控制层
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 20px;
+    z-index: -1;
+    background-color: var(--tw-bg-color, #F2F2F4); /* 使用变量控制颜色 */
+    background-image: var(--tw-bg-image, none);    /* 使用变量控制图片 */
+    background-size: cover;
+    background-position: center;
+    opacity: var(--tw-bg-opacity, 1);             /* 使用变量控制透明度 */
+  }
+}
+/* --- 中间三列布局 --- */
+.tw-grid-body {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 110px;
+  /* ▼▼▼【修改】将对齐方式改为居中，这样gap才能生效 ▼▼▼ */
+  justify-content: center;
+  /* ▼▼▼【新增】在这里自由调整三个图片框之间的间距 ▼▼▼ */
+  gap: 10px; /* 你可以把 10px 改成任何你想要的间距，比如 8px 或 15px */
+}
+.tw-item {
+  width: 31%; 
+  aspect-ratio: 1 / 1;
+  background-color: #fff;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.02);
+  overflow: hidden;
+  position: relative;
+  
+  /* ▼▼▼【修改】下面是为图片上传功能新增和调整的样式 ▼▼▼ */
+  
+  cursor: pointer; /* 新增：让鼠标放上去有小手，提示可以点击 */
+  padding: 3px; /* 新增：给内部图片留出白边，像拍立得一样 */
+  box-sizing: border-box; /* 新增：确保 padding 不会撑大盒子 */
+  
+  /* 新增：当图片没上传时，盒子内部使用浅灰色背景和虚线边框来占位 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F8F8F8;
+  border: 1px dashed #E0E0E0; 
+}
+
+.tw-item img {
+  /* 新增：这是控制上传后图片的样式 */
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 保证图片不变形地填满容器 */
+  border-radius: 8px; /* 让图片本身也有圆角 */
+  display: block; /* 消除图片下方的幽灵空白 */
+}
+
+/* --- 底部 Footer --- */
+/* --- 新增的小横条样式 --- */
+.tw-handle-bar {
+  width: 48px;
+  height: 6px;
+  background-color: #d8d8d8; /* 一个温和的灰色 */
+  border-radius: 10px;
+  margin-bottom: 8px; /* 和下面的内容保持一点距离 */
+}
+
+/* --- 底部 Footer --- */
+.tw-footer {
+  width: 100%; /* ▼▼▼【修改】让它占满整行 ▼▼▼ */
+  display: flex;
+  justify-content: flex-end; /* ▼▼▼【修改】让里面的内容全部靠右对齐 ▼▼▼ */
+  align-items: center;
+  gap: 8px; /* ▼▼▼【修改】控制两个按钮之间的间距，8px比较舒服 ▼▼▼ */
+  margin-top: -5px;  /* 向上移动5px，靠近上面的内容 */
+  margin-bottom: -5px; /* 向下移动5px，靠近下面的标题 */
+}
+
+.tw-title {
+  margin-top: 8px; /* ▼▼▼【修改】让标题和上面的按钮区域拉开距离 ▼▼▼ */
+  font-size: 12px;
+  color: #888; /* 颜色改得更淡一点，不那么抢眼 */
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.tw-btn {
+  background: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+/* ========================================= */
+/* == Colorful Widget 拍立得小组件样式 == */
+/* ========================================= */
+
+/* 1. 外层容器：居中显示，与上方保持距离 */
+.colorful-widget-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 10px; 
+}
+
+/* 2. 组件主体：严格遵循 320x240，背景全透明 */
+.colorful-widget {
+  width: 320px;
+  height: 240px;
+  background-color: transparent; 
+  position: relative; 
+}
+
+/* 3. 拍立得卡片通用样式 */
+.polaroid-card {
+  position: absolute;
+  background-color: #FFFFFF;
+  padding: 6px 6px 20px 6px; 
+  border-radius: 4px; 
+  box-sizing: border-box;
+  box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0,0,0,0.08); 
+}
+
+/* 【重点新增】利用伪元素在图片上方叠加一层凹陷内阴影 */
+.polaroid-card::after {
+  content: '';
+  position: absolute;
+  top: 6px;  /* 紧贴上边缘的 padding */
+  left: 6px; /* 紧贴左边缘的 padding */
+  width: 96px;
+  height: 96px;
+  border-radius: 2px;
+  /* 核心：顶部和左侧深色内阴影，底部亮色反光，模拟相纸压痕 */
+  box-shadow: inset 0px 3px 6px rgba(0, 0, 0, 0.15),
+              inset 1px 0px 4px rgba(0, 0, 0, 0.08),
+              inset -1px -1px 2px rgba(255, 255, 255, 0.5);
+  /* 极细的边框让边缘的切面更真实 */
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  pointer-events: none; /* 穿透点击，不影响鼠标操作 */
+}
+
+/* 内部正方形图片区 */
+.polaroid-card .polaroid-img {
+  width: 96px; 
+  height: 96px;
+  background-color: #E0E0E0; 
+  border-radius: 2px; 
+  object-fit: cover; 
+  display: block; 
+}
+
+/* 4. 三张卡片的错落叠放 */
+
+/* 第一个相框 (左侧) */
+.card-left {
+  left: 1px; 
+  top: 45px; 
+  transform: rotate(-9deg); 
+  z-index: 1; 
+}
+
+/* 中间的相框 */
+.card-center {
+  left: 100px; 
+  top: 15px; 
+  transform: rotate(5deg); 
+  z-index: 3; 
+  padding-bottom: 24px; 
+}
+.card-center .polaroid-img {
+  width: 112px; 
+  height: 112px;
+}
+/* 【同步放大】中间卡片的凹陷层尺寸也要跟着放大 */
+.card-center::after {
+  width: 112px;
+  height: 112px;
+}
+
+/* 第三个相框 (右侧) */
+.card-right {
+  left: 210px;
+  top: 50px; 
+  transform: rotate(-13deg); 
+  z-index: 2; 
+}
+
+/* 5. 底部文字样式 */
+.colorful-widget-title {
+  position: absolute;
+  top: 195px; 
+  left: 50%;
+  transform: translateX(-50%); 
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 13px; 
+  font-weight: 500; 
+  color: #555555; 
+  letter-spacing: 0.5px;
+}
+/* ========================================= */
+/* == Instagram 风格分享小组件样式 == */
+/* ========================================= */
+
+.instagram-widget-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 居中对齐 */
+  width: 52%;
+  margin-top: -10px;
+  /* 确保底部有足够的空间，不被指示条遮挡 */
+  margin-bottom: 60px; 
+}
+/* 1. 组件整体容器 */
+.instagram-widget-card {
+  width: 140px; /* 在这里随便设置你想要的宽度 */
+  height: 150px; /* 在这里随便设置你想要的高度 */
+  
+  background-color: #E8E8ED;
+  border-radius: 18px;
+  padding: 10px;
+  box-shadow: 0 0 0 6px #fff, 0 8px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+
+/* 2. 顶部栏 */
+.insta-header {
+  height: 30px; /* 高度微调 */
+  background-color: #c9c9c9; /* 修改为您图片中稍深的灰色 */
+  border-radius: 16px; /* 圆角微调 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px; /* 内边距微调 */
+  /* margin-bottom 已被外层 gap 替代，可以删除 */
+}
+
+.insta-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 12px; /* 字体微调 */
+  font-weight: 700; /* 加粗 */
+  color: #FFFFFF; /* 修改为白色 */
+}
+
+/* 这是为新图标预留的样式，把它加在这里 */
+.insta-check-icon {
+  width: 24px;
+  height: 24px;
+  background-color: #BFC1C9; /* 图片中图标的灰色背景 */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.insta-check-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: #FFFFFF; /* 图标本身是白色 */
+  stroke-width: 2.5;
+}
+
+/* 3. 中间图片区 */
+.insta-image-area {
+  flex-grow: 1;
+  border-radius: 12px; /* 圆角与顶部栏保持一致感 */
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background-color: #ddd;
+  /* margin-bottom 已被外层 gap 替代，可以删除 */
+}
+
+.insta-image-area img {
+
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Aspect Fill 裁剪模式 */
+  display: block;
+}
+
+/* 鼠标悬停时的提示 */
+.insta-overlay-hint {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.3);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.insta-image-area:hover .insta-overlay-hint {
+  opacity: 1;
+}
+
+/* 4. 底部操作栏 */
+.insta-action-bar {
+  height: 24px; /* 高度与顶部栏统一 */
+  background-color: #e8e8ed; /* 颜色与顶部栏统一 */
+  border-radius: 16px; /* 圆角与顶部栏统一 */
+  display: flex;
+  align-items: center;
+  padding: 0 2px; /* 左右内边距，给图标留出空间 */
+  justify-content: space-between;
+}
+
+/* 圆形图标容器 */
+.icon-circle {
+  width: 28px; /* 微调尺寸 */
+  height: 28px; /* 微调尺寸 */
+  background-color: #c9c9c9; /* 使用卡片主背景色，营造凹陷感 */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-icon {
+  width: 18px; /* 图标尺寸微调 */
+  height: 18px; /* 图标尺寸微调 */
+  color: #ffffff; /* 修改为您图片中的图标灰色 */
+  /* stroke-width 属性对于 fill 填充的图标无效，可以删掉或保留 */
+}
+
+/* 中间胶囊按钮 */
+.action-pill {
+  height: 25px; /* 微调尺寸 */
+  background-color: #c9c9c9; /* 使用卡片主背景色 */
+  border-radius: 15px;
+  padding: 0 12px; /* 左右内边距微调 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 9px; /* 字体大小微调 */
+  font-weight: 700; /* 加粗 */
+  color: #ffffff; /* 修改为您图片中的文字灰色 */
+}
+
+/* 5. 底部组件名称 */
+.insta-widget-label {
+  margin-top: 10px; /* 距离卡片距离微调 */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 13px; /* 字体调大 */
+  font-weight: 700; /* 加粗 */
+  color: #c9c9c9; /* 修改为您图片中的深灰色 */
+  text-align: center;
+}
+/* === 自定义配置弹窗精致样式 === */
+.config-minimal-card {
+  width: 300px;
+  background: #ffffff;
+  border-radius: 32px;
+  padding: 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(0,0,0,0.05);
+
+  .config-header {
+    text-align: left; /* 改为左对齐更有设计感 */
+    margin-bottom: 24px;
+    border-left: 4px solid #000;
+    padding-left: 12px;
+    h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+    .subtitle { font-size: 10px; color: #bbb; text-transform: uppercase; }
+  }
+
+  .config-item {
+    display: flex;
+    flex-direction: column; /* 改为上下排列，空间更舒展 */
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 20px;
+    label { font-size: 12px; font-weight: 600; color: #888; }
+  }
+
+  .color-input-group {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .hex-input {
+    flex: 1;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'Monaco', monospace;
+    font-size: 13px;
+    background: #f9f9f9;
+    outline: none;
+    &:focus { border-color: #000; background: #fff; }
+  }
+
+  input[type="color"] {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    &::-webkit-color-swatch-wrapper { padding: 0; }
+    &::-webkit-color-swatch { border: none; }
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: #000;
+  }
+}
+
+.config-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ccc;
+  margin: 20px 0 10px;
+  text-transform: uppercase;
+}
+.btn-bw-outline {
+  background: transparent;
+  border: 1px solid #000;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.btn-bw-primary {
+  width: 100%;
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 14px;
+  font-weight: 600;
+  margin-top: 10px;
+  cursor: pointer;
+}
+/* 隐藏系统默认的颜色选择器外观，使其更精致 */
+input[type="color"] {
+  border: none;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  background: none;
+}
+/* ========================================================= */
+/* === 顶部装饰组件 (6种样式) CSS === */
+/* ========================================================= */
+.top-decorative-wrapper {
+  margin-top: 50px;
+  padding: 0 20px;
+  min-height: 100px; /* 防止切换时高度塌陷 */
+}
+.top-style-item { display: none; }
+.top-style-item.active { display: block; animation: fadeIn 0.3s ease; }
+
+/* 样式1: 萌物收藏盒 */
+.cute-pill-box {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+  border-radius: 30px; padding: 6px 6px 6px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid rgba(255,255,255,0.5); width: 100%;
+}
+.cute-pill-box .pill-avatar img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.cute-pill-box .pill-text { font-size: 13px; color: #666; font-weight: 500; flex-grow: 1; margin: 0 10px; }
+.cute-pill-box .pill-btn { background: #e0e0e0; border: none; border-radius: 20px; padding: 6px 14px; font-size: 12px; color: #fff; font-weight: bold; }
+
+/* 样式2: 透明磨砂卡 */
+.glass-star-card {
+  background: rgba(255,255,255,0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.6); position: relative;
+}
+.glass-star-card .glass-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 10px; }
+.glass-star-card .glass-avatar-box img { width: 64px; height: 64px; border-radius: 12px; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.glass-star-card .glass-id { font-size: 12px; color: #666; margin: 8px 0 15px; font-weight: 500; }
+.glass-star-card .glass-search { display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(255,255,255,0.7); border-radius: 20px; padding: 8px; font-size: 12px; color: #888; }
+.glass-star-card .glass-search svg { width: 14px; height: 14px; }
+
+/* 样式3: 复古档案卡 */
+.retro-file-card {
+  background: #f4f4f4; border: 1px solid #ccc; border-radius: 4px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1); padding: 2px;
+}
+.retro-file-card .retro-menubar { background: #e0e0e0; font-family: monospace; font-size: 10px; padding: 4px; color: #555; border-bottom: 1px solid #ccc; margin-bottom: 8px; }
+.retro-file-card .retro-content { display: flex; gap: 10px; padding: 5px; }
+.retro-file-card .retro-img img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #ddd; }
+.retro-file-card .retro-text { flex-grow: 1; }
+.retro-file-card .t-name { font-size: 13px; font-weight: bold; color: #333; margin: 0 0 5px 0; }
+.retro-file-card .t-msg { font-size: 12px; color: #666; margin: 0 0 5px 0; background: #fff; padding: 6px; border-radius: 4px; }
+.retro-file-card .t-time { font-size: 10px; color: #999; }
+
+/* 样式4: 单词高亮卡 */
+.word-list-card {
+  display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.8);
+  border-radius: 20px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee;
+}
+.word-list-card .word-left { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #b0b0b0; font-weight: 500; text-align: center; }
+.word-list-card .word-left .highlight { background: #fff; color: #333; padding: 4px 12px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
+.word-list-card .word-right { position: relative; }
+.word-list-card .word-right img { width: 120px; height: 120px; border-radius: 16px; object-fit: cover; }
+.word-list-card .word-right .pass-btn { position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; color: #333; }
+
+/* 样式5: 极简韩文消息框 */
+.korean-msg-card {
+  background: rgba(255,255,255,0.9); border-radius: 16px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+.korean-msg-card .k-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 14px; font-weight: bold; color: #333; }
+.korean-msg-card .k-header img { width: 30px; height: 30px; border-radius: 50%; }
+.korean-msg-card .k-header svg { width: 16px; height: 16px; margin-left: auto; }
+.korean-msg-card .k-input { background: #f7f7f7; padding: 10px 12px; border-radius: 8px; font-size: 13px; color: #555; margin-bottom: 8px; border: 1px solid #eee; }
+.korean-msg-card .k-footer { text-align: center; font-size: 12px; color: #999; font-weight: bold; margin-top: 10px; }

@@ -1,0 +1,158 @@
+// 文件路径: /style/components/_exit-confirmation-modal.scss
+// 描述: 线下模式退出确认弹窗 - 美化版本
+
+
+.exit-confirmation-overlay {
+  // 遮罩层样式 (保持不变)
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); // 半透明黑色背景
+  backdrop-filter: blur(4px); // 背景模糊效果，更有质感
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.exit-confirmation-modal {
+  // 弹窗卡片主样式
+  background-color: #f7f7f7; // 使用一个非常浅的灰色，比纯白更有质感
+  border-radius: 24px; // 更圆润的边角
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05); // 更柔和的阴影
+  width: 90%;
+  max-width: 320px;
+  text-align: center;
+  padding: 24px; // 统一内边距
+  transform: scale(0.95) translateY(10px); // 初始状态稍微缩小并下移
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); // 更流畅的缓动动画
+
+  .exit-confirmation-overlay.visible & {
+    transform: scale(1) translateY(0); // 最终状态
+  }
+
+  // 头像和昵称区域
+  .profiles {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .profile-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px; // 头像和昵称的间距
+
+    .avatar {
+      width: 56px; // 尺寸微调
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ffffff; // 白色边框，增加层次感
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); // 为头像添加一点阴影
+    }
+
+    .nickname {
+      font-size: 13px; // 字体微调
+      font-weight: 500;
+      color: #3c3c43; // 柔和的黑色
+    }
+  }
+
+  // 心电波动画容器
+ .heartbeat-container {
+  flex-grow: 1;
+  height: 60px; // 稍微增加高度以适应新的波形
+  margin: 0 16px;
+  overflow: hidden;
+}
+.heartbeat-svg {
+  width: 100%;  // 宽度不再需要200%，因为不是滚动动画了
+  height: 100%;
+  // 移除了旧的 animation 属性
+}
+.heartbeat-path {
+  // --- 这是从你提供的SVG中移植过来的核心样式 ---
+  fill: none;
+  stroke: #F472B6;      // 漂亮的粉色
+  stroke-width: 2.5;
+  stroke-linecap: butt;   // 线条末端是平的
+  stroke-linejoin: miter; // 线条拐角是尖的
+  
+  // 霓虹辉光效果
+  filter: drop-shadow(0 0 4px #F472B6) drop-shadow(0 0 12px rgba(244, 114, 182, 0.7));
+  // --- 动画核心 ---
+  stroke-dasharray: 600;  // 定义虚线模式，总长度足够长
+  stroke-dashoffset: 600; // 初始偏移，让线条完全“隐藏”
+  animation: draw-in 2s linear infinite; // 应用新的绘制动画
+}
+// 这是新的动画关键帧，实现了“绘制”效果
+@keyframes draw-in {
+  to {
+    stroke-dashoffset: 0; // 动画结束时，偏移为0，线条完全显示
+  }
+}
+
+  // 标题
+  .modal-title {
+    font-size: 20px;
+    font-weight: 700; // 加粗
+    color: #000000;
+    margin: 16px 0; // 调整上下间距
+  }
+
+  // 按钮区域
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+
+    button {
+      flex: 1;
+      padding: 14px; // 按钮更大，更易点击
+      border: none;
+      border-radius: 16px; // 圆角按钮
+      font-size: 16px;
+      font-weight: 600; // 字体加粗
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:active {
+        transform: scale(0.96); // 点击时有按压效果
+      }
+
+      &.cancel-btn {
+        background-color: #e5e5ea; // 浅灰色背景
+        color: #1c1c1e; // 深灰色文字
+      }
+
+      &.confirm-btn {
+        background-color: #000000; // 纯黑背景
+        color: #FFFFFF; // 白色文字
+      }
+    }
+  }
+}
+
+// 心电波滚动动画 (保持不变)
+@keyframes heartbeat-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%); // 向左滚动一个周期的宽度
+  }
+}

@@ -1,0 +1,58 @@
+// 文件路径: styles/components/_bottom-nav.scss
+
+.chat-bottom-nav {
+  position: absolute;
+  bottom: max(12px, calc(var(--space-md, 16px) - var(--app-page-offset-pull-up, 0px)));
+  left: var(--space-md, 16px);
+  right: var(--space-md, 16px);
+  height: 64px;
+  border-radius: 100px;
+  background: white;
+
+  // =======================================================
+  // |                👇 这里是修改点 👇                   |
+  // =======================================================
+  // 将紫色的阴影改为更柔和、通用的黑色阴影
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 60;
+  transition: none;
+
+  .nav-item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--font-xs);
+    color: var(--c-text-secondary);
+    cursor: pointer;
+
+    span {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+      fill: none;
+      stroke: var(--c-text-secondary);
+    }
+    
+    &.active {
+      color: #8a6dff;
+      svg {
+        stroke: #8a6dff;
+        fill: rgba(138, 109, 255, 0.1);
+      }
+    }
+  }
+}

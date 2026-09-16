@@ -1,0 +1,46 @@
+// 文件路径: styles/components/_list-item.scss
+// 描述: 设置页面中常用的列表项，通常包含图标、文字和箭头。
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 14px var(--radius-lg);
+  cursor: pointer;
+  border-bottom: 1px solid var(--c-border);
+  transition: background-color 0.2s ease;
+  font-size: var(--font-md);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: var(--c-bg-tertiary);
+  }
+
+  .settings-item-icon {
+    margin-right: var(--radius-lg);
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 1.5;
+      stroke: #333;
+      fill: none;
+    }
+  }
+
+  .settings-item-text {
+    flex-grow: 1;
+    color: var(--c-text-primary);
+  }
+
+  .settings-item-arrow svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--c-text-tertiary);
+    stroke-width: 2.5;
+  }
+}

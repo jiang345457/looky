@@ -1,0 +1,68 @@
+// 文件路径: styles/components/_button.scss
+// 描述: 通用的按钮样式，包括不同颜色、大小和按钮组。
+
+.btn {
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  border: none;
+  font-size: var(--font-md);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  // 颜色变体
+  &.btn-primary {
+    background-color: var(--c-text-primary);
+    color: white;
+    &:hover {
+      background-color: #333;
+    }
+  }
+
+  &.btn-secondary {
+    background-color: var(--c-bg-secondary);
+    color: var(--c-text-primary);
+    &:hover {
+      background-color: #e5e5ea;
+    }
+  }
+
+  &.btn-accent {
+    background-color: var(--c-accent);
+    color: white;
+  }
+  
+  // 尺寸变体
+  &.btn-small {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-xs);
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    
+    // 小按钮的特定颜色状态
+    &.btn-save {
+      background-color: var(--c-text-primary);
+      color: white;
+    }
+    &.btn-reset {
+      background-color: var(--c-text-secondary);
+      color: white;
+    }
+  }
+
+  // 布局变体
+  &.full-width {
+    width: 100%;
+  }
+}
+
+// 按钮组
+.btn-group {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: 30px;
+
+  .btn {
+    flex-grow: 1;
+  }
+}

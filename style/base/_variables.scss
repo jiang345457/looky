@@ -1,0 +1,76 @@
+/* ===== CSS 变量定义 - 控制整体主题样式 ===== */
+:root {
+  /*颜色系统*/
+  --c-text-primary: #1c1c1e;
+  --c-text-secondary: #8e8e93;
+  --c-text-tertiary: #c7c7cc;
+  --c-bg-primary: #ffffff;
+  --c-bg-secondary: #f2f2f5;
+  --c-bg-tertiary: #f8f8f8;
+  --c-border: #f0f0f0;
+  --c-border-light: #e5e5e5;
+  --c-accent: #007aff;
+  --c-accent-green: #34C759;
+  --c-accent-red: #ff3b30;
+  --c-black: #000;
+  --desktop-icon-name-color: #333333;
+  /*间距系统 (固定像素值)*/
+  --space-xs: 5px;
+  --space-sm: 10px;
+  --space-md: 15px;
+  --space-lg: 20px;
+  --space-xl: 25px;
+  /*圆角系统*/
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 5px 15px rgba(0, 0, 0, 0.15);
+  /*字体大小*/
+  --font-xs: 12px;
+  --font-sm: 14px;
+  --font-md: 16px;
+  --font-lg: 18px;
+  --font-xl: 22px;
+  --looky-display-scale: 1;
+  --looky-display-width: 100%;
+  --looky-display-height: 100%;
+}
+/* =================================================================== */
+/* == 【最终版】手机端响应式变量 (字体固定 + 布局微调) == */
+/* =================================================================== */
+@media (max-width: 600px) {
+  :root {
+    /*
+     * --- 新策略 ---
+     * 1. 核心字体 (如正文、按钮文字) 使用固定的 px 值，保证在所有手机上阅读体验一致。
+     * 2. 布局间距和少数大标题使用 clamp()，允许它们在合理范围内缩放，但不会无限变大。
+     */
+
+    /* --- 【重点修改】响应式间距，使用 clamp() 并收紧最大值 --- */
+    /* 这将保证边距会缩放，但不会撑得太大 */
+    --space-xs: clamp(4px, 1.28vw, 5px);     /* 在 4px-5px 之间缩放 */
+    --space-sm: clamp(8px, 2.56vw, 10px);    /* 在 8px-10px 之间缩放 */
+    --space-md: clamp(12px, 3.84vw, 15px);   /* 在 12px-15px 之间缩放 */
+    --space-lg: clamp(16px, 5.12vw, 20px);   /* 在 16px-20px 之间缩放 */
+    --space-xl: clamp(24px, 6.41vw, 28px);   /* 在 24px-28px 之间缩放 */
+
+    /* --- 响应式圆角 (这个影响不大，保持原样) --- */
+    --radius-sm: 2.05vw;
+    --radius-md: 3.07vw;
+    --radius-lg: 4.1vw;
+    --radius-xl: 5.64vw;
+
+    /* --- 【！！！核心修改！！！】固定核心字体大小 --- */
+    /* 我们不再让这些字体缩放，这会彻底解决“字体偏大”的问题 */
+    --font-sm: 14px; /* (原14px) 比如时间、小标签等，固定住！ */
+    --font-md: 16px; /* (原16px) 比如按钮文字、正文，固定住！这是最重要的！ */
+    
+    /* 对于较大的标题，我们仍然允许轻微缩放，但范围收得很紧 */
+    --font-lg: clamp(17px, 4.61vw, 18px); /* (原18px) 只允许在 17-18px 之间变化 */
+    --font-xl: clamp(20px, 5.64vw, 22px); /* (原22px) 只允许在 20-22px 之间变化 */
+  }
+}
+

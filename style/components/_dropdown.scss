@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Dropdown Style Picker Component (下拉样式选择器组件)
+   ========================================================================== */
+// 触发器容器 (现在包含了所有内容)
+.timestamp-center-option {
+  flex-wrap: wrap; // 允许内容换行
+  padding-bottom: 0; // 确保没有多余的底部内边距
+  &.dropdown-open {
+    // 当展开时，给底部一点空间，让它和下面的选项分隔开
+    padding-bottom: 12px;
+  }
+}
+// 触发点击的区域样式
+.dropdown-trigger-area {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-grow: 1;
+  min-width: 120px;
+}
+// 下拉箭头图标
+.dropdown-arrow {
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  color: var(--c-text-tertiary);
+  transition: transform 0.2s ease-in-out;
+  flex-shrink: 0;
+  &.active {
+    transform: rotate(180deg);
+  }
+}
+// 下拉卡片容器
+.style-picker-dropdown {
+  // ▼▼▼ 核心修改：移除 absolute 定位，让它在正常文档流中 ▼▼▼
+  display: none; // 默认隐藏
+  flex-direction: column;
+  gap: 6px;
+  width: 100%; // 宽度占满父容器
+  margin-top: 10px; // 与上方元素保持间距
+  
+  // 使用平滑的展开/收起动画
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease, margin-top 0.3s ease;
+  &.active {
+    display: flex;
+    max-height: 200px; // 一个足够大的高度
+    opacity: 1;
+  }
+}
+// 单个样式选项 (样式不变)
+.style-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: 1px solid transparent; // 添加透明边框占位
+  &:hover {
+    background-color: var(--c-bg-secondary);
+  }
+  &.selected {
+    background-color: var(--c-accent-blue-bg);
+    border-color: var(--c-accent-blue);
+  }
+}
+
+// 样式预览区域
+.style-preview {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border-radius: 6px;
+  background-color: var(--c-bg-primary);
+  font-size: 13px;
+  user-select: none;
+  span::before {
+  display: none !important;
+  }
+}
+
+// 简洁样式预览
+.simple-center-preview {
+  color: var(--c-text-secondary);
+}
+
+// 胶囊样式预览
+.pill-center-preview {
+  background-color: #E6E6E6;
+  color: var(--c-text-primary);
+  font-weight: 500;
+  gap: 6px;
+
+  svg {
+    color: #666;
+  }
+}
+
+// 样式描述文字
+.style-description {
+  color: var(--c-text-primary);
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 70px;
+}

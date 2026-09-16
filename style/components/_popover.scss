@@ -1,0 +1,437 @@
+// 文件路径: styles/components/_popover.scss
+// 描述: 通用的气泡弹出菜单组件。
+
+/* ==========================================================================
+   通用弹出菜单 (Action Popover - 用于简单的横向菜单)
+   ========================================================================== */
+.action-popover {
+  position: absolute;
+  background-color: var(--c-bg-primary);
+  color: var(--c-text-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--c-border-light);
+  z-index: 1002;
+  display: flex;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  // 小三角
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 12px;
+    height: 12px;
+    background-color: var(--c-bg-primary);
+    border-right: 1px solid var(--c-border-light);
+    border-bottom: 1px solid var(--c-border-light);
+  }
+}
+
+.popover-button {
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: var(--c-bg-tertiary);
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--c-text-primary);
+    stroke-width: 2;
+    fill: none; /* 确保图标是空心的 */
+  }
+
+  &.delete {
+    svg {
+      stroke: var(--c-accent-red);
+    }
+    span {
+      color: var(--c-accent-red);
+    }
+  }
+}
+
+.popover-divider {
+  width: 1px;
+  background-color: var(--c-border);
+  margin: 8px 0;
+}
+
+
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 新增/修正：消息长按菜单专属样式 (Message Action Popover) ▼▼▼
+ * ==========================================================================
+ */
+.message-action-popover {
+  /* 继承 .action-popover 的基础样式，但覆盖布局 */
+  @extend .action-popover; 
+  
+  /* --- 核心：网格布局 --- */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 创建一个3列的网格 */
+  gap: 4px; /* 网格项之间的间距 */
+  padding: 8px;
+  width: 240px; /* 给一个固定的宽度，让布局更稳定 */
+  overflow: visible; /* 确保箭头不会被裁剪 */
+
+  /* 当菜单被放置在消息下方时，箭头需要朝上 */
+  &.popover-place-below::after {
+    top: -7px;
+    bottom: auto;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1px solid var(--c-border-light);
+    border-top: 1px solid var(--c-border-light);
+  }
+
+  /* 调整内部按钮以适应网格 */
+   /* 调整内部按钮以适应网格 */
+  .popover-button {
+    background: none; /* <-- 新增：移除按钮的默认背景 */
+    border: none;     /* <-- 新增：移除按钮的默认边框 */
+    padding: 8px;
+    border-radius: 8px;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  
+  /* 隐藏旧的分割线，因为网格布局不再需要它 */
+  .popover-divider {
+    display: none;
+  }
+}
+
+/* 响应式调整 */
+@media (max-width: 600px) {
+  .message-action-popover {
+    width: 61.5vw; /* 使用vw单位以适应不同屏幕 */
+  }
+}
+
+
+/* ==========================================================================
+   灵动岛 (Dynamic Island)
+   ========================================================================== */
+.dynamic-island-container {
+  position: absolute;
+  top: 44px; 
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px) scale(0.96);
+  opacity: 0;
+  max-width: min(88vw, 380px);
+  min-width: 150px;
+  max-height: 46px;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  background: rgba(20, 20, 22, 0.94);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(24px) saturate(180%);
+  z-index: 10080;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.14s ease, box-shadow 0.14s ease, border-radius 0.18s cubic-bezier(0.22, 1, 0.36, 1), padding 0.18s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  will-change: transform, opacity, max-height;
+  white-space: normal;
+}
+
+.dynamic-island-container.is-expanded {
+  border-radius: 22px;
+  padding: 14px 16px;
+  max-height: 180px;
+  align-items: flex-start;
+}
+
+.dynamic-island-container.show {
+  transform: translateX(-50%) translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+// 群成员连续生成期间，始终保持可见，避免被其它短提示提前隐藏。
+.dynamic-island-container.show.loading {
+  transform: translateX(-50%) translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2147483647;
+}
+
+.dynamic-island-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.dynamic-island-container.is-expanded .dynamic-island-content {
+  align-items: center;
+}
+
+.dynamic-island-icon {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: #d9d9de;
+}
+
+.dynamic-island-icon svg {
+  width: 21px;
+  height: 21px;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  transform-origin: center;
+}
+
+.dynamic-island-container.is-success .dynamic-island-icon {
+  color: var(--c-accent-green);
+}
+
+.dynamic-island-container.is-error .dynamic-island-icon {
+  color: #ff6b6b;
+}
+
+.dynamic-island-container.is-warning .dynamic-island-icon {
+  color: #ffd60a;
+}
+
+.dynamic-island-container.is-info .dynamic-island-icon {
+  color: #d6d8df;
+}
+
+.dynamic-island-container.is-expanded .dynamic-island-icon {
+  margin-top: 2px;
+}
+
+.dynamic-island-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+#dynamic-island-text {
+  display: block;
+  line-height: 1.28;
+  font-size: 13px;
+  font-weight: 700;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  text-align: center;
+}
+
+.dynamic-island-hint {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  line-height: 1.32;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  text-align: center;
+}
+
+.dynamic-island-copy-btn {
+  display: none;
+  align-self: center;
+  min-height: 24px;
+  padding: 0 10px 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  gap: 6px;
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.dynamic-island-copy-btn:active {
+  transform: scale(0.97);
+}
+
+.dynamic-island-copy-btn::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='black' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='9' y='9' width='10' height='10' rx='2'/%3E%3Cpath d='M7 15H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='black' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='9' y='9' width='10' height='10' rx='2'/%3E%3Cpath d='M7 15H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  opacity: 0.92;
+}
+
+.dynamic-island-container.is-error .dynamic-island-copy-btn {
+  display: inline-flex;
+}
+
+.dynamic-island-container.show:not(.loading) .dynamic-island-icon svg {
+  animation: dynamic-island-icon-pop 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dynamic-island-container.is-success.show .dynamic-island-icon polyline {
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: dynamic-island-check-draw 0.5s ease-out 0.06s both;
+}
+
+.dynamic-island-container.loading .dynamic-island-icon {
+  display: none;
+}
+
+.dynamic-island-container.loading .dynamic-island-content svg {
+  display: none;
+}
+
+.dynamic-island-container.loading .dynamic-island-content::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: dynamic-island-spin 0.8s linear infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes dynamic-island-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dynamic-island-icon-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) translateY(-2px) rotate(-12deg);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.1) translateY(0) rotate(2deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes dynamic-island-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ==========================================================================
+   ▼▼▼ 样式修正：统一近期记忆菜单的样式 ▼▼▼
+   ========================================================================== */
+#recent-memory-action-popover {
+  @extend .message-action-popover;
+}
+#recent-memory-action-popover::after {
+    display: none;
+}
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 新增：通用垂直操作菜单 (Action Menu Popover) ▼▼▼
+ * ==========================================================================
+ */
+.action-menu-popover {
+  position: absolute;
+  top: 75px; // 根据顶栏高度微调
+  right: 15px;
+  background-color: var(--c-bg-primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--c-border-light);
+  z-index: 200;
+  overflow: hidden;
+  display: none; // 默认隐藏
+  min-width: 160px;
+  padding: 6px;
+  box-sizing: border-box;
+  // 用于JS控制显示的类
+  &.show {
+    display: block;
+  }
+}
+/* styles/components/_popover.scss */
+
+// ▼▼▼ 使用下面这个 【最终修正版】 替换掉旧的 .action-menu-popover 规则 ▼▼▼
+.action-menu-popover {
+  position: absolute;
+  top: 75px; 
+  right: 15px;
+  background-color: var(--c-bg-primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--c-border-light);
+  min-width: 160px;
+  padding: 6px;
+  box-sizing: border-box;
+
+  // --- 核心修正：确保它在最顶层，并默认透明且缩小 ---
+  z-index: 999;           // 给一个非常高的层级，确保它不会被其他任何元素遮挡
+  opacity: 0;             // 默认完全透明
+  transform: scale(0.95) translateY(-10px); // 默认稍微缩小和上移，营造弹出感
+  transform-origin: top right; // 设置缩放和变形的原点在右上角，这样动画效果才对
+  pointer-events: none;   // 默认不可点击，这样它即使透明也不会挡住下面的元素
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out; // 添加流畅的过渡动画
+
+  // --- 核心修正：当 JS 添加 .show 类时，让它浮现出来 ---
+  &.show {
+    opacity: 1;
+    transform: scale(1) translateY(0); // 恢复正常大小和位置
+    pointer-events: auto;              // 恢复可点击
+  }
+}
+// ▲▲▲ 替换结束 ▲▲▲

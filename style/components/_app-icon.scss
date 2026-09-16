@@ -1,0 +1,130 @@
+// 文件路径: styles/components/_app-icon.scss
+// 描述: 主屏幕和 Dock 栏上的应用图标。
+
+.app-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  width: 60px;
+
+  .icon-bg {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    transition: background-color 0.3s ease;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+
+    svg {
+      width: 30px;
+      height: 30px;
+      fill: white;
+      transition: opacity 0.3s ease;
+    }
+
+    &.has-image svg {
+      opacity: 0;
+    }
+    
+    // 新增的图片图标样式
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; 
+      border-radius: inherit; // 继承父元素的圆角
+    }
+  }
+
+  .app-name {
+    color: var(--desktop-icon-name-color, #333333);
+    font-size: calc(11px * var(--looky-font-scale, 1));
+    font-weight: 500;
+  }
+}
+
+#home-screen-wrapper .app-icon .icon-bg {
+  border-radius: 22px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+#home-screen-wrapper .app-icon .icon-bg > svg {
+  width: 34px !important;
+  height: 34px !important;
+  fill: none !important;
+}
+
+#home-screen-wrapper #idle-icon-6 .cl-icon-stack {
+  transform: translateY(0) scale(0.96);
+  transform-origin: center;
+}
+
+// 特定图标的样式
+#sms-icon .icon-bg { background-color: #2979FF; }
+#phone-icon .icon-bg { background-color: #4CAF50; }
+
+// 这些图标使用了图片背景，所以背景色设为透明
+#home-screen-wrapper .app-icon .icon-bg.has-image {
+  background-color: transparent !important;
+}
+
+
+#memo-icon .icon-bg,
+#settings-icon .icon-bg,
+#love-icon .icon-bg,
+#chat-icon .icon-bg {
+  background-color: var(--c-bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#memo-icon svg,
+#love-icon svg,
+#chat-icon svg {
+  fill: none;
+}
+
+#settings-icon {
+  .icon-bg {
+    position: relative;
+    overflow: hidden;
+  }
+
+  svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: #2c2c2c;
+    stroke-width: 1.4;
+    position: relative;
+    z-index: 2;
+  }
+}
+/* --- 响应式布局: 手机端适配 (屏幕宽度小于等于 600px) --- */
+@media (max-width: 600px) {
+  .app-icon {
+    gap: 1.6vw;    // (原 6px)
+    width: 16vw;   // (原 60px)
+
+    .icon-bg {
+      width: 16vw;       // (原 60px)
+      height: 16vw;      // (原 60px)
+      border-radius: 4vw; // (原 15px)
+      box-shadow: 0 1.6vw 4vw rgba(0, 0, 0, 0.12); // (原 6px 15px)
+
+      svg {
+        width: 8vw;  // (原 30px)
+        height: 8vw; // (原 30px)
+      }
+    }
+
+    .app-name {
+      font-size: calc(11px * var(--looky-font-scale, 1)); // (原 11px)
+    }
+  }
+}

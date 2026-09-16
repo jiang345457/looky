@@ -1,0 +1,5166 @@
+// 文件路径: styles/components/_modal.scss
+// 描述: 通用的模态框/弹窗组件，包括遮罩层和卡片。
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  &.visible {
+    display: flex;
+    opacity: 1;
+
+    .modal-card {
+      transform: scale(1);
+    }
+  }
+
+  // 位置变体
+  &.position-top {
+    align-items: flex-start;
+    padding-top: 25vh;
+    z-index: 5000; // 确保在普通弹窗之上
+  }
+}
+
+.phone-screen .modal-overlay[style*="100vw"],
+.phone-screen .modal-overlay[style*="100dvh"] {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+.phone-screen .image-gen-overlay,
+.phone-screen .image-gen-viewer,
+.phone-screen .privacy-sheet-overlay,
+.phone-screen .music-bottom-sheet-overlay,
+.phone-screen .forum-sheet-overlay {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+@media (max-width: 600px) {
+  body > .modal-overlay,
+  body > .image-gen-overlay,
+  body > .image-gen-viewer,
+  body > .privacy-sheet-overlay,
+  body > .music-bottom-sheet-overlay,
+  body > .forum-sheet-overlay {
+    width: var(--looky-display-width, 100%) !important;
+    height: var(--looky-display-height, 100%) !important;
+    min-height: var(--looky-display-height, 100%) !important;
+    transform: scale(var(--looky-display-scale, 1));
+    transform-origin: top left;
+  }
+}
+
+body.modal-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+.modal-card {
+  background-color: var(--c-bg-primary);
+  border-radius: 14px;
+  padding: var(--space-lg);
+  width: 85%;
+  max-width: 320px;
+    max-height: 85vh;     /* 🌟 新增这行：最高不能超过屏幕的85% 🌟 */
+  overflow-y: auto;     /* 🌟 新增这行：内容太多时，允许在卡片内部上下滑动 🌟 */
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+
+  h3 {
+    margin: 0 0 var(--space-md);
+    text-align: center;
+    font-size: var(--font-lg);
+    color: var(--c-text-primary);
+  }
+}
+
+.modal-buttons {
+  display: flex;
+  gap: var(--space-sm);
+
+  .btn {
+    flex-grow: 1;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+#api-input-modal-card {
+  background-color: #f7f7f7; // 浅灰色背景
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  padding: 24px;
+  
+  h3 {
+    color: #000000;
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  input,
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d1d6; // 更浅的边框
+    border-radius: 12px; // 更圆润
+    margin-bottom: var(--space-lg);
+    font-size: 15px;
+    box-sizing: border-box;
+    background-color: #FFFFFF; // 输入框为白色
+    color: #1c1c1e;
+    resize: vertical;
+    &::placeholder {
+      color: #8e8e93;
+    }
+    &:focus {
+      outline: none;
+      border-color: #007aff; // 聚焦时使用苹果蓝
+      box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+    }
+  }
+  .modal-buttons .btn {
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 16px;
+  }
+  .modal-buttons .btn-secondary {
+    background-color: #e5e5ea;
+    color: #1c1c1e;
+  }
+  // 如果你的 URL 弹窗确认按钮 class 是 btn-accent
+  .modal-buttons .btn-accent,
+  .modal-buttons .btn-primary { // 兼容两种按钮 class
+    background-color: #000000;
+    color: #FFFFFF;
+  }
+}
+// 选择列表型模态框
+.selection-modal-card {
+   .selection-list,
+  .settings-card { 
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 50vh;
+    overflow-y: auto;
+    border: 1px solid var(--c-border-light);
+    border-radius: var(--radius-sm);
+  }
+
+  .selection-list-item {
+    padding: 12px var(--space-md);
+    border-bottom: 1px solid var(--c-border);
+    cursor: pointer;
+    font-size: var(--font-sm);
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background-color: var(--c-bg-tertiary);
+    }
+    &.selected {
+      background-color: #eef5ff;
+      color: var(--c-accent);
+      font-weight: 600;
+    }
+    &.active .checkmark-icon {
+      display: block;
+    }
+    
+    .item-text {
+      flex-grow: 1;
+    }
+  }
+  
+  .checkmark-icon {
+    width: 20px;
+    height: 20px;
+    stroke: var(--c-accent-green);
+    stroke-width: 2.5;
+    flex-shrink: 0;
+    display: none;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--radius-lg);
+
+    .btn {
+      padding: var(--space-sm) var(--space-lg);
+      font-size: var(--font-sm);
+    }
+  }
+}
+// 选择列表型模态框
+.selection-modal-card {
+  .selection-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 50vh;
+    overflow-y: auto;
+    border: 1px solid var(--c-border-light);
+    border-radius: var(--radius-sm);
+  }
+
+  .selection-list-item {
+    padding: 12px var(--space-md);
+    border-bottom: 1px solid var(--c-border);
+    cursor: pointer;
+    font-size: var(--font-sm);
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background-color: var(--c-bg-tertiary);
+    }
+    &.selected {
+      background-color: #eef5ff;
+      color: var(--c-accent);
+      font-weight: 600;
+    }
+    &.active .checkmark-icon {
+      display: block;
+    }
+    
+    .item-text {
+      flex-grow: 1;
+    }
+  }
+  
+  .checkmark-icon {
+    width: 20px;
+    height: 20px;
+    stroke: var(--c-accent-green);
+    stroke-width: 2.5;
+    flex-shrink: 0;
+    display: none;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--radius-lg);
+
+    .btn {
+      padding: var(--space-sm) var(--space-lg);
+      font-size: var(--font-sm);
+    }
+  }
+}
+// 图标通用样式 (从源文件恢复)
+.config-list-item .config-name-text {
+  flex-grow: 1;
+  font-weight: 500;
+  color: var(--c-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delete-icon {
+  width: 20px;
+  height: 20px;
+  stroke: var(--c-accent-red);
+  stroke-width: 2;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   角色编辑弹窗 - 时尚黑白线条风格 (Line Art Fashion Style)
+   ========================================================================== */
+
+#add-char-modal-overlay .line-art-card {
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 1);
+  padding: 0;
+  width: 85%;
+  max-width: 350px;
+  color: #000;
+  overflow: hidden; /* 保持内容在卡片圆角内 */
+  border-radius: 12px; 
+  /* ▼▼▼【核心修改】从这里开始 ▼▼▼ */
+  display: flex; /* 1. 将卡片设置为 Flex 容器 */
+  flex-direction: column; /* 2. 让子元素（header, body, footer）垂直排列 */
+  max-height: 85vh; /* 3. 限制弹窗最大高度为视窗的85%，超出则触发内部滚动 */
+  /* ▲▲▲【核心修改】到这里结束 ▲▲▲ */
+}
+
+/* 1. 头部：头像区 */
+.line-header {
+  padding: 30px 0 20px;
+  display: flex;
+  justify-content: center;
+  background-color: #fff;
+   flex-shrink: 0; 
+}
+
+.char-modal-avatar-container {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #000; /* 头像黑边框 */
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.char-modal-avatar-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 占位符样式 */
+.avatar-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #000;
+}
+.avatar-placeholder svg { width: 24px; height: 24px; stroke-width: 1.5; }
+.avatar-placeholder span { font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+
+/* 2. 内容区 */
+.line-body {
+  padding: 0 24px 20px; /* 增加了底部内边距，让滚动到底部时更美观 */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* ▼▼▼【核心修改】从这里开始 ▼▼▼ */
+  flex-grow: 1; /* 1. 让内容区占据 header 和 footer 之间的所有可用空间 */
+  overflow-y: auto; /* 2. 【关键】当内容高度超出时，自动显示垂直滚动条 */
+  /* ▲▲▲【核心修改】到这里结束 ▲▲▲ */
+ 
+}
+
+/* 输入组：标签 + 下划线输入框 */
+.line-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.line-input-group label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #000;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.line-input {
+  border: none;
+  border-bottom: 1px solid #e0e0e0; /* 默认浅灰线 */
+  padding: 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  background: transparent;
+  border-radius: 0;
+  transition: border-color 0.2s;
+}
+
+.line-input:focus {
+  outline: none;
+  border-bottom: 2px solid #000; /* 聚焦变黑粗线 */
+}
+
+/* 下拉框容器 */
+.select-wrapper {
+  position: relative;
+}
+.line-select {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 8px 0;
+  font-size: 15px;
+  color: #000;
+  background: transparent;
+  border-radius: 0;
+  appearance: none; /* 移除默认箭头 */
+  cursor: pointer;
+}
+.line-select:focus { outline: none; border-bottom: 2px solid #000; }
+.select-arrow {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  fill: none;
+  stroke: #000;
+  stroke-width: 2;
+}
+
+/* ====================================================== */
+/* 角色设定折叠区 (Persona Setting)                         */
+/* ====================================================== */
+
+/* 折叠区域总容器，定义了上下黑边框 */
+.line-details {
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  margin-top: 10px;
+}
+
+/* 折叠区域的标题部分 (Summary)，就是 "PERSONA SETTING" 那一行 */
+.line-details summary {
+  padding: 10px 0;
+  list-style: none; // 移除 Firefox 等浏览器中的默认箭头
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+
+  // 同时缩小右侧的 “+” 图标
+  svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.2s ease; // 为旋转增加过渡动画
+  }
+}
+
+/* 隐藏 Chrome/Safari 默认的折叠箭头 */
+.line-details summary::-webkit-details-marker { display: none; }
+
+/* 当折叠区域展开时 (<details> 标签拥有 open 属性)，旋转 SVG 图标（让 + 变成 x） */
+.line-details[open] summary svg { transform: rotate(45deg); }
+
+/* 展开后的内容区域 */
+.details-content {
+  padding-bottom: 15px; // 内容区底部留出一些空间
+}
+
+/* 角色设定的文本输入框 (Textarea) */
+.line-textarea {
+  width: 100%;
+  border: none;
+  background: #f9f9f9; // 给一个淡淡的背景色以示区分
+  padding: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #333;
+  height: 260px;   /* 【修改】从 100px 增大到 150px，让文本框更高 */
+  resize: none;      // 禁止用户手动拖拽调整大小，保持UI统一
+  box-sizing: border-box;
+}
+
+/* 文本框获得焦点时的样式 */
+.line-textarea:focus { 
+  outline: 1px solid #000; // 聚焦时显示黑色边框
+  background: #fff;        // 聚焦时背景变白
+}
+
+.line-action-btn {
+  padding: 10px 16px; // 保持较小的内边距
+  border: 1px solid #000;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #fff;
+  flex-shrink: 0;
+
+  // 【关键】缩小右侧的箭头图标
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.line-action-btn:active {
+  background: #000;
+  color: #fff;
+}
+
+.btn-content { display: flex; flex-direction: column; }
+
+.btn-title { 
+  font-size: 11px; // 【关键】减小主标题字体
+  font-weight: 800; 
+  letter-spacing: 0.5px; 
+}
+.btn-subtitle { 
+  font-size: 9px; // 【关键】减小副标题字体
+  opacity: 0.6; 
+  margin-top: 2px; 
+}
+
+/* 3. 底部按钮区 */
+.line-footer {
+  display: flex;
+  border-top: 1px solid #000; /* 分割线 */
+  flex-shrink: 0; 
+}
+
+.line-footer button {
+  flex: 1;
+  padding: 18px;
+  border: none;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-line-secondary {
+  color: #000;
+  border-right: 1px solid #000; /* 中间分割线 */
+}
+.btn-line-secondary:hover { background: #f0f0f0; }
+
+.btn-line-primary {
+  background: #000 !important;
+  color: #fff !important;
+}
+.btn-line-primary:hover { opacity: 0.9; }
+
+
+/* ==========================================================================
+   NPC 管理弹窗 - 极简黑白时尚风格 (Minimalist Black & White)
+   ========================================================================== */
+
+#char-npc-modal-overlay .npc-minimal-card {
+  background-color: #ffffff; /* 纯白背景 */
+  border-radius: 24px;       /* 大圆角 */
+  padding: 0;                /* 移除默认内边距，由内部控制 */
+  width: 90%;
+  max-width: 360px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12); /* 极其柔和的高级阴影 */
+  border: 1px solid rgba(0,0,0,0.04); /* 几乎看不见的边框增加质感 */
+  overflow: hidden; /* 确保圆角不被内部内容切掉 */
+  color: #1c1c1e;   /* 深黑色文字 */
+}
+
+/* 1. 标题区 */
+.npc-header {
+  padding: 24px 24px 10px; /* 上左右宽一点 */
+  text-align: center;
+}
+.npc-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: -0.5px; /* 字体紧凑一点更时尚 */
+}
+.npc-header p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #8e8e93; /* 浅灰色辅助说明 */
+}
+
+/* 2. 列表区 */
+.npc-list-area {
+  padding: 0 24px;
+  margin-bottom: 20px;
+}
+.npc-list-container {
+  /* 【修改】增加高度，超过约 3-4 个 NPC 时会出现滚动条 */
+  max-height: 240px; 
+  overflow-y: auto;
+  min-height: 60px;
+  /* 保持滚动条隐藏但可滚动 (美观) */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  
+  /* 给个内边距，防止内容贴边 */
+  padding-bottom: 10px;
+}
+.npc-list-container::-webkit-scrollbar { display: none; }
+
+/* 【新增】被选中正在编辑的 NPC 样式 */
+.npc-item.editing {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border: 1px solid #000; /* 加个黑边框表示选中 */
+}
+
+
+
+/* 列表项样式 */
+.npc-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f2f2f7; /* 极细的分割线 */
+}
+.npc-item:last-child { border-bottom: none; }
+
+.npc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.npc-info span {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c1c1e;
+}
+.npc-info small {
+  font-size: 12px;
+  color: #8e8e93;
+}
+/* 删除按钮：灰色小圆圈 */
+.npc-delete-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f2f2f7;
+  color: #8e8e93;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.npc-delete-btn:hover {
+  background: #ff3b30; /* 悬停变红 */
+  color: white;
+}
+
+/* 3. 输入区 (灰色背景块) */
+.npc-input-area {
+  background-color: #F9F9F9; /* 非常淡的灰底，区分输入区 */
+  padding: 20px 24px;
+  border-top: 1px solid #f0f0f0;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.npc-input-row {
+  display: flex; gap: 10px;
+}
+
+/* 输入框通用样式 */
+.minimal-input {
+  background: #ffffff;
+  border: 1px solid #e5e5ea; /* 浅灰边框 */
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+  color: #1c1c1e;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+.minimal-input:focus {
+  outline: none;
+  border-color: #000000; /* 聚焦时变成黑色边框 */
+}
+.minimal-input::placeholder {
+  color: #c7c7cc;
+}
+.minimal-textarea {
+  height: 70px;
+  resize: none;
+}
+
+/* 添加按钮：纯黑块 */
+.btn-minimal-black {
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-minimal-black:active { opacity: 0.7; }
+.btn-minimal-black svg { width: 16px; height: 16px; }
+
+/* 4. 底部完成按钮 */
+.npc-footer {
+  padding: 10px 24px 20px;
+  background-color: #F9F9F9;
+  text-align: center;
+}
+.btn-minimal-text {
+  background: transparent;
+  border: none;
+  color: #8e8e93;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 10px 20px;
+}
+.btn-minimal-text:hover { color: #000; }
+
+
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 新增/修复：位置发送模态框专属样式 ▼▼▼
+ * ==========================================================================
+ */
+
+/* 模态框内的地图预览容器 */
+#location-map-preview {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--c-bg-secondary); /* 加载时的背景色 */
+  margin-top: 15px;
+  border: 1px solid var(--c-border-light);
+}
+
+/* 地图图片 */
+#location-map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 随机生成的红色图钉 */
+#location-map-pin {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  /* 使用内联 SVG 作为图钉图标，无需外部图片文件 */
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23EA4335"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>');
+  background-size: contain;
+  /* 关键：让图钉的尖端对准坐标点，而不是左上角 */
+  transform: translate(-50%, -90%);
+}
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 新增/修复：转账发送模态框专属样式 ▼▼▼
+ * ==========================================================================
+ */
+.transfer-modal-card {
+  .transfer-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding-bottom: 20px;
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+    }
+    h3 {
+      margin: 0;
+      font-size: var(--font-md);
+      font-weight: 500;
+    }
+  }
+  .transfer-body {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+  }
+  .currency-symbol {
+    font-size: 32px;
+    font-weight: 500;
+    margin-right: 10px;
+  }
+  #transfer-amount-input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 40px;
+    font-weight: 600;
+    width: 100%;
+  }
+  .transfer-remark-body {
+    padding-top: 10px;
+    border-top: 1px solid var(--c-border-light);
+  }
+  #transfer-remark-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    padding: 5px 0;
+  }
+}
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 新增/修复：聊天设置页 - 表情包选择弹窗样式 ▼▼▼
+ * ==========================================================================
+ */
+
+// --- 1. 弹窗和列表的基本样式 ---
+#chat-sticker-selector-overlay .modal-card {
+  width: 90%;
+  max-width: 360px;
+}
+
+#chat-sticker-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  max-height: 60vh; // 限制最大高度，超出可滚动
+  overflow-y: auto;
+  // 隐藏滚动条
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// --- 2. 列表内的项目样式 ---
+.sticker-selection-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--c-border);
+  transition: background-color 0.2s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+  &:hover {
+    background-color: var(--c-bg-tertiary);
+  }
+}
+
+// --- 3. 项目内部元素样式 ---
+.sticker-pack-preview {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  margin-right: 12px;
+  background-color: var(--c-bg-secondary); // 预览图加载前的底色
+}
+
+.sticker-selection-item .item-text {
+  flex-grow: 1;
+  font-size: 16px;
+}
+
+.sticker-selection-item input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  margin-left: 16px;
+  flex-shrink: 0;
+  accent-color: var(--c-accent); // 让勾选框颜色跟随主题色
+}
+/* 
+ * ======================================================================
+ *   ▼▼▼ 新增/修复：专属铃声设置模态框样式 ▼▼▼
+ * ======================================================================
+ */
+#ringtone-modal-card {
+  width: 85vw;
+  max-width: 340px;
+  padding: var(--space-lg);
+  background-color: var(--c-bg-secondary);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+#ringtone-modal-card .modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 var(--space-sm) 0;
+  color: var(--c-text-primary);
+}
+
+.ringtone-options-list {
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.ringtone-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ringtone-option:not(:last-child) {
+  border-bottom: 1px solid var(--c-border-light);
+}
+
+.ringtone-option:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.ringtone-option .option-label {
+  font-size: 16px;
+  color: var(--c-text-primary);
+}
+
+.ringtone-option .selection-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #c7c7cc; // 使用 var(--c-text-tertiary) 对应的颜色
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ringtone-option.selected .selection-indicator {
+  background-color: var(--c-accent);
+  border-color: var(--c-accent);
+}
+
+.ringtone-option.selected .selection-indicator::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.ringtone-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-lg);
+}
+
+.ringtone-preview .preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ringtone-preview .preview-label {
+  font-size: 12px;
+  color: var(--c-text-secondary);
+}
+
+.ringtone-preview #current-ringtone-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--c-text-primary);
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ringtone-preview .preview-play-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--c-bg-tertiary);
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.preview-play-btn:hover {
+  background-color: var(--c-border-light);
+}
+
+.preview-play-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--c-text-primary);
+}
+/* 
+ * ======================================================================
+ *   ▼▼▼ 新增/修复：消息通知设置模态框样式 ▼▼▼
+ * ======================================================================
+ */
+#notification-modal-card {
+  width: 85vw;
+  max-width: 340px;
+  padding: var(--space-lg);
+  background-color: var(--c-bg-secondary);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  height: calc(100dvh - 80px);
+  max-height: 760px;
+  overflow: hidden;
+  position: relative;
+}
+
+#notification-modal-card .notification-modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--c-text-secondary);
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+#notification-modal-card .notification-modal-close-btn:active {
+  transform: scale(0.94);
+}
+
+#notification-modal-card .notification-modal-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(100dvh - 156px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding-right: 2px;
+}
+
+#notification-modal-card .modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  color: var(--c-text-primary);
+}
+
+.notification-settings-section {
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: opacity 0.3s ease, max-height 0.4s ease, transform 0.3s ease;
+  transform-origin: top;
+}
+
+#notification-modal-card .notification-settings-section {
+  overflow: visible;
+}
+
+.notification-settings-section .section-header {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-text-secondary);
+  padding: 10px var(--space-lg) 5px;
+}
+
+#notification-sound-section {
+  max-height: none;
+  opacity: 1;
+  transform: scaleY(1);
+  &.disabled {
+    max-height: 0;
+    opacity: 0;
+    transform: scaleY(0.9);
+    overflow: hidden;
+    pointer-events: none;
+    margin-top: -20px;
+  }
+}
+
+.plot-push-modal-card,
+.ooc-nudge-modal-card {
+  .styled-input {
+    width: 100%;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+}
+
+.ooc-nudge-actions,
+.ooc-custom-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ooc-custom-area {
+  margin-top: 12px;
+}
+
+.ooc-custom-area[hidden] {
+  display: none;
+}
+
+#notification-modal-card .settings-item {
+  padding: 16px var(--space-lg);
+  border-bottom: none;
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+}
+
+#notification-modal-card .ringtone-options-list {
+  background-color: transparent;
+}
+
+#notification-modal-card .notification-mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 var(--space-md) var(--space-md);
+}
+
+#notification-modal-card .notification-mode-options .ringtone-option {
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  border: none;
+  border-radius: 0;
+  background-color: var(--c-bg-primary);
+}
+
+#notification-modal-card .notification-mode-options .ringtone-option:not(:last-child) {
+  border-bottom: 1px solid var(--c-border-light);
+}
+
+#notification-modal-card .notification-mode-options .option-label {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+#notification-modal-card .notification-mode-options .selection-indicator {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+#notification-modal-card .ringtone-preview {
+  margin: 0 var(--space-md) var(--space-md); 
+  padding: var(--space-lg) 0 0; 
+  border-top: 1px solid var(--c-border-light); 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 新增/修复：上下文轮数设置弹窗样式 ▼▼▼
+ * ==========================================================================
+ */
+.context-turns-modal-card {
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  border: 1px solid rgba(0,0,0,0.05);
+
+  h4 {
+    font-size: var(--font-lg);
+    font-weight: 600;
+    margin: 0 0 8px 0;
+  }
+  .helper-text {
+    font-size: var(--font-xs);
+    color: var(--c-text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--space-xl);
+  }
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.slider-label {
+  font-size: var(--font-sm);
+  color: var(--c-text-tertiary);
+  font-weight: 500;
+}
+
+.context-turns-modal-card .slider {
+  position: static; 
+  cursor: auto;     
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--c-bg-secondary);
+  border-radius: 6px;
+  outline: none;
+  accent-color: var(--c-text-primary);
+}
+
+.context-turns-modal-card .slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  background: var(--c-bg-primary);
+  border: 2px solid var(--c-text-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+  &:active {
+    transform: scale(1.2);
+  }
+}
+
+.context-turns-modal-card .slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  background: var(--c-bg-primary);
+  border: 2px solid var(--c-text-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.slider-value-display {
+  font-size: var(--font-sm);
+  color: var(--c-text-secondary);
+  margin-bottom: var(--space-xl);
+  span {
+    font-weight: 600;
+    font-size: var(--font-md);
+    color: var(--c-text-primary);
+  }
+}
+
+.context-turns-modal-card .btn {
+  background-color: var(--c-text-primary);
+  color: white;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  transition: background-color 0.2s ease;
+  &:hover {
+    background-color: #333;
+  }
+}
+
+.context-turns-modal-card .slider::before {
+  display: none;
+}
+
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 【新增/修复】通话记录详情模态框专属样式 ▼▼▼
+ * ==========================================================================
+ */
+
+/* 1. 调整卡片本身，使其更高，并使用flex布局 */
+#call-history-modal-card {
+  width: 90%;
+  max-width: 380px;
+  max-height: 70vh; /* 限制最大高度为屏幕的70% */
+  display: flex;
+  flex-direction: column; /* 让头部和内容区垂直排列 */
+  padding: 0; /* 移除内边距，由内部元素控制 */
+}
+
+/* 头部样式 */
+.call-history-header {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--c-border-light);
+  flex-shrink: 0; /* 防止头部被压缩 */
+}
+
+.call-history-char-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+}
+
+.call-history-char-info h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-text-primary);
+}
+
+.call-history-char-info p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--c-text-secondary);
+}
+
+/* 内容区域（消息列表）样式 */
+#call-history-modal-card .modal-content {
+  padding: 10px 15px; /* 为消息列表添加内边距 */
+  flex-grow: 1; /* 占据剩余空间 */
+  overflow-y: auto; /* 超出部分滚动 */
+  background-color: var(--c-bg-secondary); /* 添加一点底色区分 */
+}
+
+/* 2. 消息列表容器样式 */
+#call-history-message-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md); /* 消息之间的间距 */
+  padding-right: 8px; /* 为滚动条留出一点空间，即使隐藏了也让内容不贴边 */
+}
+
+/* 隐藏滚动条，保持界面整洁 */
+#call-history-message-list::-webkit-scrollbar {
+  display: none;
+}
+#call-history-message-list {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 3. 借用并微调主聊天窗口的消息样式，以确保视觉统一 */
+/* 消息外层容器 (包含头像和气泡) */
+#call-history-message-list .message-wrapper {
+  display: flex;
+  /* 核心修正：让头像和气泡顶部对齐 */
+  align-items: flex-start;
+  gap: var(--space-sm);
+  max-width: 90%; /* 限制最大宽度 */
+  margin-bottom: 2px; /* 减小消息行之间的垂直间距 */
+}
+#call-history-message-list .message-wrapper.received {
+  align-self: flex-start;
+}
+#call-history-message-list .message-wrapper.sent {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+/* 头像 */
+#call-history-message-list .chat-avatar-small {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* 气泡 */
+#call-history-message-list .message-bubble {
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-lg);
+  /* 核心修正：减小内边距，使其更紧凑 */
+  padding: 1px 8px;
+  box-shadow: var(--shadow-sm);
+}
+#call-history-message-list .message-bubble p {
+  margin: 0;
+  font-size: var(--font-md);
+  line-height: 1.5;
+  word-break: break-word;
+}
+#call-history-message-list .message-wrapper.sent .message-bubble {
+  background-color: #8a6dff;
+  color: white;
+}
+
+#call-history-modal-card {
+  max-height: 78vh;
+  background: #fff;
+  border: 1px solid #111;
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.call-history-header {
+  border-bottom: 1px solid #d8d8d8;
+  background: #fff;
+  position: relative;
+}
+
+.call-history-char-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+}
+
+#call-history-modal-card .modal-content {
+  padding: 14px 16px;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+#call-history-message-list {
+  gap: 14px;
+  padding-right: 0;
+}
+
+#call-history-message-list .call-log-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 92%;
+  margin-bottom: 2px;
+}
+
+#call-history-message-list .call-log-entry.received {
+  align-self: flex-start;
+}
+
+#call-history-message-list .call-log-entry.sent {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+#call-history-message-list .call-log-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+#call-history-message-list .call-log-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+#call-history-message-list .call-log-card {
+  position: relative;
+  background-color: #fafafa;
+  border: 1px solid #d9d9d9;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+#call-history-message-list .call-log-meta {
+  margin-bottom: 6px;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0;
+  font-weight: 700;
+  color: #777;
+}
+
+#call-history-message-list .call-log-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: break-word;
+  color: #171717;
+}
+
+#call-history-message-list .call-log-entry.sent .call-log-card {
+  background-color: #111;
+  border-color: #111;
+  color: white;
+}
+
+#call-history-message-list .call-log-entry.sent .call-log-text,
+#call-history-message-list .call-log-entry.sent .call-log-meta {
+  color: white;
+}
+
+#call-history-message-list .call-log-translation {
+  color: #666;
+  background: #e3e3e3;
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.call-history-tts-btn {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.16);
+  transition: transform 0.16s ease, background-color 0.16s ease;
+}
+
+.call-history-tts-btn:active {
+  transform: scale(0.92);
+  background: #333;
+}
+
+.call-history-tts-btn svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}
+
+.call-history-tts-btn svg rect {
+  transform-origin: center;
+}
+
+/* 底部样式 */
+.call-history-footer {
+    padding: 12px;
+    text-align: center;
+    border-top: 1px solid var(--c-border-light);
+    flex-shrink: 0; /* 防止底部被压缩 */
+}
+
+.call-history-footer .btn {
+    width: 100%;
+    padding: 10px;
+}
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 【新增/修复】撤回消息查看弹窗样式 ▼▼▼
+ * ==========================================================================
+ */
+.recalled-content-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.recalled-content-modal.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.recalled-content-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+.recalled-content-card {
+  position: relative;
+  background: var(--c-bg-primary);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transform: scale(0.9);
+  transition: transform 0.2s ease;
+}
+.recalled-content-modal.visible .recalled-content-card {
+  transform: scale(1);
+}
+.recalled-content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  /* border-bottom: 1px solid #e5e5e5; */ /* <-- 移除这条线 */
+}
+.recalled-content-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-text-primary);
+}
+.recalled-close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  color: var(--c-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+.recalled-close-btn:hover {
+  background: var(--c-bg-secondary);
+}
+.recalled-content-body {
+  padding: 24px 20px;
+  text-align: center;
+}
+.recalled-message-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--c-text-primary);
+  margin: 0;
+  word-wrap: break-word;
+}
+.recalled-sticker-preview {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.recalled-sticker-text {
+  font-size: 14px;
+  color: var(--c-text-secondary);
+  margin: 0;
+}
+.recalled-content-footer {
+  padding: 12px 20px;
+  /* border-top: 1px solid #e5e5e5; */ /* <-- 移除这条线 */
+  text-align: center;
+}
+.recalled-time {
+  font-size: 12px;
+  color: var(--c-text-tertiary);
+}
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 【修改】相册-添加图片弹窗专属样式 (浅色主题) ▼▼▼
+ * ==========================================================================
+ */
+.image-upload-modal {
+  background-color: #FFFFFF; // 白色背景
+  color: #1c1c1e; // 深灰色文字
+  border-radius: 20px; // 圆润边角
+  width: 90%;
+  max-width: 380px;
+  padding: 0;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  // --- 头部 ---
+  .upload-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0; // 浅色分割线
+    flex-shrink: 0;
+    h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #000000;
+    }
+    .close-btn {
+      background: #f0f2f5; // 浅灰色背景
+      color: #8e8e93;    // 中灰色图标
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 20px;
+      line-height: 28px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      &:hover {
+        background-color: #e5e5ea;
+      }
+    }
+  }
+  // --- 主体 ---
+  .upload-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background-color: #f7f7f7; // 主体区域用一个非常浅的灰色区分
+  }
+  
+  // 拖拽区
+  .upload-area {
+    border: 2px dashed #d1d1d6; // 虚线边框
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    color: #636366;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background-color: #FFFFFF;
+    transition: background-color 0.2s, border-color 0.2s;
+    &.dragover {
+      background-color: #f0f2f5;
+      border-color: #007aff;
+    }
+    svg {
+      width: 40px;
+      height: 40px;
+      stroke-width: 1.5;
+      stroke: #8e8e93;
+      margin-bottom: 8px;
+    }
+    .file-input-label {
+      color: #007aff; // 苹果蓝
+      cursor: pointer;
+      font-weight: 500;
+    }
+  }
+  // 文件列表
+  .file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  // 单个上传项
+  .upload-item {
+    background-color: #FFFFFF;
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #f0f0f0;
+    .preview-img {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background-color: #f0f2f5;
+    }
+    .upload-details {
+      flex-grow: 1;
+      input {
+        width: 100%;
+        background: #f0f2f5;
+        border: 1px solid #e5e5ea;
+        border-radius: 8px;
+        padding: 8px 10px;
+        color: #1c1c1e;
+        font-size: 14px;
+        &:focus {
+          outline: none;
+          border-color: #007aff;
+          background-color: #FFFFFF;
+        }
+        &::placeholder { color: #8e8e93; }
+      }
+    }
+    .remove-upload-btn {
+      background: none; border: none; color: #8e8e93; font-size: 24px; cursor: pointer; padding: 5px;
+    }
+  }
+  
+  // --- 底部 ---
+  .upload-footer {
+    display: flex;
+    gap: 12px;
+    padding: 12px 20px;
+    border-top: 1px solid #f0f0f0;
+    flex-shrink: 0;
+    background-color: #ffffff;
+    /* ▼▼▼ 【新增】修复圆角问题 ▼▼▼ */
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    .btn {
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-weight: 600;
+      border: none;
+      font-size: 15px;
+    }
+    .btn-secondary { background-color: #e5e5ea; color: #1c1c1e; }
+    .btn-primary { 
+      background-color: #000000; 
+      color: #FFFFFF;
+      &:disabled {
+        background-color: #d1d1d6;
+        color: #8e8e93;
+        cursor: not-allowed;
+      }
+    }
+  }
+// 统一选择器样式
+ .unified-selector-container {
+    display: flex;
+    flex-direction: column; // 改为垂直排列
+    gap: 12px;
+    padding: 12px 20px;
+    background-color: #f0f2f5;
+    border-bottom: 1px solid #e5e5ea;
+    flex-shrink: 0;
+    .selector-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      label {
+        font-size: 14px;
+        color: #636366;
+        flex-shrink: 0; // 防止标签被压缩
+      }
+      select {
+        flex-grow: 1;
+        width: 100%; // 确保填满
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid #d1d1d6;
+        background-color: #FFFFFF;
+        font-size: 14px;
+      }
+      
+      .btn-text-link {
+          background: none;
+          border: none;
+          color: #007aff;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          padding: 4px;
+          flex-shrink: 0;
+      }
+    }
+  }
+  
+  // 单个上传项内部的选择器样式 (这段保持不变)
+  .upload-item .upload-details {
+    .upload-selectors {
+      margin-top: 8px;
+      select.group-select {
+        width: 100%;
+        padding: 6px 8px;
+        font-size: 13px;
+        background-color: #FFFFFF;
+        border: 1px solid #e5e5ea;
+        border-radius: 6px;
+      }
+    }
+  }
+}
+/* ==========================================================================
+   ▼▼▼ 【新增】通用弹窗表单样式 ▼▼▼
+   ========================================================================== */
+.modal-card .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-card .form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-text-secondary);
+}
+
+.modal-card .styled-input,
+.modal-card .styled-select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--c-border-light);
+  border-radius: 12px;
+  font-size: 15px;
+  background-color: var(--c-bg-secondary);
+  color: var(--c-text-primary);
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-card .styled-input::placeholder {
+  color: var(--c-text-tertiary);
+}
+
+.modal-card .styled-input:focus,
+.modal-card .styled-select:focus {
+  outline: none;
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
+.modal-card .styled-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  padding-right: 40px;
+}
+/* ==========================================================================
+   ▼▼▼ 【新增】历史记录弹窗样式 ▼▼▼
+   ========================================================================== */
+
+// 整个半透明的黑色背景
+.history-modal-overlay {
+  position: fixed; // 固定在屏幕上，不随页面滚动
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); // 半透明黑色
+  z-index: 1000; // 确保它在最顶层
+  display: none; // 默认隐藏
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  // 当它显示时
+  &.visible {
+    display: flex; // 改为 flex 布局来居中
+    opacity: 1;
+
+    .history-modal-card {
+      transform: scale(1); // 恢复正常大小
+    }
+  }
+}
+
+// 白色的卡片本身
+.history-modal-card {
+  background-color: #FFFFFF;    // 白色背景
+  border-radius: 16px;          // 圆润的边角
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); // 精致的阴影
+  display: flex;
+  flex-direction: column;       // 让内部元素垂直排列
+  max-height: 100vh;             // 限制最大高度，防止撑满屏幕
+  transform: scale(0.95);       // 默认缩小一点，有弹出动画效果
+  transition: transform 0.3s ease;
+}
+
+// 头部样式
+.history-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #EAEAEA; // 精致的分割线
+  flex-shrink: 0; // 防止头部被压缩
+  h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    color: #1C1C1E; // 深色文字
+  }
+}
+
+// 中间内容区样式
+.history-modal-content {
+  padding: 8px 20px 20px;
+  overflow-y: auto; // 内容超出时可以滚动
+  flex-grow: 1;     // 占据所有剩余空间
+}
+
+// 底部样式
+.history-modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #EAEAEA; // 精致的分割线
+  display: flex;
+  gap: 12px; // 按钮之间的间距
+  flex-shrink: 0; // 防止底部被压缩
+
+  button {
+    flex-grow: 1;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn-delete {
+    background-color: #FFF1F0; // 淡红色背景
+    color: #D93026;       // 红色文字
+    &:hover {
+      background-color: #FFDCD9;
+    }
+  }
+
+  .btn-cancel {
+    background-color: #f0f2f5; // 浅灰色背景
+    color: #1C1C1E;       // 深色文字
+    &:hover {
+      background-color: #e5e5ea;
+    }
+  }
+}
+/* ==========================================================================
+   ▼▼▼ 【精准修复#3】强制修正历史记录弹窗内头像的异常变形问题 ▼▼▼
+   ========================================================================== */
+
+// 之前的分析是正确的：某个通用样式污染了头像。
+// 现在的目标是：只针对“历史记录弹窗”(.history-modal-card)内部的
+// 头像(很可能是 .sender-avatar)进行强制样式覆盖。
+.history-modal-card {
+  .session-avatar {
+    // --- 1. 强制恢复正确的尺寸和形状 ---
+    // 这个尺寸参考了 _offline-mode.scss 中定义的头像大小
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+
+    // --- 2. 强制重置所有可能导致变形和错位的属性 ---
+    position: static !important;   // 强制恢复正常的文档流定位
+    transform: none !important;    // 【核心修复】强制移除任何缩放(scale)，解决尺寸问题
+    opacity: 1 !important;         // 强制完全不透明
+    z-index: auto !important;      // 强制重置层级，防止覆盖
+    background: none !important;   // 强制移除任何意外的背景
+
+    // --- 3. 确保图片本身显示正常 ---
+    object-fit: cover; // 保持图片比例，防止拉伸
+    flex-shrink: 0;    // 在flex布局中，防止头像被压缩
+  }
+}
+/* ==========================================================================
+   ▼▼▼ 【UI优化】重塑历史记录弹窗内的 session-summary 卡片样式 ▼▼▼
+   ========================================================================== */
+
+.history-modal-card .session-summary {
+  // --- 1. 移除 <summary> 元素的默认样式 ---
+  list-style: none; // 移除 Firefox 等浏览器中的三角箭头
+  &::-webkit-details-marker {
+    display: none; // 【核心】移除 Chrome/Safari 中的三角箭头
+  }
+
+  // --- 2. 塑造精致的卡片外观 ---
+  display: block; // 确保元素表现为块级，以便应用以下样式
+  background-color: #ffffff; // 使用纯白色背景
+  border-radius: 12px; // 更圆润的圆角
+  padding: 16px; // 넉넉한 내부 여백
+  margin-bottom: 12px; // 和下一个卡片之间留出间距
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07); // 添加柔和、有层次感的阴影
+  border: 1px solid rgba(0, 0, 0, 0.05); // 添加一个极细的边框，增加质感
+  cursor: pointer; // 鼠标悬浮时显示为手型，提示可点击
+  transition: all 0.2s ease-out; // 为所有变化添加平滑过渡效果
+
+  // --- 3. 优化内部元素布局和样式 ---
+  .session-avatars {
+    margin-bottom: 10px; // 头像组和下面的文字拉开距离
+  }
+
+  .session-title { // 假设标题文本有一个类名
+    font-size: 16px;
+    font-weight: 600; // 字体加粗
+    color: #1c1c1e; // 主要文字颜色
+    line-height: 1.4;
+    margin-bottom: 6px; // 标题和日期拉开距离
+  }
+
+  .session-date { // 假设日期有一个类名
+    font-size: 13px;
+    color: #8e8e93; // 使用次要文字颜色，更柔和
+  }
+
+  // --- 4. 添加交互效果，提升精致感 ---
+  &:hover {
+    transform: translateY(-2px); // 鼠标悬浮时轻微上移
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); // 阴影加深，更有立体感
+  }
+
+  // 当卡片被展开时（如果它是 <details> 的一部分）
+  &[aria-expanded="true"] {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); // 展开时阴影可以稍微收敛
+  }
+}
+
+// 同时，为了让整体布局更和谐，给包裹这些卡片的容器也加一点样式
+.history-modal-content {
+  padding: 8px 16px; // 给内容区域增加一些左右内边距
+}
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 【恢复/修复】历史记录详情弹窗卡片化样式 ▼▼▼
+ * ==========================================================================
+ */
+
+// 为详情弹窗的遮罩层设置更高的层级，确保它能覆盖在历史记录列表之上
+#history-record-detail-overlay {
+  z-index: 1001;
+}
+
+// 针对详情弹窗卡片本身的专属样式
+#history-record-detail-card {
+  width: 85%;
+  max-width: 340px;
+  padding: 0; // 移除通用内边距，由内部元素自己控制
+  text-align: left;
+  // 设置一个浅灰色背景，与内部的白色小卡片形成对比
+  background-color: #f7f7f7;
+
+  // 标题区域样式
+  h3 {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--c-border-light);
+    font-size: 17px;
+    font-weight: 600;
+    // 确保标题区域是白色背景
+    background-color: #ffffff; 
+    border-top-left-radius: 16px; // 匹配弹窗的圆角
+    border-top-right-radius: 16px;
+    margin: 0; // 覆盖 h3 的通用 margin
+  }
+  
+  // 内容区域（可滚动）
+  .modal-content {
+    padding: 12px; // 为内部卡片留出呼吸空间
+    max-height: 65vh; // 限制最大高度
+    overflow-y: auto; // 内容超出时滚动
+  }
+
+  // 【核心】内部的每一条记录都显示为一个独立的小卡片
+  .history-record-item {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); // 添加细微阴影
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // 卡片内的发送者名称
+  .record-sender {
+    font-weight: 600;
+    color: var(--c-text-secondary);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  // 卡片内的文本内容
+  .record-text {
+    margin: 4px 0 0 0 !important; // 强制覆盖可能存在的其他 margin
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--c-text-primary);
+    white-space: pre-wrap; // 保持换行
+  }
+  
+  // 底部按钮区域
+  .modal-buttons {
+    padding: 12px 20px;
+    border-top: 1px solid var(--c-border-light);
+    background-color: #ffffff; // 确保按钮区域是白色背景
+    border-bottom-left-radius: 16px; // 匹配弹窗的圆角
+    border-bottom-right-radius: 16px;
+
+    // 自定义删除按钮的颜色
+    .btn-danger {
+      background-color: var(--c-accent-red-light);
+      color: var(--c-accent-red);
+      &:hover {
+        background-color: darken(#FFF1F0, 5%);
+      }
+    }
+  }
+}
+
+
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 【最终版】纯粹、精致的黑白风时间设置弹窗样式 ▼▼▼
+ * ==========================================================================
+ */
+#time-settings-modal {
+  // 这是中间的白色卡片
+  .modal-card.time-settings-card {
+    background-color: #ffffff; // 纯白背景，这是基调
+    border-radius: 24px;       // 更大的圆角，线条更圆润
+    padding: 0;
+    box-shadow: 0 12px 50px -12px rgba(0, 0, 0, 0.2); // 柔和且有深度的阴影
+    width: 90%;
+    max-width: 370px;
+    border: 1px solid rgba(0, 0, 0, 0.05); // 一条极细的边框增加质感
+    transform: scale(0.95); // 保留弹出动画
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); // 使用更有弹性的动画曲线
+    // 弹窗头部：标题和关闭按钮
+    .modal-header {
+      padding: 24px 28px 20px; // 加大头部内边距，更舒展
+      position: relative;
+      
+      .modal-title {
+        font-size: 20px; // 标题更大气
+        font-weight: 700; // 更粗的字体
+        color: #000000;
+        text-align: center; // 标题居中
+      }
+      // 关闭按钮改为更现代的胶囊形状
+      .modal-close-btn {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 30px;
+        height: 30px;
+        background: #f0f0f0; // 浅灰色背景
+        color: #888;
+        border-radius: 50%; // 圆形按钮
+        font-size: 22px;
+        line-height: 30px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          background: #e0e0e0;
+          transform: rotate(90deg); // 增加有趣的交互
+        }
+      }
+    }
+    // 弹窗主要内容区
+    .modal-content {
+      padding: 0 28px 28px; // 左右和底部内边距
+    }
+    // 设置组 (不再使用卡片，而是通过分割线来组织)
+    .setting-group {
+      padding: 20px 0;
+      border-top: 1px solid #f0f0f0; // 用分割线来分隔组
+      &:first-child {
+        border-top: none; // 第一个组不需要顶部分割线
+        padding-top: 0;
+      }
+    }
+    // 设置项（如 "时间感知" 那一行）
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0; // 移除默认内边距
+      
+      .setting-label {
+        font-size: 16px;
+        font-weight: 500; // 中等粗细，清晰而不笨重
+        color: #1a1a1a;
+      }
+    }
+    // 灰色小字说明
+    .setting-description {
+      font-size: 14px;
+      color: #7d7d7d;
+      margin-top: 12px; // 和上面的选项拉开距离
+      line-height: 1.5;
+      padding: 0;
+    }
+    
+  
+  }
+  // 弹窗出现时的动画效果
+  &.visible .modal-card.time-settings-card {
+      transform: scale(1);
+  }
+}
+/* 
+ * ==========================================================================
+ *   ▼▼▼ 【修正版】分组选择弹窗样式 (白黑简约风) ▼▼▼
+ * ==========================================================================
+ */
+
+// 这是对弹窗卡片本身的样式定义
+#group-selector-modal-overlay .minimal-bw-card {
+  background-color: #ffffff !important; /* 纯白背景 */
+  border: 1px solid #000000; /* 黑色细边框 */
+  border-radius: 16px;       /* 更圆润的边角 */
+  color: #000000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  padding: 24px; // 统一给卡片一个内边距
+
+  // --- 标题 ---
+  h3 {
+    text-align: center;
+    font-weight: 700;
+    margin: 0 0 20px 0; // 调整边距
+    border-bottom: 1px solid #f0f0f0; // 用一条更精致的线
+    padding-bottom: 16px;
+    font-size: 18px;
+  }
+
+  // --- 列表容器 ---
+  .group-list-container {
+    border: none;
+    background-color: #f7f7f7; // 列表区域用浅灰色背景，增加层次
+    padding: 8px;
+    border-radius: 12px; // 列表容器也加上圆角
+    margin-bottom: 24px; // 和下方按钮拉开距离
+    max-height: 250px; // 适当增加最大高度
+    overflow-y: auto;
+  }
+
+  // --- 单个分组卡片 ---
+  .group-option-item {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &:hover {
+      border-color: #aaaaaa;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    &.selected {
+      background-color: #000000;
+      color: #ffffff;
+      border-color: #000000;
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  // --- 底部按钮 ---
+  // 这部分会继承 .modal-buttons 的基础样式，我们不需要额外写太多
+  .modal-buttons {
+    // 如果需要微调，可以在这里写
+    .btn-secondary-bw {
+        background: #ffffff;
+        color: #000000;
+        border: 1px solid #000000;
+        &:hover { background: #f0f0f0; }
+    }
+    
+    .btn-primary-bw {
+        background: #000000;
+        color: #ffffff;
+        border: 1px solid #000000;
+        &:hover { opacity: 0.8; }
+    }
+  }
+}
+/* ======================================================
+   NPC 管理弹窗 - 新增样式 (头像与概率滑块)
+   ====================================================== */
+
+.npc-form-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* 头像上传框 */
+.npc-avatar-upload {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: #f0f0f0;
+  border: 1px solid #e5e5ea;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.npc-avatar-upload img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.npc-avatar-upload .upload-hint {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* 文本输入框容器 */
+.npc-text-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+/* 概率设置行 */
+.npc-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 4px;
+}
+
+.setting-label {
+  font-size: 12px;
+  color: #8e8e93;
+  font-weight: 500;
+  width: 100px;
+}
+
+#npc-prob-display {
+  color: #000;
+  font-weight: 700;
+}
+
+/* 简约滑块 */
+.minimal-slider {
+  flex-grow: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  background: #e5e5ea;
+  border-radius: 2px;
+  outline: none;
+}
+
+.minimal-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #000;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+/* ======================================================
+   ▼▼▼ 【新增】背景图选择弹窗样式 (粘贴到文件最底部) ▼▼▼
+   ====================================================== */
+#bg-choice-modal-overlay {
+  .modal-card {
+    width: 300px;        /* 固定宽度，不大不小 */
+    text-align: center;  /* 内容居中 */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;           /* 按钮之间的间距 */
+  }
+
+  /* 标题稍微有些间距 */
+  h3 {
+    margin-bottom: 8px;
+  }
+
+  /* 按钮通用样式 */
+  .btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  /* 1. 上传图片按钮 (黑底白字) */
+  #bg-choice-upload-btn {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  /* 2. URL按钮 (灰底黑字) */
+  #bg-choice-url-btn {
+    background-color: #f0f0f0;
+    color: #1c1c1e;
+  }
+
+  /* 3. 取消按钮 (透明背景) */
+  #bg-choice-cancel-btn {
+    background-color: transparent;
+    color: #8e8e93;
+    margin-top: 4px;
+  }
+}
+/* ======================================================
+   ▼▼▼ 【新增】保存方案弹窗专属样式 (iOS 风格) ▼▼▼
+   ====================================================== */
+#save-scheme-modal-overlay {
+  z-index: 1050; // 确保在最上层
+
+  .save-scheme-card {
+    width: 320px;
+    background-color: #ffffff;
+    border-radius: 24px; // 更大的圆角
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15); // 柔和的深阴影
+  }
+
+  /* 头部文字 */
+  .save-scheme-header {
+    text-align: center;
+    h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #000;
+      margin: 0 0 6px 0;
+    }
+    p {
+      font-size: 13px;
+      color: #8e8e93;
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  /* 表单区域 */
+  .save-scheme-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #8e8e93;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 4px;
+    }
+  }
+
+  /* 输入框美化 */
+  .minimal-input {
+    background: #f2f2f7; // 苹果风格的浅灰底色
+    border: 1px solid transparent; // 预留边框位置
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 16px;
+    color: #1c1c1e;
+    outline: none;
+    transition: all 0.2s;
+
+    &::placeholder {
+      color: #c7c7cc;
+    }
+    &:focus {
+      background: #fff;
+      border-color: #007aff; // 聚焦变蓝
+      box-shadow: 0 0 0 4px rgba(0,122,255,0.1);
+    }
+  }
+
+  /* 类型选择器 (胶囊网格) */
+  .scheme-type-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* 单个胶囊按钮 */
+  .type-chip {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    background-color: #f2f2f7; // 默认灰底
+    color: #1c1c1e;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    &:hover {
+      background-color: #e5e5ea;
+    }
+
+    /* 选中状态：黑底白字 */
+    &.active {
+      background-color: #000000;
+      color: #ffffff;
+      transform: scale(1.05); // 选中时轻微放大
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+  }
+
+  /* 底部按钮 */
+  .modal-buttons {
+    margin-top: 8px;
+    gap: 12px;
+    
+    .btn {
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 15px;
+    }
+  }
+}
+// ... 文件已有的内容 ...
+
+// ▼▼▼ 【这是本次新增的代码】从这里开始复制 ▼▼▼
+/* ======================================================
+   背景图选择弹窗样式 (iOS 风格)
+   ====================================================== */
+#bg-choice-modal-overlay {
+  // 当点击时，从底部弹出而不是中间缩放
+  align-items: flex-end;
+
+  .modal-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 8px;
+    border-radius: 14px;
+    background-color: rgba(249, 249, 249, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: none;
+    transform: translateY(100%); // 默认藏在屏幕下方
+    transition: transform 0.3s ease-out;
+  }
+
+  &.visible .modal-card {
+    transform: translateY(0); // 出现时滑上来
+  }
+  
+  h3 {
+    display: none; // 不需要标题
+  }
+
+  .modal-buttons {
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 17px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      background-color: #fff;
+      color: var(--c-accent);
+      transition: background-color 0.2s;
+      
+      &:active {
+        background-color: #e5e5e5;
+      }
+    }
+    
+    // 主按钮（黑色）
+    .btn-primary {
+      color: #000;
+      font-weight: 600;
+    }
+    
+    // 次要按钮（灰色）
+    .btn-secondary {
+       color: #000;
+    }
+  }
+}
+// ▲▲▲ 复制到这里结束 ▲▲▲
+
+/* ======================================================
+   ▼▼▼ 【新增】单个聊天数据导入/导出弹窗样式 ▼▼▼
+   ====================================================== */
+.chat-data-modal {
+  width: 90%;
+  max-width: 360px;
+  padding: 0; // 移除卡片默认内边距，由内部控制
+  background-color: var(--c-bg-secondary); // 使用浅灰色背景
+  border-radius: var(--radius-xl);
+
+  // -- 头部 --
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--c-border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--c-text-secondary);
+      cursor: pointer;
+    }
+  }
+
+  // -- 内容区 --
+  .modal-content {
+    padding: 20px;
+
+    .modal-description {
+      font-size: 14px;
+      color: var(--c-text-secondary);
+      text-align: center;
+      margin: 0 0 24px 0;
+      line-height: 1.5;
+      
+      strong {
+        color: var(--c-text-primary);
+        font-weight: 600;
+      }
+    }
+  }
+  
+  // -- 数据选择项 --
+  .data-selection-group {
+    background-color: var(--c-bg-primary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  
+  .data-selection-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+    
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--c-border-light);
+    }
+
+    input[type="checkbox"] {
+      display: none; // 隐藏原生复选框
+    }
+    
+    // 自定义复选框
+    .custom-checkbox {
+      width: 22px;
+      height: 22px;
+      border: 1.5px solid var(--c-border-strong);
+      border-radius: 50%;
+      margin-right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      
+      // 勾选后的✔
+      &::after {
+        content: '✓';
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        transform: scale(0);
+        transition: transform 0.2s ease;
+      }
+    }
+
+    // 标签文字
+    .label-text {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    // 选中时的样式
+    input[type="checkbox"]:checked + .custom-checkbox {
+      background-color: var(--c-accent);
+      border-color: var(--c-accent);
+
+      &::after {
+        transform: scale(1);
+      }
+    }
+  }
+
+  // -- 底部按钮区 --
+  .modal-footer {
+    padding: 20px;
+    display: flex;
+    gap: 12px;
+
+    .btn {
+      flex: 1;
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    
+    .btn-secondary {
+      background-color: var(--c-bg-tertiary);
+      color: var(--c-text-primary);
+    }
+  }
+}
+
+/* ======================================================
+   ▼▼▼ 【新增】线下设置弹窗专属样式 (黑白、圆润、精致) ▼▼▼
+   ====================================================== */
+#offline-settings-modal {
+  .modal-card.offline-settings-card {
+    background-color: #f7f7f7; // 使用柔和的浅灰色作为背景
+    border-radius: 20px;
+    width: 90%;
+    max-width: 360px;
+    padding: 0; // 内部控制边距
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  // --- 弹窗头部 ---
+  .settings-modal-header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e5e5;
+    
+    h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #000;
+      // 将标题向左推，为关闭按钮留出空间
+      flex-grow: 1;
+      text-align: center;
+      padding-left: 30px; // 平衡关闭按钮的宽度
+    }
+    .modal-close-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #e9e9eb;
+      color: #8a8a8e;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+  }
+
+  // --- 内容区 ---
+  .settings-modal-content {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  // --- 设置组卡片 (可复用) ---
+  .setting-group-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .setting-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+      color: #8a8a8e;
+    }
+    h4 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1c1c1e;
+    }
+  }
+
+  // --- 壁纸预览区 ---
+  .wallpaper-preview {
+    width: 100%;
+    height: 150px;
+    border-radius: 8px;
+    background-color: #e9e9eb;
+    margin-bottom: 16px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .preview-placeholder {
+    font-size: 14px;
+    color: #8a8a8e;
+  }
+  
+  // --- 操作按钮 ---
+  .wallpaper-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-action, .btn-action-secondary {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+  }
+  .btn-action { // 主按钮
+    background-color: #000000;
+    color: #ffffff;
+    &:active { background-color: #333; }
+  }
+  .btn-action-secondary { // 次按钮
+    background-color: #e9e9eb;
+    color: #1c1c1e;
+    &:active { background-color: #dcdce1; }
+  }
+
+  // --- 未来扩展的占位符 ---
+  .placeholder-text {
+    text-align: center;
+    font-size: 14px;
+    color: #aeaeae;
+    padding: 20px 0;
+  }
+}
+
+// --- 【新增】壁纸来源选择菜单的样式 ---
+#offline-wallpaper-source-menu {
+  // 复用现有的 action-menu-popover 样式，只需微调
+  z-index: 1100; // 确保在设置弹窗之上
+}
+/* ======================================================
+   ▼▼▼ 【问题修复】提升URL输入弹窗的层级 ▼▼▼
+   ====================================================== */
+
+// 你的通用输入弹窗（用于输入URL等）的遮罩层ID是 #api-input-modal-overlay
+// 我们给它一个比通用 .modal-overlay (z-index: 200) 更高的 z-index
+#api-input-modal-overlay {
+  z-index: 210;
+}
+/* ======================================================
+   ▼▼▼ 【UI更新】删除聊天记录弹窗样式 (白底黑图标精致风) ▼▼▼
+   ====================================================== */
+
+.minimal-black-white-modal {
+  background-color: #ffffff; /* 变为白色背景 */
+  color: #1c1c1e; /* 默认文字变为深灰色 */
+  border-radius: 20px;
+  border: 1px solid #f0f0f0; /* 边框变为浅灰色 */
+  width: 90%;
+  max-width: 350px;
+  padding: 0;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12); /* 阴影调浅 */
+
+  .modal-header-bw {
+    padding: 20px 24px;
+    position: relative;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0; /* 分割线变浅 */
+
+    .modal-title-bw {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #000000; /* 标题为纯黑 */
+    }
+
+    .modal-close-btn-bw {
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      transform: translateY(-50%);
+      background: #f0f2f5; /* 关闭按钮背景变浅灰 */
+      color: #8e8e93;   /* 图标颜色变中灰 */
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 20px;
+      line-height: 26px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: #e5e5ea;
+      }
+    }
+  }
+
+  .delete-options-list {
+    padding: 16px; // 列表内边距
+    display: flex;
+    flex-direction: column;
+    gap: 12px; // 选项间距
+  }
+
+  .delete-option-item {
+    padding: 12px 16px;
+    border-radius: 12px;
+    background-color: #f7f7f7; // 选项背景为极浅灰色
+    display: flex;
+    align-items: center; // 垂直居中
+    gap: 16px; // 图标和文字的间距
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+
+    &:hover {
+      background-color: #ebebeb;
+      transform: scale(1.02);
+    }
+    
+    // --- 新增图标样式 ---
+    .option-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #e9e9eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0; // 防止图标被压缩
+      
+      svg {
+        width: 20px;
+        height: 20px;
+        color: #1c1c1e; // 默认图标颜色
+      }
+    }
+    
+    .option-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .option-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: #1c1c1e; // 标题颜色
+    }
+
+    .option-desc {
+      font-size: 12px;
+      color: #8e8e93; // 描述文字颜色
+      margin-top: 4px;
+    }
+    
+    // “删除全部”选项的特殊样式
+    &[data-action="all"] {
+      .option-icon {
+        background-color: #ffe5e3; // 图标背景变淡红
+        svg {
+          color: #FF3B30; // 图标变红色
+        }
+      }
+      .option-title {
+        color: #FF3B30; // 标题变红色
+      }
+    }
+  }
+
+  .modal-footer-bw {
+    padding: 16px;
+    
+    .btn-secondary-bw {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background-color: #e5e5ea; // 取消按钮背景
+      color: #1c1c1e;      // 取消按钮文字
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: #dcdce1;
+      }
+    }
+  }
+}
+/* ======================================================
+   ▼▼▼ 【新增】日记壁纸来源选择弹窗 (iOS Action Sheet 风格) ▼▼▼
+   ====================================================== */
+#diary-wallpaper-source-modal {
+  align-items: flex-end;
+  z-index: 1200; // 确保在日记设置弹窗之上
+
+  .wallpaper-source-card {
+    width: calc(100% - 16px);
+    max-width: 420px;
+    margin: 0 8px 8px;
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+  }
+
+  &.visible .wallpaper-source-card {
+    transform: translateY(0);
+  }
+
+  .action-sheet-group {
+    background-color: rgba(245, 245, 247, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 14px;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .action-sheet-btn {
+    width: 100%;
+    border: none;
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 500;
+    color: #000000;
+    background-color: transparent;
+    border-top: 1px solid rgba(60, 60, 67, 0.29);
+    transition: background-color 0.2s;
+
+    &:first-child {
+      border-top: none;
+    }
+
+    &:active {
+      background-color: rgba(220, 220, 222, 0.9);
+    }
+
+    &.cancel {
+      font-weight: 600;
+    }
+  }
+}
+// ... (文件之前的内容保持不变) ...
+
+// ▼▼▼ 【重构】角色心声卡片样式 (文艺海报风) ▼▼▼
+
+// 1. 遮罩层：增加毛玻璃效果，提升沉浸感
+.thoughts-overlay-blur {
+  backdrop-filter: blur(8px); // 背景模糊
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.3); // 降低纯黑透明度，更通透
+}
+
+// 2. 海报主体卡片
+.inner-thoughts-poster {
+  // 尺寸与定位
+  width: 85%;
+  max-width: 360px;
+  height: auto;
+  max-height: 75vh; // 稍微拉长一点
+  padding: 0; // 内部布局自己控制
+  
+  // 视觉风格：仿纸质/高级卡片
+  background-color: #fffef9; // 暖白/米色，像纸张一样
+  border-radius: 4px; // 直角或极小圆角，更有书卷气
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.15), // 深层阴影
+    0 0 0 1px rgba(0, 0, 0, 0.02);   // 极细边框
+  
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  // 装饰性背景大字 (MONOLOGUE)
+  .poster-bg-text {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    font-size: 80px;
+    font-weight: 900;
+    color: rgba(0, 0, 0, 0.03); // 极淡的灰色
+    z-index: 0;
+    font-family: sans-serif;
+    pointer-events: none;
+    letter-spacing: 5px;
+  }
+
+  // 内容容器
+  .poster-content-wrapper {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 30px 24px 24px; // 内边距
+    min-height: 0; 
+  }
+
+  // 顶部标题
+  .thoughts-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+
+    .decoration-line {
+      width: 20px;
+      height: 1px;
+      background-color: #d1d1d1;
+    }
+
+    .thoughts-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 3px; // 增加字间距
+      color: #8c8c8c;
+      text-transform: uppercase;
+    }
+  }
+
+  // 滚动区域
+  .thoughts-scroll-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 4px; // 防止滚动条贴字
+    
+    // 隐藏滚动条但保留功能
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  // 核心文本样式 (已优化)
+  .thoughts-text {
+    font-family: "Songti SC", "Noto Serif SC", STSong, serif; // 宋体/衬线体
+    font-size: 17px;
+    line-height: 1.9; // 宽松行高，适合阅读
+    color: #2c2c2c;   // 深炭灰
+    text-align: justify; // 两端对齐
+    white-space: pre-wrap; // 保留换行
+    
+    // ▼▼▼ 删除首字下沉，改为重点词特效 ▼▼▼
+    
+    // 定义重点词样式 (对应 <strong> 标签)
+    strong {
+      color: #8e443d; // 【朱砂红】复古、文艺、不刺眼
+      font-weight: 600; // 稍微加粗
+      // 底部添加淡淡的红晕笔触，像用马克笔轻轻划过
+      background: linear-gradient(to bottom, transparent 65%, rgba(142, 68, 61, 0.15) 65%);
+      padding: 0 2px; // 左右留一点呼吸感
+      margin: 0 1px;
+      border-radius: 2px;
+    }
+    // ▲▲▲ 修改结束 ▲▲▲
+  }
+
+  // 底部装饰
+  .thoughts-footer {
+    margin-top: 24px;
+    text-align: right;
+    flex-shrink: 0;
+    
+    .footer-sign {
+      font-family: "Georgia", serif; // 英文字体用衬线
+      font-style: italic;
+      font-size: 12px;
+      color: #b0b0b0;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 2px;
+    }
+  }
+
+  // 关闭按钮 (极简风格)
+  .poster-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s, transform 0.2s;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: #333;
+      transform: rotate(90deg); // 旋转交互
+    }
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+// ▲▲▲ 新增结束 ▲▲▲
+/* --- 分页控制条样式 (新增) --- */
+.upload-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 15px 0 5px;
+  margin-top: 10px;
+  border-top: 1px solid var(--c-border-light);
+  width: 100%;
+}
+
+.page-nav-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--c-border);
+  background-color: var(--c-bg-primary);
+  color: var(--c-text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover:not(:disabled) {
+    background-color: var(--c-bg-tertiary);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: transparent;
+  }
+}
+
+.page-info-text {
+  font-size: 13px;
+  color: var(--c-text-secondary);
+  font-variant-numeric: tabular-nums; /* 防止数字变动时宽度跳动 */
+}
+/* ====================================================== */
+/* == 【修改版】飞机预订弹窗样式 (极简黑白风) == */
+/* ====================================================== */
+.flight-book-card {
+  width: 90%;
+  max-width: 340px;
+  background-color: #ffffff; // 纯白背景
+  border-radius: 20px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1); // 柔和的阴影
+  border: 1px solid #f0f0f0; // 极淡的边框
+
+  // 头部样式
+  .modal-header {
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    background-color: #fff; // 白色
+    border-bottom: none;    // 去掉分割线，更干净
+    
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #000; // 纯黑文字
+    }
+    .modal-close-btn {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      background: #f5f5f5; // 浅灰按钮背景
+      width: 28px; height: 28px; border-radius: 50%;
+      border: none; color: #333; // 深灰图标
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+  }
+
+  // 内容区域
+  .modal-content {
+    padding: 10px 24px 30px; // 调整间距
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  // 图标区域 (不再是蓝色)
+  .flight-modal-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #f7f7f7; // 浅灰背景
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    border: none;
+    svg {
+      width: 28px;
+      height: 28px;
+      color: #000; // 黑色图标
+    }
+  }
+
+  // 提示文字
+  .flight-modal-hint {
+    color: #666; // 深灰色
+    font-size: 14px;
+    margin: 0;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  // 选项网格
+  .ride-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; // 两列
+    gap: 12px;
+    width: 100%;
+  }
+
+  // 选项按钮 (黑白风格)
+  .ride-option-chip {
+    padding: 14px 0; // 上下间距
+    background-color: #fff;
+    border: 1px solid #e0e0e0; // 浅灰边框
+    color: #333;
+    font-weight: 500;
+    border-radius: 12px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    // 选中状态：黑底白字
+    &.active {
+      background-color: #000; 
+      color: #fff;
+      border-color: #000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    // 自定义输入框样式
+    &.is-input {
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      input {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: transparent;
+        text-align: center;
+        color: inherit; // 跟随父元素颜色
+        font-weight: inherit;
+        font-size: inherit;
+        outline: none;
+        padding: 14px 0;
+        border-radius: 12px;
+        
+        &::placeholder {
+           color: #999;
+           font-weight: 400;
+        }
+      }
+    }
+  }
+
+  // 底部确认按钮
+  .modal-footer {
+    padding: 0 24px 24px;
+    border: none;
+    .btn-primary {
+      background: #000; // 纯黑按钮
+      color: #fff;
+      border-radius: 14px;
+      font-weight: 600;
+      padding: 14px;
+      width: 100%;
+      border: none;
+      box-shadow: none;
+      &:active { transform: scale(0.98); }
+    }
+  }
+}
+/* ======================================================
+   ▼▼▼ 【重塑】群聊红包弹窗专属样式 (高级黑白设计风) ▼▼▼
+   ====================================================== */
+#red-packet-modal-overlay {
+  .rp-premium-card {
+    background-color: #ffffff;
+    border-radius: 28px; // 更大的圆角
+    padding: 30px 24px 24px;
+    width: 90%;
+    max-width: 360px;
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.1);
+    color: #000;
+    font-family: -apple-system, "Helvetica Neue", sans-serif;
+  }
+  /* 头部装饰 */
+  .rp-header {
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+    
+    .rp-eng {
+      display: block;
+      font-size: 10px;
+      color: #999;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    h3 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .rp-close-btn {
+      position: absolute;
+      right: -8px; top: -8px;
+      background: transparent;
+      border: none; color: #ccc;
+      font-size: 28px; line-height: 1;
+      cursor: pointer; transition: color 0.2s;
+      &:hover { color: #000; }
+    }
+  }
+  /* 胶囊切换器 */
+  .rp-type-switch {
+    display: flex;
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 30px;
+    
+    .rp-type-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 10px 0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      
+      &.active {
+        background: #fff;
+        color: #000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+    }
+  }
+  /* 巨大的金额输入 */
+  .rp-amount-huge {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    border-bottom: 2px solid #000; // 粗黑底线
+    padding-bottom: 10px;
+    margin: 0 20px;
+    
+    .currency {
+      font-size: 28px;
+      font-weight: 600;
+      margin-right: 8px;
+      font-family: 'Didot', serif;
+    }
+    input {
+      width: 140px;
+      border: none; background: transparent;
+      font-size: 48px; font-weight: 800;
+      text-align: center; color: #000; outline: none;
+      font-family: 'Didot', "Helvetica Neue", sans-serif;
+      &::placeholder { color: #e0e0e0; }
+    }
+  }
+  .rp-amount-hint {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    margin-top: 12px;
+    margin-bottom: 30px;
+  }
+  /* 极简表单行 */
+  .rp-form-area {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .rp-line-input {
+    display: flex;
+    align-items: center;
+    padding: 14px 4px;
+    border-bottom: 1px solid #f0f0f0; // 极细灰线
+    transition: border-color 0.2s;
+    &:focus-within { border-color: #000; }
+    label { font-size: 15px; color: #000; font-weight: 500; width: 80px; flex-shrink: 0; }
+    input, select {
+      flex: 1; border: none; background: transparent; outline: none;
+      text-align: right; font-size: 15px; color: #333; width: 100%;
+      &::placeholder { color: #ccc; }
+    }
+    input[type="number"] { font-weight: 600; font-size: 16px; }
+    select { appearance: none; color: #666; cursor: pointer; direction: rtl; }
+    .unit { font-size: 14px; margin-left: 8px; color: #000; font-weight: 500; }
+    .arrow { margin-left: 8px; color: #ccc; pointer-events: none; }
+  }
+  .rp-member-hint {
+    font-size: 11px; color: #bbb; padding-left: 4px; margin-top: -6px;
+    #rp-group-member-count { font-weight: 600; color: #888; }
+  }
+  /* 底部按钮区 */
+  .rp-footer {
+    margin-top: 35px;
+    text-align: center;
+    .rp-total-calc {
+      font-size: 13px; color: #666; margin-bottom: 12px;
+      strong { color: #000; font-size: 16px; font-family: 'Didot', serif; }
+    }
+    
+    .rp-submit-btn {
+      width: 100%; background: #000; color: #fff;
+      border: none; padding: 18px; border-radius: 16px;
+      font-size: 16px; font-weight: 600; letter-spacing: 1px;
+      cursor: pointer; transition: transform 0.2s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      &:active { transform: scale(0.96); }
+    }
+  }
+}
+/* ======================================================
+   ▼▼▼ 奢侈品高定风 · 精致线框红包拆开弹窗 ▼▼▼
+   ====================================================== */
+#red-packet-open-modal {
+  /* 外层遮罩，增加一点模糊感凸显弹窗 */
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+#red-packet-open-modal .luxury-editorial-style {
+  width: 310px;
+  height: 440px;
+  background-color: #FCFAF8; /* 极具质感的特种纸暖白色 */
+  border-radius: 2px; /* 抛弃圆角，采用邀请函直角 */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 多重阴影：底层柔和发散，内层模拟纸张厚度 */
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15), inset 0 0 0 6px #FCFAF8, inset 0 0 0 7px rgba(212, 184, 134, 0.4); 
+  font-family: "Songti SC", "Noto Serif SC", serif; /* 全局衬线体奠定基调 */
+}
+
+/* ================= 极致细节 1：四角金属护角 ================= */
+#red-packet-open-modal .deco-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #C5A059; /* 偏暗的复古金 */
+  z-index: 10;
+  pointer-events: none;
+}
+#red-packet-open-modal .top-left { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+#red-packet-open-modal .top-right { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+#red-packet-open-modal .bottom-left { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+#red-packet-open-modal .bottom-right { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+/* 关闭按钮 */
+#close-rp-open-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  color: #A3958F;
+  font-size: 26px;
+  font-weight: 300;
+  cursor: pointer;
+  z-index: 20;
+  transition: color 0.3s, transform 0.3s;
+}
+#close-rp-open-btn:hover { color: #2C2825; transform: rotate(90deg); }
+
+/* ================= 极致细节 2：顶部复古铭文 ================= */
+#red-packet-open-modal .rp-open-content {
+  margin-top: 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  z-index: 2;
+}
+#red-packet-open-modal .vintage-stamp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #D4B886;
+  font-family: "Didot", "Georgia", serif;
+  font-size: 10px;
+  letter-spacing: 4px;
+  margin-bottom: 25px;
+}
+#red-packet-open-modal .vintage-stamp .star {
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+/* ================= 极致细节 3：多重精细头像框 ================= */
+#red-packet-open-modal .avatar-gallery-frame {
+  padding: 4px;
+  border: 1px solid rgba(212, 184, 134, 0.4); /* 外层极细金线 */
+  border-radius: 50%;
+  margin-bottom: 16px;
+}
+#red-packet-open-modal .avatar-inner-ring {
+  padding: 3px;
+  border: 1px dashed #C5A059; /* 内层虚线框 */
+  border-radius: 50%;
+}
+#rp-open-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 发件人 */
+#red-packet-open-modal .sender-info { text-align: center; }
+#red-packet-open-modal .mag-label {
+  display: block;
+  font-size: 9px;
+  color: #A3958F;
+  letter-spacing: 3px;
+  margin-bottom: 4px;
+  font-family: "Didot", sans-serif;
+}
+#rp-open-name {
+  color: #2C2825;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* ================= 极致细节 4：带菱形的高定分割线 ================= */
+#red-packet-open-modal .elegant-divider {
+  display: flex;
+  align-items: center;
+  width: 70%;
+  margin: 20px 0;
+}
+#red-packet-open-modal .elegant-divider .line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #D4B886, transparent);
+}
+#red-packet-open-modal .elegant-divider .diamond {
+  width: 6px;
+  height: 6px;
+  background-color: #C5A059;
+  transform: rotate(45deg);
+  margin: 0 10px;
+}
+
+/* 祝福语 */
+#red-packet-open-modal .greeting-box {
+  padding: 0 25px;
+  text-align: center;
+}
+#rp-open-greeting {
+  color: #4A4440;
+  font-size: 15px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+}
+
+/* ================= 极致细节 5：机械表盘级同心圆按钮 ================= */
+#red-packet-open-modal .action-btn-wrapper {
+  margin-top: auto;
+  margin-bottom: 35px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+}
+/* 外圈细线 */
+#red-packet-open-modal .fine-ring.outer {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border: 1px solid rgba(212, 184, 134, 0.3);
+  border-radius: 50%;
+}
+/* 内圈细线（点阵/虚线交替） */
+#red-packet-open-modal .fine-ring.inner {
+  position: absolute;
+  width: 82px;
+  height: 82px;
+  border: 1px dashed rgba(197, 160, 89, 0.6);
+  border-radius: 50%;
+  animation: slow-rotate 15s linear infinite;
+}
+@keyframes slow-rotate {
+  100% { transform: rotate(360deg); }
+}
+
+/* 核心按钮本身 */
+#rp-open-action-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F8F1E5 0%, #D4B886 50%, #C5A059 100%);
+  border: 1.5px solid #FFF; /* 极细白边提升立体感 */
+  color: #2C2825; /* 深褐色文字 */
+  font-size: 26px;
+  font-weight: 900;
+  font-family: "Songti SC", "Noto Serif SC", serif;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4);
+  /* 保留原有 JS 动画 */
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s;
+  z-index: 2;
+}
+#rp-open-action-btn:hover {
+  box-shadow: 0 10px 25px rgba(197, 160, 89, 0.6);
+}
+/* ======================================================
+   ▼▼▼ 奢侈品高定风 · 红包领取详情【弹窗卡片】 ▼▼▼
+   ====================================================== */
+#red-packet-detail-modal {
+  z-index: 10008;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  align-items: center;
+  justify-content: center;
+}
+
+#red-packet-detail-modal .rp-detail-popup-card {
+  width: 320px;
+  max-height: 80vh; /* 限制最高不超过屏幕80% */
+  background-color: #FCFAF8; /* 特种纸暖白底色 */
+  border-radius: 2px; /* 邀请函直角 */
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  font-family: "Songti SC", "Noto Serif SC", serif;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), inset 0 0 0 6px #FCFAF8, inset 0 0 0 7px rgba(212, 184, 134, 0.4); 
+}
+
+/* ================= 细节1：四角金属护角 ================= */
+#red-packet-detail-modal .deco-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #C5A059;
+  z-index: 10;
+  pointer-events: none;
+}
+#red-packet-detail-modal .top-left { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+#red-packet-detail-modal .top-right { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+#red-packet-detail-modal .bottom-left { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+#red-packet-detail-modal .bottom-right { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+/* 弹窗右上角关闭按钮 */
+#red-packet-detail-modal .rp-popup-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  color: #A3958F;
+  font-size: 26px;
+  font-weight: 300;
+  cursor: pointer;
+  z-index: 20;
+  transition: color 0.3s, transform 0.3s;
+}
+#red-packet-detail-modal .rp-popup-close-btn:hover {
+  color: #2C2825;
+  transform: rotate(90deg);
+}
+
+/* ================= 细节2：上半部分内容区 ================= */
+#red-packet-detail-modal .rp-popup-content {
+  padding: 30px 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0; /* 防止被挤压 */
+}
+
+#red-packet-detail-modal .rp-header-title {
+  color: #D4B886;
+  font-size: 10px;
+  font-family: "Didot", "Georgia", serif;
+  letter-spacing: 4px;
+  margin-bottom: 25px;
+}
+
+/* 头像框 */
+#red-packet-detail-modal .avatar-gallery-frame {
+  padding: 4px;
+  border: 1px solid rgba(212, 184, 134, 0.4);
+  border-radius: 50%;
+  margin-bottom: 12px;
+}
+#red-packet-detail-modal .avatar-inner-ring {
+  padding: 3px;
+  border: 1px dashed #C5A059;
+  border-radius: 50%;
+}
+#rp-detail-avatar {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+#red-packet-detail-modal .mag-label {
+  display: block; text-align: center;
+  font-size: 9px; color: #A3958F;
+  letter-spacing: 3px; margin-bottom: 4px;
+  font-family: "Didot", sans-serif;
+}
+#red-packet-detail-modal .rp-detail-name-row {
+  color: #2C2825; font-size: 15px; font-weight: 600; letter-spacing: 1px;
+  margin-bottom: 8px; text-align: center;
+}
+#rp-detail-name { font-weight: 800; }
+
+#rp-detail-greeting {
+  color: #8C827A; font-size: 13px; line-height: 1.6;
+  margin-bottom: 15px; font-family: inherit; text-align: center;
+}
+
+/* 巨型金额 */
+#rp-detail-amount-box {
+  color: #2C2825;
+  font-family: "Didot", "Georgia", serif;
+  margin-bottom: 10px;
+  text-align: center;
+}
+#rp-detail-amount-box .currency { font-size: 18px; font-weight: 500; margin-right: 4px; }
+#rp-detail-my-amount { font-size: 42px; font-weight: 700; letter-spacing: -1px; }
+
+/* ================= 细节3：带菱形的高定分割线 ================= */
+#red-packet-detail-modal .elegant-divider {
+  display: flex; align-items: center; width: 80%; margin: 10px auto; flex-shrink: 0;
+}
+#red-packet-detail-modal .elegant-divider .line {
+  flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #D4B886, transparent);
+}
+#red-packet-detail-modal .elegant-divider .diamond {
+  width: 6px; height: 6px; background-color: #C5A059; transform: rotate(45deg); margin: 0 10px;
+}
+
+/* ================= 细节4：列表滑动区与强制覆盖样式 ================= */
+#red-packet-detail-modal .rp-detail-list-area {
+  flex-grow: 1; /* 撑满剩余高度 */
+  overflow-y: auto; /* 超出则滑动 */
+  padding: 10px 0 24px;
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none; scrollbar-width: none;
+}
+#red-packet-detail-modal .rp-detail-list-area::-webkit-scrollbar { display: none; }
+
+#rp-detail-status-text {
+  text-align: center; color: #A3958F; font-size: 10px;
+  letter-spacing: 1px; margin-bottom: 10px; font-family: "Didot", sans-serif;
+}
+
+/* 强制接管 JS 里输出的 div 样式！绝不破坏逻辑！ */
+#rp-detail-list > div {
+  border-bottom: 1px solid rgba(212, 184, 134, 0.2) !important;
+  padding: 12px 0 !important;
+  margin: 0 24px !important; /* 左右留白 */
+}
+/* ======================================================
+   修复：抢红包记录里的真实头像 (完美圆形不变形)
+   ====================================================== */
+#rp-detail-list > div > div:first-child > img:first-child {
+  background: #F8F1E5 !important; 
+  border: 1px solid rgba(212, 184, 134, 0.4) !important;
+  border-radius: 50% !important; 
+  width: 36px !important; 
+  height: 36px !important;
+  min-width: 36px !important; /* 防止被 flex 挤压 */
+  min-height: 36px !important; 
+  object-fit: cover !important; /* 核心：保证图片填充整个圆且不变形 */
+  display: block !important;
+  padding: 0 !important; /* 去掉之前给 div 设置的干扰属性 */
+  box-sizing: border-box !important; /* 让边框算在 36px 以内 */
+}
+
+
+/* 名字和时间容器间距 */
+#rp-detail-list > div > div:first-child > div:nth-child(2) {
+  gap: 2px !important;
+}
+
+/* 名字排版 */
+#rp-detail-list > div > div:first-child > div:nth-child(2) > span:first-child {
+  font-family: "Songti SC", "Noto Serif SC", serif !important;
+  color: #2C2825 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* “手气最佳” 的金色徽章 */
+#rp-detail-list span[style*="手气最佳"] {
+  border: none !important;
+  background: linear-gradient(135deg, #F8F1E5 0%, #D4B886 100%) !important;
+  color: #2C2825 !important;
+  padding: 2px 6px !important;
+  border-radius: 2px !important; 
+  font-family: -apple-system, sans-serif !important;
+  font-size: 9px !important;
+  font-weight: bold !important;
+  letter-spacing: 1px !important;
+  margin-left: 6px !important;
+  box-shadow: 0 2px 4px rgba(212, 184, 134, 0.3) !important;
+}
+
+/* 领取时间排版 */
+#rp-detail-list > div > div:first-child > div:nth-child(2) > span:nth-child(2) {
+  color: #A3958F !important;
+  font-family: "Georgia", serif !important;
+  font-size: 10px !important;
+  letter-spacing: 1px !important;
+}
+
+/* 右侧金额数字排版 */
+#rp-detail-list > div > div:last-child {
+  font-family: "Didot", "Georgia", serif !important;
+  font-size: 16px !important;
+  color: #C5A059 !important; 
+  font-weight: 700 !important;
+}
+
+.history-modal-card.modal-card {
+  padding: 0;
+  max-height: min(85vh, 85dvh);
+  overflow: hidden;
+}
+
+.vector-match-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(44px, calc(env(safe-area-inset-top) + 18px)) 18px max(24px, calc(env(safe-area-inset-bottom) + 18px));
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
+.vector-match-modal-card {
+  position: relative;
+  width: min(390px, 100%);
+  max-height: min(82dvh, calc(100dvh - 88px));
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 18px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+}
+
+.vector-match-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #e5e5e5;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  font-size: 20px;
+  line-height: 1;
+  z-index: 2;
+}
+
+.vector-match-modal-header {
+  flex: 0 0 auto;
+  padding: 18px 52px 12px 18px;
+  border-bottom: 1px solid #f0f0f0;
+
+  h3 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    color: #111;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #777;
+  }
+}
+
+.vector-match-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vector-match-snapshot {
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  background: #fafafa;
+  margin-bottom: 12px;
+}
+
+.vector-match-snapshot-meta,
+.vector-match-result-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  color: #888;
+  font-size: 11px;
+}
+
+.vector-match-result-meta span:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.vector-match-result-item {
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.vector-match-result-text {
+  margin-top: 5px;
+  color: #222;
+  font-size: 13px;
+  line-height: 1.55;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.vector-match-more,
+.vector-match-empty {
+  padding: 14px 8px;
+  color: #999;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+#forward-message-modal-overlay {
+  .forward-message-modal-card {
+    width: min(86vw, 340px);
+    max-height: min(72vh, 560px);
+    padding: 0;
+    overflow: hidden;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  }
+
+  .forward-message-modal-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: center;
+
+    h3 {
+      margin: 0;
+      color: #222;
+      font-size: 17px;
+      font-weight: 700;
+    }
+  }
+
+  .forward-message-char-list {
+    min-height: 80px;
+    max-height: min(52vh, 360px);
+    overflow-y: auto;
+    padding: 10px 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .forward-message-char-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 8px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #222;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.18s ease;
+
+    &:hover,
+    &:active {
+      background: #f5f5f5;
+    }
+
+    img {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      margin-right: 12px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #f1f1f1;
+    }
+
+    span {
+      min-width: 0;
+      overflow: hidden;
+      font-size: 15px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .forward-message-empty {
+    padding: 32px 12px;
+    color: #999;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .forward-message-cancel-btn {
+    width: 100%;
+    padding: 14px 20px;
+    border: 0;
+    border-top: 1px solid #f0f0f0;
+    background: #fff;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:active {
+      background: #f5f5f5;
+    }
+  }
+}
+
+.forwarded-message-detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0;
+  background: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  &.visible {
+    opacity: 1;
+  }
+
+  .forwarded-message-detail-card {
+    width: 100%;
+    max-width: 430px;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 0;
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .forwarded-detail-header {
+    display: flex;
+    align-items: center;
+    min-height: 62px;
+    padding: max(12px, env(safe-area-inset-top)) 12px 8px;
+    border-bottom: 1px solid #f1f1f1;
+
+    .forwarded-detail-title {
+      flex: 1;
+      min-width: 0;
+      padding-right: 36px;
+      text-align: center;
+    }
+
+    .forwarded-detail-title strong {
+      display: block;
+      overflow: hidden;
+      color: #222;
+      font-size: calc(17px * var(--looky-font-scale, 1));
+      font-weight: 500;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .forwarded-detail-title span {
+      display: block;
+      margin-top: 4px;
+      color: #777;
+      font-size: calc(12px * var(--looky-font-scale, 1));
+    }
+  }
+
+  .forwarded-detail-close {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    background: transparent;
+    color: #222;
+    cursor: pointer;
+    font-size: calc(30px * var(--looky-font-scale, 1));
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  .forwarded-detail-body {
+    height: calc(100% - 62px);
+    overflow-y: auto;
+    padding: 12px 14px 32px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .forwarded-record-row {
+    display: flex;
+    gap: 8px;
+    padding: 10px 0 12px;
+    border-bottom: 1px solid #ededed;
+  }
+
+  .forwarded-record-avatar {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #f0f0f0;
+  }
+
+  .forwarded-record-main {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .forwarded-record-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 5px;
+    color: #8a8a8a;
+    font-size: calc(13px * var(--looky-font-scale, 1));
+
+    span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    time {
+      flex: 0 0 auto;
+      color: #b8b8b8;
+      font-size: calc(12px * var(--looky-font-scale, 1));
+    }
+  }
+
+  .forwarded-record-text {
+    color: #222;
+    font-size: calc(15px * var(--looky-font-scale, 1));
+    line-height: 1.45;
+    word-break: break-word;
+  }
+
+  .forwarded-record-translation {
+    padding-top: 5px;
+    margin-top: 6px;
+    border-top: 1px solid #eeeeee;
+    color: #777;
+    font-size: calc(12px * var(--looky-font-scale, 1));
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .forwarded-record-image {
+    display: block;
+    width: min(170px, 100%);
+    max-height: 210px;
+    margin-bottom: 6px;
+    object-fit: contain;
+  }
+
+  .forwarded-record-sticker {
+    display: block;
+    width: auto;
+    max-width: min(120px, 100%);
+    max-height: 120px;
+    margin-bottom: 6px;
+    object-fit: contain;
+  }
+}
+
+.fake-chat-record-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10080;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  padding: max(30px, env(safe-area-inset-top)) 14px max(20px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: rgba(16, 16, 16, 0.34);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  &.visible {
+    .fake-chat-record-modal-card {
+      transform: translateY(0) scale(1);
+    }
+  }
+}
+
+.fake-chat-record-modal-card {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 440px);
+  max-width: 440px;
+  max-height: min(780px, calc(100dvh - 50px));
+  padding: 16px 14px 12px;
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+  border-radius: 18px;
+  background: #fff;
+  color: #171717;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  transform: translateY(10px) scale(0.98);
+  transition: transform 0.22s ease;
+}
+
+.fake-chat-record-modal-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0 -2px;
+  padding: 0 2px 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fake-chat-record-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+
+  h3 {
+    margin: 3px 0 0;
+    color: #111;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-align: left;
+  }
+}
+
+.fake-chat-record-eyebrow {
+  color: #999;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.fake-chat-record-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f3f3f3;
+  color: #555;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fake-chat-record-description {
+  margin: 6px 0 10px;
+  color: #888;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.fake-chat-record-source-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background: #f2f2f2;
+
+  button {
+    min-height: 32px;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #888;
+    font-size: 12px;
+    cursor: pointer;
+
+    &.active {
+      background: #111;
+      color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+    }
+  }
+}
+
+.fake-chat-record-source-name,
+.fake-chat-ai-prompt,
+.fake-chat-speaker-name,
+.fake-chat-message-text,
+.fake-chat-speaker-type {
+  box-sizing: border-box;
+  border: 1px solid #e2e2e2;
+  background: #fafafa;
+  color: #222;
+  outline: none;
+
+  &:focus {
+    border-color: #777;
+    background: #fff;
+  }
+}
+
+.fake-chat-record-source-name,
+.fake-chat-ai-prompt {
+  width: 100%;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.fake-chat-field-label {
+  display: block;
+  margin: 0 0 6px;
+  color: #555;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.fake-chat-participant-label {
+  margin-top: 2px;
+}
+
+.fake-chat-participant-picker {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.fake-chat-participant-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 38px;
+  padding: 0 11px;
+  border: 1px solid #e2e2e2;
+  border-radius: 9px;
+  background: #fafafa;
+  color: #333;
+  outline: none;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus,
+  &[aria-expanded='true'] {
+    border-color: #777;
+    background: #fff;
+  }
+}
+
+.fake-chat-participant-chevron {
+  color: #888;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.fake-chat-participant-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  z-index: 4;
+  max-height: 230px;
+  padding: 7px;
+  overflow-y: auto;
+  border: 1px solid #dedede;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+}
+
+.fake-chat-participant-section-title {
+  padding: 7px 8px 5px;
+  color: #999;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.fake-chat-participant-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 5px;
+}
+
+.fake-chat-participant-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #222;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover,
+  &:active {
+    background: #f2f2f2;
+  }
+
+  &.is-child {
+    padding-left: 24px;
+    color: #555;
+    font-size: 11px;
+  }
+}
+
+.fake-chat-participant-item-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fake-chat-participant-item-meta {
+  flex: 0 0 auto;
+  color: #aaa;
+  font-size: 10px;
+}
+
+.fake-chat-participant-empty {
+  padding: 14px 8px;
+  color: #999;
+  font-size: 11px;
+  text-align: center;
+}
+
+.fake-chat-group-settings {
+  padding: 10px;
+  margin: 2px 0 10px;
+  border: 1px solid #e5e5e5;
+  border-radius: 11px;
+  background: #f8f8f8;
+}
+
+.fake-chat-group-settings-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+
+  strong {
+    color: #333;
+    font-size: 12px;
+  }
+
+  span {
+    color: #999;
+    font-size: 10px;
+  }
+}
+
+.fake-chat-group-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fake-chat-group-member-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fake-chat-group-member-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 31px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border: 1px solid #e2e2e2;
+  border-radius: 7px;
+  background: #fff;
+  color: #222;
+  font-size: 11px;
+  outline: none;
+
+  &:focus {
+    border-color: #777;
+  }
+}
+
+.fake-chat-group-member-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: #eee;
+  color: #777;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.fake-chat-add-group-member-btn {
+  width: 100%;
+  min-height: 30px;
+  padding: 5px;
+  margin-top: 7px;
+  border: 1px dashed #ccc;
+  border-radius: 7px;
+  background: #fff;
+  color: #666;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.fake-chat-record-source-name {
+  height: 38px;
+  padding: 0 11px;
+  margin-bottom: 8px;
+}
+
+.fake-chat-ai-panel {
+  padding: 11px;
+  margin: 4px 0 2px;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  background: #f8f8f8;
+}
+
+.fake-chat-ai-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+
+  strong {
+    color: #222;
+    font-size: 12px;
+  }
+
+  span {
+    color: #999;
+    font-size: 10px;
+  }
+}
+
+.fake-chat-ai-prompt {
+  min-height: 64px;
+  padding: 9px 11px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.fake-chat-ai-generate-btn {
+  width: 100%;
+  min-height: 34px;
+  margin-top: 8px;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  background: #fff;
+  color: #222;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fake-chat-record-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 14px 0 8px;
+  color: #222;
+  font-size: 13px;
+  font-weight: 700;
+
+  button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #555;
+    font-size: 12px;
+    cursor: pointer;
+  }
+}
+
+.fake-chat-record-list {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 100px;
+  max-height: none;
+  overflow: visible;
+  padding: 2px 2px 4px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fake-chat-record-row {
+  padding: 9px;
+  border: 1px solid #e7e7e7;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.fake-chat-record-row-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.fake-chat-speaker-role-switch {
+  display: inline-flex;
+  width: fit-content;
+  padding: 2px;
+  border-radius: 8px;
+  background: #f1f1f1;
+}
+
+.fake-chat-speaker-role {
+  min-width: 48px;
+  height: 27px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #888;
+  font-size: 11px;
+  cursor: pointer;
+
+  &.active {
+    background: #111;
+    color: #fff;
+  }
+}
+
+.fake-chat-speaker-caption {
+  min-width: 0;
+  overflow: hidden;
+  color: #888;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fake-chat-row-actions {
+  display: inline-flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.fake-chat-move-message,
+.fake-chat-speaker-name,
+.fake-chat-speaker-type {
+  height: 31px;
+  min-width: 0;
+  padding: 0 8px;
+  border-radius: 7px;
+  font-size: 11px;
+}
+
+.fake-chat-speaker-type-picker {
+  position: relative;
+  min-width: 92px;
+}
+
+.fake-chat-speaker-type {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 1px solid #e2e2e2;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.fake-chat-speaker-type-picker.is-open .fake-chat-speaker-type {
+  border-color: #777;
+  background: #fff;
+}
+
+.fake-chat-speaker-type-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fake-chat-speaker-type-chevron {
+  flex-shrink: 0;
+  color: #888;
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.fake-chat-speaker-type-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  z-index: 6;
+  min-width: 100%;
+  padding: 6px;
+  border: 1px solid #dedede;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+}
+
+.fake-chat-speaker-type-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #222;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fake-chat-speaker-type-menu button:hover {
+  background: #f3f3f3;
+}
+
+.fake-chat-move-message {
+  width: 31px;
+  height: 28px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 7px;
+  background: #f3f3f3;
+  color: #777;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.fake-chat-message-text {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px;
+  border-radius: 8px;
+  resize: vertical;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.fake-chat-remove-message {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: #f3f3f3;
+  color: #777;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.fake-chat-record-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 1px solid #ededed;
+
+  button {
+    min-height: 40px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &:disabled {
+      cursor: wait;
+      opacity: 0.55;
+    }
+  }
+}
+
+.fake-chat-secondary-btn {
+  border: 1px solid #d9d9d9;
+  background: #f7f7f7;
+  color: #333;
+}
+
+.fake-chat-primary-btn {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+}
+
+@media (max-width: 380px) {
+  .fake-chat-record-modal-card {
+    padding: 17px 13px 12px;
+  }
+
+  .fake-chat-record-row-head {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}

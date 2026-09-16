@@ -1,0 +1,2018 @@
+.check-phone-immersive {
+    background-color: #fafafa !important; // 稍微带一点灰，显得更有质感
+    background-image: radial-gradient(#d1d1d1 0.8px, transparent 0.8px); // 点阵稍微加深、加粗
+    background-size: 25px 25px; // 间距稍微拉大
+    color: #1a1a1a;
+    
+    // 【核心修复】锁死整个页面容器，禁止 iOS 滑动回弹露出底层黑边
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    display: flex;
+    flex-direction: column;
+
+    // 巨大的浅灰色背景装饰
+    .cp-bg-deco {
+
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        .deco-text-big {
+            position: absolute;
+            top: 15%; left: -10%;
+            font-size: 150px; font-weight: 900;
+            color: rgba(0,0,0,0.02);
+            transform: rotate(-10deg);
+        }
+    }
+
+    // 调整后的返回按钮
+    .cp-back-btn {
+        position: absolute;
+        top: 60px; // 避开状态栏，下移
+        left: 25px;
+        z-index: 100;
+        width: 44px; height: 44px;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(10px); // 磨砂质感
+        border: 0.5px solid #eee;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+     .cp-slider-container {
+        flex: 1; display: flex; align-items: center;
+        padding-top: 80px; // [新增] 这里把整个区域向下挤压，避开返回键
+        width: 100%; 
+        overflow: hidden; 
+    }
+
+    .cp-slider-wrapper {
+        display: flex; 
+        width: 100%; // 强制宽度
+        overflow-x: auto; 
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch; // 增加苹果手机滑动的丝滑感
+        padding: 0 50px; 
+        gap: 40px;
+        box-sizing: border-box; // 极其重要：确保padding不撑大容器
+        // 修复苹果右侧遮挡的关键：伪元素占位
+        &::after {
+            content: '';
+            flex: 0 0 50px; // 这里的宽度必须等于左侧的 padding (50px)
+            height: 1px;
+        }
+        &::-webkit-scrollbar { display: none; }
+    }
+
+    // 核心杂志风卡片
+   .cp-char-card {
+        flex: 0 0 75vw; 
+        max-width: 300px; 
+        height: 520px;
+        scroll-snap-align: center;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.03); 
+        box-shadow: 
+            0 2px 4px rgba(0,0,0,0.02), 
+            0 10px 20px rgba(0,0,0,0.03), 
+            0 20px 40px rgba(0,0,0,0.04);
+        padding: 15px;
+        display: flex; flex-direction: column;
+         overflow: hidden; // 确保内部内容不会超出圆角
+        background-clip: padding-box; 
+        position: relative;
+
+        // 装饰：卡片顶部的细线和标签
+        &::before {
+            content: "ARCHIVE / 001";
+            position: absolute; top: -25px; left: 0;
+            font-size: 10px; font-family: monospace; color: #999;
+        }
+
+         .avatar-area {
+            position: relative; width: 100%; height: 360px;
+            background: #f9f9f9; overflow: hidden;
+            border-radius: 16px 16px 4px 4px; // [新增] 图片上方也要圆角
+            
+            img {
+                width: 100%; height: 100%; object-fit: cover;
+                transition: transform 0.5s;
+            }
+
+            // 压在图片上的细碎装饰文字
+            .img-overlay-text {
+                position: absolute; bottom: 10px; left: 10px;
+                writing-mode: vertical-rl; // 日系纵向排版
+                font-size: 10px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                letter-spacing: 2px;
+            }
+        }
+
+        .name-area {
+            padding: 20px 5px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+
+            .main-name {
+                font-size: 32px; font-weight: 300; // 使用细体更高级
+                font-family: "serif"; line-height: 1;
+            }
+            
+            .char-meta {
+                text-align: right;
+                .meta-id { font-size: 9px; color: #ccc; font-family: monospace; }
+                .meta-status { 
+                    font-size: 10px; color: #000; border-bottom: 1px solid #000;
+                    margin-top: 5px; display: inline-block;
+                }
+            }
+        }
+
+        .action-area {
+            margin-top: auto;
+            display: flex; border-top: 0.5px solid #eee; padding-top: 15px;
+            
+            .view-btn {
+                flex: 1; font-size: 11px; letter-spacing: 4px;
+                text-align: center; color: #888;
+                position: relative;
+                &::after { content: '→'; margin-left: 10px; }
+            }
+        }
+    }
+
+    // 底部页码指示器
+    .cp-magazine-footer {
+        padding: 40px 30px;
+        display: flex; align-items: center; justify-content: space-between;
+        
+        .page-label { font-size: 10px; color: #999; margin-right: 10px; }
+        .curr { font-size: 24px; font-weight: 300; font-family: serif; }
+        
+        .footer-center {
+            flex: 1; margin: 0 30px;
+            .progress-track {
+                height: 1px; background: #eee; width: 100%;
+                .progress-bar { height: 1px; background: #000; width: 0%; transition: 0.3s; }
+            }
+        }
+    }
+}
+/* ========================================================== */
+/* == 【重构】高级感角色子页面样式 == */
+/* ========================================================== */
+#page-character-phone.character-phone-immersive {
+    background: #fdfbf7 !important; // 温暖的奶油色背景
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    // 【核心修复：防长按干扰】彻底禁止查手机页面的文字选中和系统默认菜单
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+
+    flex-direction: column;
+    padding: 0;
+    // 【核心修复】禁止详情页外层整体弹性滚动，防止漏出黑边
+    overflow: hidden;
+    overscroll-behavior: none;
+
+    // 1. 极简顶部
+
+    .cp-phone-header {
+        padding: 60px 1px 2px; // 避开状态栏
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-shrink: 0;
+    .cp-back-icon {
+            background: rgba(0, 0, 0, 0.05); // 极浅的灰色背景
+            border: none;
+            width: 38px; height: 38px; // 固定大小
+            border-radius: 50%; // 圆形
+            display: flex; align-items: center; justify-content: center;
+            color: #1a1a1a;
+            transition: all 0.2s;
+            &:active { background: rgba(0, 0, 0, 0.1); transform: scale(0.9); } // 点击效果
+            svg { width: 20px; height: 20px; stroke-width: 2px; }
+        }
+
+        .cp-phone-title-area {
+            h1 { font-size: 24px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.5px; margin: 0; }
+            .cp-phone-status { font-size: 11px; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px; }
+        }
+
+        .cp-header-right-dot {
+            margin-left: auto;
+            width: 8px; height: 8px; background: #333; border-radius: 50%;
+        }
+    }
+    // 2. 内容区域
+    .app-content {
+        flex: 1; min-height: 0; padding: 0 20px; overflow: hidden;
+        display: flex; flex-direction: column;
+        isolation: isolate;
+        background-color: #fdfbf7;
+        &::-webkit-scrollbar { display: none; }
+        .char-phone-content-view {
+            display: none; // 默认全部隐藏
+            &.active {
+                display: flex;
+                flex-direction: column;
+                flex: 1 1 0%;
+                min-height: 0;
+                overflow: hidden;
+            }
+        }
+    }
+
+      .cp-view-back-btn {
+        position: absolute;
+        top: 60px; // 与聊天页面的返回键高度视觉对齐
+        left: 0;   // 靠左对齐，因为外层容器有 margin，所以不会贴边
+        background: rgba(0, 0, 0, 0.04);
+        border: none;
+        width: 38px; height: 38px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: #1a1a1a;
+        transition: all 0.2s;
+        cursor: pointer;
+        z-index: 10;
+        &:active { background: rgba(0, 0, 0, 0.08); transform: scale(0.9); }
+        svg { width: 20px; height: 20px; stroke-width: 2px; }
+    }
+    .cp-section-title {
+        font-size: 12px; color: #ccc; text-transform: uppercase; 
+        letter-spacing: 1.5px; margin: 25px 0 15px;
+    }
+    .cp-recent-contacts {
+        flex-shrink: 0;
+    }
+    // 联系人横向滚动
+    .cp-contact-scroll {
+        display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;
+        &::-webkit-scrollbar { display: none; }
+
+        .cp-contact-item {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            .avatar-circle {
+                width: 56px; height: 56px; border-radius: 22px; // 稍微方圆一点更现代
+                background: #fff; border: 1px solid #f0f0f0; object-fit: cover;
+                display: flex; align-items: center; justify-content: center; color: #aaa;
+            }
+                     span { font-size: 11px; color: #666; font-weight: 500; }
+        }
+    }
+
+    // [新增] 包裹列表的区域，让它占据剩余空间
+    .cp-message-section {
+        flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+    }
+    // 消息列表重塑 (去紫、变轻)
+    .conversation-list {
+        flex: 1 1 0%; min-height: 0; height: auto; overflow-y: auto; // [核心修改] 让列表区域单独滚动
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+        overscroll-behavior-y: contain;
+        box-sizing: border-box;
+        padding-bottom: 120px; // [核心修改] 加大底边距，防止被底栏遮挡
+        background: transparent;
+        &::-webkit-scrollbar { display: none; } // 隐藏滚动条更美观
+        .conversation-item {
+            background: #fff; 
+
+            margin-bottom: 8px; // 缩小条目之间的间距
+            border-radius: 14px; // 缩小圆角，看起来更硬朗精致
+            padding: 10px 12px; // 缩小内边距，让卡片变矮、变窄
+            border: 0.5px solid rgba(0,0,0,0.04); // 边框更细、更淡
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02); // 阴影减弱，消除厚重感
+            display: flex; align-items: center; // 确保头像和文字垂直居中对齐
+            
+            .avatar-container {
+                margin-right: 12px; // 调整头像和文字的距离
+                .avatar { 
+                    width: 42px; height: 42px; // 头像从 48px 缩小到 42px
+                    border-radius: 10px; // 头像圆角同步缩小
+                }
+            }
+            .conversation-info {
+                flex: 1; min-width: 0;
+                display: flex; flex-direction: column; justify-content: center;
+                
+                .info-top {
+                    display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;
+                    .name { 
+                        font-size: 15px; color: #1a1a1a; font-weight: 600; 
+                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+                    }
+                    .time { 
+                        font-size: 11px; color: #c0c0c0; font-weight: 400; 
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                        letter-spacing: 0.5px; flex-shrink: 0; margin-left: 10px;
+                    }
+                }
+                .info-bottom {
+                    .last-message { 
+                        font-size: 13px; color: #8e8e93; margin: 0;
+                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+                    }
+                }
+            }
+
+            .unread-badge { background: #333; transform: scale(0.8); } // 缩小红点/黑点体积
+        }
+    }
+
+    // 3. 悬浮 Dock (极简黑白灰)
+    .cp-dock-nav {
+        position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
+        width: 350px; height: 60px; 
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border-radius: 33px; 
+        border: 1px solid rgba(255,255,255,0.5);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        display: flex; align-items: center; justify-content: space-around;
+        z-index: 1000;
+        .dock-item {
+            background: none; border: none; padding: 12px; color: #bbb;
+            svg { width: 26px; height: 26px; fill: currentColor; transition: 0.3s; } // 图标从22放大到26
+            &.active { color: #1a1a1a; }
+        }
+    }
+    #char-phone-chat-view {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: transparent;
+        padding: 0 20px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+  // ▼▼▼ [新增] 专属聊天详情页样式 ▼▼▼
+    #char-phone-conversation-view {
+        // 强制全屏显示，覆盖掉父级的 padding
+        position: absolute; inset: 0; z-index: 500;
+        // 详情聊天只响应自己的消息长按菜单，不参与 LoverSync 标记
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        
+         .cp-detail-header {
+            padding: 60px 20px 10px 15px; // 调整了左边距，让返回键不至于太贴边
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(253, 251, 247, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 0.5px solid rgba(0,0,0,0.05);
+            
+            // 【新增】专门管理左侧靠在一起的布局
+            .cp-detail-header-left {
+                display: flex; align-items: center; gap: 12px; // 这里控制返回箭头和头像的距离
+            }
+
+            button { 
+                background: none; border: none; padding: 5px; display: flex; align-items: center; 
+                svg { width: 26px; height: 26px; stroke: #1a1a1a; } // 强制规定图标大小，确保能看到
+            }
+            
+            .cp-detail-title-group {
+                display: flex; align-items: center; gap: 12px;
+                .cp-detail-avatar { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; } // 头像稍稍调大，更像聊天页
+                .cp-detail-name { font-size: 18px; font-weight: 600; color: #1a1a1a; letter-spacing: 0.5px; }
+            }
+        }
+
+        .cp-detail-messages {
+           flex: 1; overflow-y: auto; padding: 20px 20px 40px;
+            display: flex; flex-direction: column; gap: 12px;
+            &::-webkit-scrollbar { display: none; }
+            .cp-msg {
+                display: flex; align-items: flex-end; gap: 10px; max-width: 85%;
+                animation: cpNpcMessageIn 0.34s ease both;
+            }
+            .cp-msg.received { align-self: flex-start; }
+            .cp-msg.sent { align-self: flex-end; flex-direction: row-reverse; }
+            .cp-msg { touch-action: pan-y; }
+            
+            .msg-avatar { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; }
+            .msg-bubble {
+                padding: 12px 16px; font-size: 14px; line-height: 1.5;
+                border-radius: 16px;
+            }
+            .cp-phone-media {
+                display: block;
+                width: min(190px, 60vw);
+                max-height: 240px;
+                border-radius: 12px;
+                object-fit: cover;
+            }
+            .cp-phone-rich-label {
+                display: block;
+                margin-top: 4px;
+                font-size: 12px;
+                opacity: 0.78;
+            }
+            .cp-msg-translation {
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px solid rgba(255,255,255,0.22);
+                font-size: 12px;
+                line-height: 1.45;
+                opacity: 0.76;
+            }
+            .cp-msg.received .cp-msg-translation { border-top-color: rgba(0,0,0,0.08); }
+            .cp-msg-translation.collapsed { display: none; }
+            .cp-phone-reply-preview {
+                padding: 8px 10px;
+                margin: 8px 10px 0;
+                border-radius: 8px;
+                font-size: 12px;
+                line-height: 1.35;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                border-left: 3px solid;
+            }
+            .cp-msg.received .cp-phone-reply-preview {
+                background: rgba(0,0,0,0.04);
+                color: #666;
+                border-color: #dcdcdc;
+            }
+            .cp-msg.received .cp-phone-reply-preview strong { color: #222; }
+            .cp-msg.sent .cp-phone-reply-preview {
+                background: rgba(255,255,255,0.12);
+                color: rgba(255,255,255,0.82);
+                border-color: rgba(255,255,255,0.38);
+            }
+            .cp-msg.sent .cp-phone-reply-preview strong { color: #fff; }
+            .cp-msg-translate-btn {
+                width: 26px; height: 26px;
+                min-width: 26px; max-width: 26px;
+                flex: 0 0 26px;
+                aspect-ratio: 1 / 1;
+                box-sizing: border-box;
+                border: 1px solid rgba(0,0,0,0.08);
+                border-radius: 50%;
+                background: #fff;
+                color: #111;
+                font-size: 12px;
+                line-height: 26px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            }
+            .cp-msg-translate-btn.active { background: #111; color: #fff; }
+            // 对方：白色气泡，黑字，细边框
+            .cp-msg.received .msg-bubble {
+                background: #fff; color: #1a1a1a; border: 0.5px solid rgba(0,0,0,0.06);
+                border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            }
+            // 自己：黑色气泡，白字
+             .cp-msg.sent .msg-bubble {
+                  background: #1a1a1a; color: #fff;
+                  border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+              }
+              .cp-msg.takeover .msg-bubble {
+                  animation: cpTakeoverSend 0.42s cubic-bezier(0.2, 0.9, 0.25, 1.2);
+                  box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+              }
+              .cp-takeover-notice {
+                  align-self: center;
+                  display: inline-flex; align-items: center; gap: 8px;
+                  padding: 8px 12px; border-radius: 999px;
+                  background: rgba(26,26,26,0.82); color: #fff;
+                  font-size: 11px; letter-spacing: 0.5px;
+                  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+                  animation: cpTakeoverNotice 0.5s ease both;
+                  .scan-dot {
+                      width: 7px; height: 7px; border-radius: 50%;
+                      background: #ffcc66; box-shadow: 0 0 0 0 rgba(255,204,102,0.7);
+                      animation: cpTakeoverPulse 1s infinite;
+                  }
+              }
+               .cp-npc-end-notice {
+                   align-self: center;
+                   display: inline-flex;
+                   align-items: center;
+                   gap: 8px;
+                   padding: 7px 12px;
+                  border: 1px solid rgba(0,0,0,0.08);
+                  border-radius: 999px;
+                  color: rgba(0,0,0,0.45);
+                   background: rgba(255,255,255,0.68);
+                   font-size: 10px;
+                   letter-spacing: 1.4px;
+                   .cp-phone-lock-countdown {
+                       letter-spacing: 0;
+                       font-variant-numeric: tabular-nums;
+                   }
+                   .cp-phone-force-unlock {
+                       padding: 3px 7px;
+                       border: 0;
+                       border-radius: 999px;
+                       background: #1a1a1a;
+                       color: #fff;
+                       font-size: 10px;
+                       letter-spacing: 0;
+                   }
+               }
+          }
+         .cp-detail-input-area {
+           position: relative;
+           padding: 12px 15px calc(15px + env(safe-area-inset-bottom));
+            background: #fff; border-top: 0.5px solid rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 12px;
+
+            .cp-phone-function-menu {
+                position: absolute;
+                left: 12px;
+                bottom: calc(100% + 8px);
+                display: grid;
+                grid-template-columns: repeat(2, minmax(90px, 1fr));
+                gap: 8px;
+                width: 190px;
+                padding: 10px;
+                border: 1px solid rgba(0,0,0,0.06);
+                border-radius: 16px;
+                background: rgba(255,255,255,0.98);
+                box-shadow: 0 12px 28px rgba(0,0,0,0.14);
+                z-index: 20;
+
+                &[hidden] { display: none; }
+
+                button {
+                    min-height: 36px;
+                    border: 0;
+                    border-radius: 10px;
+                    background: #f5f5f5;
+                    color: #222;
+                    font-size: 12px;
+                }
+            }
+            
+            .input-icon-btn, .send-btn { 
+                background: none; border: none; padding: 5px; color: #1a1a1a; 
+                svg { width: 24px; height: 24px; }
+            }
+             .input-wrapper {
+                  flex: 1; background: #f5f5f5; border-radius: 20px; padding: 10px 15px;
+                  input { width: 100%; background: transparent; border: none; outline: none; font-size: 14px; color: #333; }
+                  input:disabled { color: #999; }
+              }
+               .send-btn:disabled { opacity: 0.35; }
+               .send-btn.is-cancel {
+                   width: 34px; height: 34px;
+                   padding: 0;
+                   border-radius: 50%;
+                   background: #111;
+                   color: #fff;
+                   display: inline-flex;
+                   align-items: center;
+                   justify-content: center;
+               }
+               .send-btn.is-cancel svg { display: none; }
+               .send-btn.is-cancel::before {
+                   content: "";
+                   width: 10px; height: 10px;
+                   border-radius: 2px;
+                   background: currentColor;
+                   display: block;
+               }
+           }
+       }
+      .cp-npc-action-popover {
+          position: fixed;
+          z-index: 99999;
+          display: flex;
+          gap: 2px;
+          padding: 4px;
+          border-radius: 999px;
+          background: rgba(18,18,18,0.94);
+          box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+      }
+      .cp-npc-action-popover button {
+          border: 0;
+          border-radius: 999px;
+          background: #fff;
+          color: #111;
+          font-size: 12px;
+          padding: 7px 11px;
+      }
+      .cp-phone-takeover-active .cp-detail-header {
+          animation: cpTakeoverHeader 0.75s ease both;
+      }
+    // ▼▼▼ [新增] 日杂风书签备忘录样式 ▼▼▼
+    #char-phone-memo-view {
+        position: absolute; inset: 0; z-index: 400; 
+        background: #fdfbf7; // 偏暖的纸张底色
+        
+        // [核心修改1] 改为 flex 布局，且外层坚决不滚动
+        display: none; 
+        flex-direction: column;
+        overflow: hidden; 
+        
+        &.active { display: flex; } // 激活时用 flex 撑满整个屏幕
+
+        // 文艺手账风标题栏
+        .cp-memo-header {
+            flex-shrink: 0; // [核心修改2] 保证标题栏高度固定，绝不被挤压变形
+            padding: 70px 25px 30px;
+            text-align: center;
+            border-bottom: 0.5px dashed #ddd;
+            margin: 0 20px 25px;
+            position: relative;
+            
+            h2 { 
+                font-family: "Georgia", serif; 
+                font-size: 26px; font-weight: 400; color: #1a1a1a; letter-spacing: 6px; margin: 0; 
+            }
+            .sub { 
+                font-size: 10px; color: #999; letter-spacing: 2px; 
+                display: block; margin-top: 8px; font-family: monospace;
+            }
+            // 装饰：淡粉色复古邮戳
+            &::after {
+                content: 'POST'; position: absolute; right: 10px; bottom: -20px;
+                width: 46px; height: 46px; border-radius: 50%;
+                border: 1px solid rgba(200, 150, 150, 0.4);
+                color: rgba(200, 150, 150, 0.4); font-size: 10px;
+                display: flex; align-items: center; justify-content: center;
+                transform: rotate(-15deg); letter-spacing: 1px; font-family: serif;
+                pointer-events: none;
+            }
+        }
+        // 双列瀑布流布局
+        .cp-memo-list {
+            display: grid; // 【核心修复】放弃 column-count，改用 Grid，彻底根除 Safari 横向溢出 Bug
+            grid-template-columns: repeat(2, 1fr);
+            align-items: start; // 防止卡片被拉伸
+            gap: 15px;
+
+            flex: 1; 
+            overflow-y: auto; 
+            overflow-x: hidden; // 严禁横向滚动
+            padding: 0 20px 120px; 
+            -webkit-overflow-scrolling: touch; 
+            &::-webkit-scrollbar { display: none; } 
+        }
+        
+        // 核心：精美的书签卡片设计
+        .cp-bookmark-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 2px; 
+            padding: 25px 15px 15px;
+            position: relative;
+            box-shadow: 2px 4px 15px rgba(0,0,0,0.03);
+            display: flex; // 恢复 flex 以便内部文字优雅排版
+            flex-direction: column;
+            width: 100%;           
+            box-sizing: border-box;
+
+            // [核心新增]：强制右列的第一张卡片往下沉 40px，打破齐平，瞬间产生错落感！
+            &:nth-child(2) {
+                margin-top: 40px; 
+            }
+
+            // 顶部打孔的圆圈
+
+            .bookmark-hole {
+                position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+                width: 6px; height: 6px; border-radius: 50%;
+                background: #fdfbf7; border: 1px solid #eaeaea;
+                box-shadow: inset 1px 1px 2px rgba(0,0,0,0.05);
+            }
+            // 穿在孔里的麻绳装饰虚线
+            &::before {
+                content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+                width: 1px; height: 18px; background: #ddd;
+            }
+            .bookmark-date {
+                font-family: monospace; font-size: 10px; color: #a0a0a0; 
+                text-align: center; margin-bottom: 12px;
+                border-bottom: 1px solid rgba(0,0,0,0.03); padding-bottom: 8px;
+            }
+            .bookmark-content {
+                font-size: 13px; color: #444; line-height: 1.8;
+                font-family: "Songti SC", "Noto Serif CJK SC", serif; // 使用衬线体(宋体)营造文艺感
+                text-align: justify; letter-spacing: 0.5px;
+            }
+            .bookmark-footer {
+                margin-top: 15px; font-size: 10px; color: #d0d0d0; 
+                font-family: "Georgia", serif; font-style: italic;
+                text-align: right; border-top: 1px dashed rgba(0,0,0,0.03); padding-top: 8px;
+            }
+            
+            // 变体：深色极简书签
+            &.dark {
+                background: #2b2b2b; color: #f0f0f0; border: none;
+                box-shadow: 2px 6px 15px rgba(0,0,0,0.1);
+                .bookmark-hole { background: #fdfbf7; border: none; }
+                &::before { background: #666; }
+                .bookmark-date { color: #888; border-color: rgba(255,255,255,0.1); }
+                .bookmark-content { color: #e8e8e8; }
+                .bookmark-footer { color: #666; border-color: rgba(255,255,255,0.05); }
+            }
+        }
+    }
+    // ▼▼▼ [新增] 详情页样式：手账纸张感 ▼▼▼
+    #char-phone-memo-detail-view {
+        position: absolute; inset: 0; z-index: 600;
+        
+        .cp-memo-detail-header {
+            padding: 60px 20px 10px; display: flex; align-items: center; justify-content: space-between;
+            .memo-detail-back-btn { background: none; border: none; padding: 5px; svg { width: 26px; height: 26px; } }
+            .header-tag { font-size: 10px; color: #ccc; letter-spacing: 2px; font-family: monospace; }
+        }
+        .cp-memo-detail-body {
+            flex: 1; padding: 30px 25px;
+            display: flex; justify-content: center;
+            
+            .memo-paper-container {
+                width: 100%; max-width: 320px; position: relative;
+                
+                // 顶部的和纸胶带效果
+                .washi-tape {
+                    position: absolute; top: -15px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+                    width: 100px; height: 30px;
+                    background: rgba(212, 163, 115, 0.3); // 柔和的奶茶色胶带
+                    backdrop-filter: blur(2px);
+                    z-index: 2;
+                    &::after { // 胶带撕裂边缘感
+                        content: ''; position: absolute; inset: 0;
+                        border-left: 2px dotted rgba(255,255,255,0.5);
+                        border-right: 2px dotted rgba(255,255,255,0.5);
+                    }
+                }
+                .memo-inner-paper {
+                    background-color: #fff; padding: 40px 25px 30px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+                    border-radius: 2px;
+                    min-height: 400px;
+                    background-image:
+                        linear-gradient(rgba(210, 196, 178, 0.24) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(210, 196, 178, 0.14) 1px, transparent 1px);
+                    background-size: 100% 28px, 28px 100%;
+                    background-position: 0 18px, 0 0;
+                    .memo-date-meta {
+                        font-size: 11px; color: #bbb; font-family: serif;
+                        margin-bottom: 20px; border-bottom: 0.5px solid #f5f5f5; padding-bottom: 10px;
+                    }
+                    .memo-title {
+                        font-size: 20px; font-weight: 500; color: #1a1a1a;
+                        margin-bottom: 20px; font-family: "Songti SC", serif;
+                    }
+                    .memo-text-content {
+                        font-size: 14px; color: #444; line-height: 1.9;
+                        font-family: "Songti SC", "Noto Serif CJK SC", serif; 
+                        text-align: justify; letter-spacing: 0.5px;
+                        
+                        /* 手账风小标题 */
+                        .memo-mini-title {
+                            font-size: 15px; font-weight: 600; color: #b5835a; 
+                            margin: 18px 0 10px; border-left: 3px solid #d4a373; padding-left: 10px;
+                        }
+                        /* 手账风波浪分割线 */
+                        .memo-divider {
+                            height: 6px; margin: 15px 0; opacity: 0.4;
+                            background-image: radial-gradient(circle at 3px 3px, #999 1.5px, transparent 2px);
+                            background-size: 12px 6px; background-repeat: repeat-x;
+                        }
+                        /* 手账荧光笔高光 */
+                        .hl-yellow {
+                            background: linear-gradient(120deg, rgba(240, 220, 120, 0) 0%, rgba(240, 220, 120, 0.7) 15%, rgba(240, 220, 120, 0.7) 85%, rgba(240, 220, 120, 0) 100%);
+                            padding: 0 4px; border-radius: 2px; color: #111; font-weight: 500;
+                        }
+                        /* 普通正文 */
+                        .memo-paragraph { margin: 0 0 12px; }
+
+                        /* 手写感复选框列表 */
+                        .memo-todo-item {
+                            display: flex; align-items: flex-start; margin-bottom: 12px;
+                            
+                            .bullet-box {
+                                width: 14px; height: 14px; border: 1.5px solid #888; border-radius: 3px; // 变成小方框
+                                margin-top: 5px; margin-right: 12px; flex-shrink: 0; position: relative;
+                            }
+                            .text { flex: 1; color: #333; }
+
+                            &.done {
+                                .bullet-box {
+                                    background: #d4a373; border-color: #d4a373;
+                                    &::after { content: '✔'; position: absolute; color: white; font-size: 10px; top: -1px; left: 2px; font-weight: bold;}
+                                }
+                                .text { color: #aaa; text-decoration: line-through; text-decoration-color: #bbb; text-decoration-thickness: 1.5px;}
+                            }
+                        }
+                    }
+                    .memo-leaf-deco {
+                        margin-top: 40px; text-align: right; opacity: 0.3; filter: grayscale(1);
+                    }
+                    .memo-thought-strip {
+                        margin-top: 18px;
+                        padding: 12px 14px;
+                        border: 1px dashed rgba(180, 140, 105, 0.45);
+                        border-radius: 2px;
+                        background: rgba(255, 248, 232, 0.72);
+                        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+                        display: flex;
+                        flex-direction: column;
+                        gap: 6px;
+                        transform: rotate(-0.6deg);
+                    }
+                    .memo-thought-strip .thought-label {
+                        font-family: "Courier New", monospace;
+                        font-size: 9px;
+                        letter-spacing: 2px;
+                        color: #b5835a;
+                        font-weight: 700;
+                    }
+                    .memo-thought-strip .thought-text {
+                        font-size: 12px;
+                        line-height: 1.7;
+                        color: #6f5d4e;
+                        font-family: "Songti SC", "Noto Serif CJK SC", serif;
+                    }
+                }
+            }
+        }
+    }
+     // ▼▼▼ [新增] 日杂风购物记录(Receipt)样式 ▼▼▼
+    #char-phone-shop-view {
+        position: absolute; inset: 0; z-index: 400; 
+        background: #fdfbf7; // 暖纸底色
+        
+        // [核心修改1] 转为 flex 布局，外层严禁滚动
+        display: none; 
+        flex-direction: column;
+        overflow: hidden; 
+        &.active { display: flex; }
+
+        .cp-shop-header {
+            flex-shrink: 0; // [核心修改2] 保护顶栏，防止被下方列表挤压变形
+            padding: 70px 25px 20px;
+            text-align: center;
+            position: relative;
+            margin: 0 20px;
+            
+            h2 { 
+                font-family: "Georgia", serif; 
+                font-size: 24px; font-weight: 400; color: #1a1a1a; letter-spacing: 8px; margin: 0; 
+            }
+            .sub { 
+                font-size: 10px; color: #999; letter-spacing: 2px; 
+                display: block; margin-top: 8px; font-family: monospace;
+            }
+            &::after { // 底部收据锯齿线装饰
+                content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+                height: 4px; 
+                background-image: radial-gradient(circle at 2px 0px, transparent 2px, #e8e8e8 2.5px);
+                background-size: 8px 4px;
+            }
+        }
+
+        .cp-shop-list {
+            flex: 1; // [核心修改3] 占据下方所有的剩余空间
+            overflow-y: auto; // [核心修改4] 开启局部内部滚动
+            -webkit-overflow-scrolling: touch; // 增强手机滑动流畅度
+            &::-webkit-scrollbar { display: none; }
+            
+            // [核心修改5] 把原本在最外层的 120px 底边距挪到这里，这样滑到底部就不会被底栏遮住了
+            padding: 30px 25px 120px; 
+            display: flex; flex-direction: column; gap: 35px;
+        }
+
+        .cp-shop-card {
+
+            background: transparent;
+            position: relative;
+            
+            .card-date {
+                font-family: monospace; font-size: 11px; color: #888;
+                border-bottom: 1px solid #1a1a1a;
+                padding-bottom: 5px; margin-bottom: 15px;
+                display: inline-block; padding-right: 20px;
+            }
+            
+            .card-body {
+                display: flex; gap: 15px;
+                
+                .item-img {
+                    width: 75px; height: 95px; 
+                    background-color: #eee; background-size: cover; background-position: center;
+                    border-radius: 2px;
+                    filter: grayscale(15%) contrast(0.9); // 降低饱和度，增加胶片复古感
+                    box-shadow: 2px 4px 10px rgba(0,0,0,0.03);
+                }
+                
+                .item-info {
+                    flex: 1; display: flex; flex-direction: column; justify-content: center;
+                    
+                    .item-brand {
+                        font-family: "Georgia", serif; font-style: italic; font-size: 11px; color: #999; margin-bottom: 6px;
+                    }
+                    .item-name {
+                        font-family: "Songti SC", "Noto Serif CJK SC", serif; 
+                        font-size: 14px; color: #333; line-height: 1.4; margin-bottom: 6px;
+                        letter-spacing: 0.5px;
+                    }
+                    // [新增] 规格参数样式
+                    .item-specs {
+                        font-size: 10px; color: #888; margin-bottom: 12px;
+                        font-family: -apple-system, sans-serif;
+                        background: rgba(0,0,0,0.03); padding: 3px 8px; border-radius: 4px; 
+                        display: inline-block; align-self: flex-start;
+                    }
+                    .item-price {
+                        font-family: "Georgia", serif; font-size: 15px; color: #1a1a1a; font-weight: 600;
+                    }
+                }
+            }
+            
+            // [新增] 购买时的心理路程
+            .card-thought {
+                margin-top: 15px; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,0.06);
+                font-size: 12px; color: #666; font-family: "Songti SC", serif; 
+                line-height: 1.6; text-align: justify;
+                position: relative; padding-left: 12px;
+                
+                // 左侧细竖线装饰
+                &::before {
+                    content: ''; position: absolute; left: 0; top: 15px; bottom: 3px;
+                    width: 2px; background: #d4a373; opacity: 0.5; border-radius: 1px;
+                }
+                .thought-quote { font-style: italic; }
+            }
+
+            .card-stamp {
+                position: absolute; right: 0; top: 15px; // 移到右上角，防止挡住底部的字
+                font-family: monospace; font-size: 10px; color: #c49a6c; 
+                border: 1px solid #c49a6c; padding: 2px 6px; transform: rotate(15deg);
+                opacity: 0.5; letter-spacing: 1px; pointer-events: none;
+            }
+        }
+    }
+    // ▼▼▼ [新增] 模拟Coogle浏览器页面样式 ▼▼▼
+    #char-phone-browser-view {
+        position: absolute; inset: 0; z-index: 400; 
+        background: #fdfbf7; // 保持与整个APP一致的奶油色背景，比纯白更护眼高级
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch; // 【优化点1：强制开启苹果/安卓的原生丝滑滚动】
+        padding-bottom: 120px;
+        &::-webkit-scrollbar { display: none; }
+
+        .cp-view-back-btn {
+            left: 20px; // 强制左边距，与其他页面严格对齐
+        }
+        
+        .browser-main-container {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 140px 25px 30px; // 顶部留出大片留白，这是Google设计的精髓
+        }
+
+        .coogle-logo {
+            font-size: 56px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 500;
+            letter-spacing: -2px;
+            margin-bottom: 35px;
+        }
+
+        .browser-search-box {
+            display: flex; align-items: center;
+            width: 100%; height: 48px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 24px;
+            padding: 0 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03); // 极淡的阴影
+            margin-bottom: 35px;
+            
+            svg { width: 20px; height: 20px; flex-shrink: 0; }
+            input {
+                flex: 1; border: none; outline: none; background: transparent;
+                padding: 0 12px; font-size: 15px; color: #3c4043;
+                &::placeholder { color: #9aa0a6; }
+            }
+        }
+
+        .browser-history-list {
+            width: 100%;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            overflow: hidden; // 确保圆角能包住内部的横线
+
+            .history-item {
+                display: flex; align-items: center;
+                padding: 16px 15px;
+                border-bottom: 1px solid #f1f3f4; // 浅灰色分割线
+                
+                &:last-child { border-bottom: none; }
+                
+                .history-icon, .remove-icon { width: 18px; height: 18px; flex-shrink: 0; }
+                .history-text {
+                    flex: 1; margin: 0 15px; font-size: 14px; color: #3c4043;
+                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; // 文字过长显示省略号
+                }
+            }
+        }
+    }
+    // ▼▼▼ [修改] 经典Web网页论坛风样式 ▼▼▼
+    #char-phone-browser-detail-view {
+        position: absolute; inset: 0; z-index: 600;
+        background: #ffffff; // 网页默认白底
+        
+        // 浏览器自身的UI顶栏
+        .browser-detail-header {
+            padding: 60px 15px 10px; 
+            display: flex; align-items: center; justify-content: space-between;
+            background: #fdfbf7; // 保持和搜索页一样的系统奶油色
+            border-bottom: 1px solid #e5e4e1;
+            
+            .browser-detail-back-btn { 
+                background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center;
+                svg { width: 26px; height: 26px; stroke: #1a1a1a; } 
+            }
+            .fake-url-bar {
+                flex: 1; margin: 0 15px; background: rgba(0,0,0,0.05);
+                height: 34px; border-radius: 8px; // 经典的略方圆角输入框
+                display: flex; align-items: center; justify-content: center; gap: 8px;
+                svg { width: 14px; height: 14px; stroke: #666; }
+                span { font-size: 13px; color: #555; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.5px;}
+            }
+        }
+
+        // 内部网页正文
+        .browser-webpage-body {
+            flex: 1; overflow-y: auto; padding-bottom: 80px;
+            &::-webkit-scrollbar { display: none; }
+            
+            // 网站简易抬头
+            .forum-site-header {
+                padding: 15px 20px; border-bottom: 2px solid #1a1a1a; // 粗实线划分网页头
+                display: flex; justify-content: space-between; align-items: baseline;
+                .site-logo { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: #1a1a1a; }
+                .site-nav { font-size: 13px; color: #666; }
+            }
+
+            // 主楼
+            .forum-post-main {
+                padding: 24px 20px;
+                .forum-h1 { font-size: 20px; font-weight: 700; color: #1a1a1a; line-height: 1.4; margin-bottom: 16px; }
+                .forum-meta {
+                    display: flex; gap: 14px; font-size: 13px; color: #888; margin-bottom: 20px; 
+                    padding-bottom: 16px; border-bottom: 1px dashed #e0e0e0; // 经典的虚线分割
+                }
+                .forum-content { font-size: 15.5px; color: #333; line-height: 1.7; text-align: justify; }
+            }
+
+            // 网页色块分割
+            .forum-divider { 
+                height: 12px; background: #fdfbf7; // 借用系统奶油色做分割
+                border-top: 1px solid #ebebeb; border-bottom: 1px solid #ebebeb; 
+            }
+
+            // 回复区
+            .forum-replies {
+                padding: 0 20px;
+                .replies-title { padding: 20px 0 15px; font-size: 15px; font-weight: 700; color: #1a1a1a; border-bottom: 1px solid #ebebeb; }
+                
+                .forum-reply-item {
+                    padding: 20px 0; border-bottom: 1px solid #ebebeb;
+                    
+                    .reply-user-info {
+                        display: flex; align-items: center; margin-bottom: 12px;
+                        .avatar-wrap { 
+                            width: 34px; height: 34px; border-radius: 4px; // 论坛经典的微圆角方头像
+                            background: #f0f0f0; overflow: hidden; margin-right: 12px;
+                            img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+                        }
+                        .name-time {
+                            flex: 1; display: flex; flex-direction: column; gap: 2px;
+                            .name { font-size: 14px; font-weight: 600; color: #000000; } // 经典的网页低饱和蓝灰色
+                            .time { font-size: 12px; color: #999; }
+                        }
+                        .floor { font-size: 12px; color: #bbb; } // 沙发/板凳标志
+                    }
+                    .reply-text { font-size: 15px; color: #333; line-height: 1.6; padding-left: 46px; }
+                }
+            }
+        }
+    }
+    // ▼▼▼ [新增] 高仿真流水记录 & 屏幕时间样式 ▼▼▼
+    #char-phone-screentime-view {
+        position: absolute; inset: 0; z-index: 400; 
+        background: #fdfbf7; overflow-y: auto; padding-bottom: 120px;
+        &::-webkit-scrollbar { display: none; }
+    }
+    #char-phone-wallet-view {
+        position: absolute; inset: 0; z-index: 400;  // ← 原封不动保留
+        background: #fdfbf7; 
+        display: none; 
+        flex-direction: column;
+        overflow: hidden; 
+        &.active { display: flex; }
+    }
+    // 专属钱包顶栏
+    .cp-wallet-topbar {
+        flex-shrink: 0; // 【关键】防止被下方列表挤压变形
+        padding: 60px 20px 15px; display: flex; align-items: center; justify-content: space-between;
+        background: #fdfbf7; z-index: 10;
+        .cp-view-back-btn { position: relative; top: 0; left: 0; width: 34px; height: 34px; }
+
+        h2 { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 2px; color: #1a1a1a; margin: 0; }
+        .wallet-more-btn { background: none; border: none; padding: 5px; color: #1a1a1a; }
+    }
+
+      // 原创设计：垂直堆叠钱包动效
+    .cp-wallet-stack {
+        flex-shrink: 0; // 【关键】防止卡片在小屏幕上被挤压变扁
+        display: flex; flex-direction: column; 
+        padding: 10px 20px 30px; 
+        position: relative;
+
+        // 留出足够的高度让被堆叠的卡片露出一截
+        min-height: 250px; 
+
+        .solid-card {
+            width: 100%; height: 190px; border-radius: 12px;
+            position: absolute; left: 20px; right: 20px; width: auto;
+            cursor: pointer; 
+            // 加入带有弹性效果的贝塞尔曲线动画
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        box-shadow 0.4s ease, 
+                        z-index 0s 0.2s; 
+
+            // 未选中卡片：往下沉，并露出一小截头部（像抽屉）
+            &:not(.active) { 
+                z-index: 1; 
+                transform: translateY(70px) scale(0.95); // 往下位移并缩小
+                box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            }
+
+            // 选中的卡片：浮上来，恢复正常大小
+            &.active { 
+                z-index: 5; 
+                transform: translateY(0) scale(1);
+                box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            }
+
+            // --- 卡片内部排版保持不变 ---
+            .card-inner {
+                width: 100%; height: 100%; padding: 25px;
+                display: flex; flex-direction: column; justify-content: space-between;
+                box-sizing: border-box;
+            }
+
+            .card-top {
+                display: flex; justify-content: space-between; align-items: flex-start;
+                .minimal-chip {
+                    width: 32px; height: 24px; border-radius: 4px;
+                    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);
+                    gap: 1px; padding: 2px;
+                    i { border-radius: 1px; }
+                }
+                .minimal-nfc { width: 22px; height: 22px; transform: rotate(90deg); }
+            }
+
+            .card-middle {
+                .bank-logo-text { 
+                    font-family: 'Helvetica Neue', Helvetica, sans-serif; 
+                    font-size: 16px; font-weight: 800; letter-spacing: 2px; display: flex; align-items: baseline;
+                    .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-left: 4px; }
+                }
+            }
+
+            .card-bottom {
+                display: flex; justify-content: space-between; align-items: flex-end;
+                .card-holder { display: flex; flex-direction: column; span { font-size: 9px; opacity: 0.6; letter-spacing: 1px; margin-bottom: 2px; } strong { font-size: 13px; font-family: monospace; letter-spacing: 1px; } }
+                .card-number { display: flex; align-items: center; gap: 8px; .hidden-digits { font-size: 10px; opacity: 0.6; letter-spacing: 2px; transform: translateY(-2px); } .visible-digits { font-family: 'Courier New', Courier, monospace; font-size: 20px; font-weight: 600; letter-spacing: 1px; } }
+            }
+            .cp-card-balance {
+                align-self: flex-end;
+                margin-top: 5px;
+                font-size: 10px;
+                letter-spacing: 0.4px;
+                opacity: 0.72;
+            }
+        }
+
+        // --- 材质定义保持不变 ---
+        .solid-black {
+            background-color: #1c1c1e; border: 1px solid #333; color: #f5f5f7;
+            .minimal-chip { border: 1px solid rgba(255,255,255,0.2); i { background: rgba(255,255,255,0.1); } }
+            .minimal-nfc { color: #8e8e93; }
+            .bank-logo-text .dot { background: #0a84ff; } 
+        }
+
+        .solid-white {
+            background-color: #fdfdfd; border: 1px solid #e5e5ea; color: #1c1c1e;
+            .minimal-chip { border: 1px solid rgba(0,0,0,0.15); i { background: rgba(0,0,0,0.05); } }
+            .minimal-nfc { color: #aeaeb2; }
+            .bank-logo-text .dot { background: #ff453a; } 
+        }
+    }
+
+     // 数据总览区
+    .cp-wallet-summary {
+        flex-shrink: 0; // 【关键】防止本月收入/支出面板被挤压
+        display: flex; padding: 0 20px 20px; gap: 15px;
+        .summary-box {
+
+            flex: 1; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.04);
+            display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            .s-label { font-size: 11px; color: #888; }
+            .s-value { font-family: "Georgia", serif; font-size: 18px; font-weight: 600; color: #1a1a1a; }
+            .s-value.plus { color: #555; }
+        }
+    }
+    // 流水列表
+    .cp-wallet-list-container {
+        flex: 1 1 0%; // 【核心魔法】自动占据下方所有的剩余空间
+        min-height: 0; // iOS Flex 子项必须允许收缩，列表才会真正成为内部滚动区
+        height: auto;
+        overflow-y: auto; // 【核心魔法】开启局部独立滚动
+        overflow-x: hidden;
+        overscroll-behavior-y: contain;
+        touch-action: pan-y;
+        padding: 0 20px 120px; // 【核心魔法】底部留出 120px 巨大留白，滚到底也绝不会被悬浮 Dock 栏遮挡
+        -webkit-overflow-scrolling: touch; // 让手机端滑动更丝滑
+        &::-webkit-scrollbar { display: none; } // 隐藏滚动条更美观
+        
+        .record-date-title { font-size: 13px; font-weight: 600; color: #1a1a1a; margin: 15px 0 10px; padding-bottom: 5px; border-bottom: 2px solid #1a1a1a; display: inline-block; }
+
+        .wallet-item {
+            display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(0,0,0,0.03);
+            &:last-child { border-bottom: none; }
+            .w-icon { width: 42px; height: 42px; border-radius: 12px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; svg { width: 20px; height: 20px; color: #333; } }
+            .w-info { flex: 1; .w-title { font-size: 15px; color: #1a1a1a; font-weight: 500; margin-bottom: 4px; } .w-time { font-size: 11px; color: #888; } }
+            .w-amount { font-family: "Georgia", serif; font-size: 16px; font-weight: 600; }
+            .w-amount.minus { color: #1a1a1a; } 
+            .w-amount.plus { color: #34a853; } // 收入用绿色
+        }
+    }
+    // ▼▼▼ [重构] 屏幕时间：情侣查岗/轨迹版 UI ▼▼▼
+    #char-phone-screentime-view {
+        position: absolute; inset: 0; z-index: 400; 
+        background: #fdfbf7; // 统一奶油色背景
+        
+        // 修复返回键位置 (强制覆盖，与 header 对齐)
+        .cp-view-back-btn {
+            position: absolute !important;
+            top: 60px !important;
+            left: 20px !important;
+            z-index: 50 !important;
+        }
+        // 内部滚动容器，避开返回键
+        .st-scroll-container {
+            height: 100%; overflow-y: auto; padding: 0 20px;
+            &::-webkit-scrollbar { display: none; }
+        }
+        // 艺术字头部 & 头像 (极简名片风)
+        .st-art-header {
+            padding: 100px 0 25px; // 顶部留白避开绝对定位的返回键
+            
+            .st-header-profile {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                
+                .avatar-wrap {
+                    width: 52px;
+                    height: 52px;
+                    border-radius: 50%;
+                    background: #f5f5f5;
+                    border: 2px solid #1a1a1a; // 极简纯黑边框，呼应整体纯色风格
+                    overflow: hidden;
+                    flex-shrink: 0;
+                    box-shadow: 2px 2px 0px rgba(26,26,26,0.1); // 微微的硬阴影增加质感
+                    
+                    img { width: 100%; height: 100%; object-fit: cover; display: block; }
+                }
+                
+                .text-wrap {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    
+                    h2 { 
+                        font-family: "Helvetica Neue", Arial, sans-serif; 
+                        font-size: 20px; 
+                        font-weight: 800; 
+                        letter-spacing: 1px; 
+                        color: #1a1a1a; 
+                        margin: 0 0 4px; 
+                    }
+                    .sub { 
+                        font-size: 13px; 
+                        color: #888; 
+                        font-family: "Songti SC", serif; 
+                        strong { color: #1a1a1a; font-weight: 600; } 
+                    }
+                }
+            }
+        }
+
+        // 通用卡片样式
+        .st-card {
+            background: #fff; border-radius: 16px; padding: 20px;
+            margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            
+            .card-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin: 0 0 18px; letter-spacing: 0.5px; }
+        }
+        // 1. 总览卡片
+        .overview-card {
+            .overview-top {
+                display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 15px;
+                .label { font-size: 13px; color: #888; }
+                .time { font-family: "Georgia", serif; font-size: 28px; color: #1a1a1a; font-weight: 500; line-height: 1; small { font-size: 14px; color: #999; margin: 0 2px; } }
+            }
+            .overview-comment {
+                display: flex; gap: 12px; align-items: flex-start;
+                svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; }
+                p { font-size: 13px; color: #666; line-height: 1.5; margin: 0; font-family: "Songti SC", serif; font-style: italic; }
+            }
+        }
+        // 2. 应用偏好卡片 (纯色极简版)
+        .apps-card {
+            .app-list {
+                display: flex; flex-direction: column; gap: 18px;
+                .app-item {
+                    display: flex; align-items: center; gap: 15px;
+                    .app-icon { 
+                        width: 40px; height: 40px; border-radius: 10px; 
+                        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+                        background: #f5f5f5; color: #1a1a1a; // 统一的灰底黑图
+                        svg { width: 22px; height: 22px; }
+                    }
+                    .app-info {
+                        flex: 1;
+                        .name-time { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; font-weight: 500; color: #333; span:last-child { font-size: 12px; color: #888; font-family: monospace;} }
+                        .bar-bg { 
+                            width: 100%; height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden; 
+                            .bar-fill { height: 100%; border-radius: 3px; background: #1a1a1a; } // 纯黑进度条
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. 时间作息卡片 (纯色图标)
+        .timeline-card {
+            .timeline-list {
+                display: flex; flex-direction: column; gap: 20px; position: relative;
+                &::before { content: ''; position: absolute; left: 16px; top: 10px; bottom: 10px; width: 1px; background: #eee; z-index: 1; }
+                
+                .tl-item {
+                    display: flex; gap: 15px; position: relative; z-index: 2;
+                    .tl-icon { 
+                        width: 34px; height: 34px; border-radius: 50%; 
+                        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+                        background: #f5f5f5; color: #1a1a1a; // 纯色灰底黑图
+                        border: 2px solid #fff; 
+                        svg { width: 16px; height: 16px; }
+                    }
+                    
+                    .tl-content {
+                        flex: 1; background: #fafafa; padding: 12px 15px; border-radius: 12px; border: 1px solid #f0f0f0;
+                        .tl-meta { font-size: 11px; color: #999; margin-bottom: 4px; font-family: monospace; }
+                        .tl-title { font-size: 14px; color: #333; margin-bottom: 6px; strong { color: #000; } }
+                        .tl-desc { font-size: 12px; color: #888; margin: 0; line-height: 1.4; font-style: italic; }
+                    }
+                }
+            }
+        }
+
+        // 4. 场景足迹卡片 - [修复类名冲突 & 纯色图标]
+        .st-footprint-card {
+            .loc-grid {
+                display: flex; flex-wrap: wrap; gap: 12px;
+                .loc-item {
+                    flex: 1 1 calc(50% - 6px); background: #fcfcfc; padding: 12px; border-radius: 12px; border: 1px solid #f0f0f0;
+                    display: flex; flex-direction: column; gap: 8px;
+                    &.full-width { flex: 1 1 100%; flex-direction: row; align-items: center; }
+                    
+                    .loc-icon { 
+                        width: 36px; height: 36px; border-radius: 10px; 
+                        display: flex; align-items: center; justify-content: center; 
+                        background: #f5f5f5; color: #1a1a1a; // 统一的灰底黑图
+                        svg { width: 18px; height: 18px; }
+                    }
+                    .loc-info {
+                        display: flex; flex-direction: column; gap: 2px;
+                        .loc-name { font-size: 14px; font-weight: 600; color: #333; }
+                        .loc-apps { font-size: 11px; color: #888; }
+                    }
+                }
+            }
+        }
+    }
+    // 微调底栏，防止7个图标挤在一起
+    .cp-dock-nav { width: 95%; max-width: 400px; } 
+    
+    // ▼▼▼ [修改] ChatGPT 页面样式 (一比一复刻图1) ▼▼▼
+    #char-phone-cgt-view {
+        position: absolute; inset: 0; z-index: 400; 
+        background: #ffffff; color: #0d0d0d; // 白底黑字
+        display: none; flex-direction: column; overflow: hidden;
+        &.active { display: flex; }
+        
+        .cgt-header {
+            padding: 60px 20px 15px; display: flex; justify-content: space-between; align-items: center;
+            background: #ffffff; flex-shrink: 0;
+            .cgt-icon-btn {
+                background: none; border: none; padding: 5px; color: #0d0d0d; cursor: pointer;
+                svg { width: 24px; height: 24px; }
+            }
+            .cgt-title { font-size: 17px; font-weight: 600; font-family: -apple-system, sans-serif; }
+        }
+
+        .cgt-message-list {
+            flex: 1; overflow-y: auto; padding: 10px 15px 120px;
+            display: flex; flex-direction: column; gap: 24px;
+            &::-webkit-scrollbar { display: none; }
+            
+            .cgt-msg-row {
+                display: flex; width: 100%;
+                // 用户气泡：靠右
+                &.user {
+                    justify-content: flex-end;
+                    .cgt-text {
+                        background: #f4f4f4; color: #0d0d0d; padding: 12px 16px; border-radius: 18px;
+                        max-width: 85%; font-size: 15px; line-height: 1.5; font-family: -apple-system, sans-serif;
+                    }
+                    .cgt-avatar { display: none; } // 隐藏头像
+                }
+                // AI 纯文本：靠左，带头像
+                &.ai {
+                    justify-content: flex-start; align-items: flex-start; gap: 12px;
+                    .cgt-avatar {
+                        width: 28px; height: 28px; flex-shrink: 0; margin-top: 2px;
+                        // 这里我们用CSS画一个接近黑白细线的圆圈Logo代替
+                        border: 1px solid #d1d5db; border-radius: 50%;
+                        display: flex; align-items: center; justify-content: center; color: #0d0d0d;
+                        svg { width: 16px; height: 16px; }
+                    }
+                    .cgt-text {
+                        flex: 1; color: #0d0d0d; font-size: 15px; line-height: 1.6; font-family: -apple-system, sans-serif;
+                        padding-top: 5px;
+                    }
+                }
+            }
+        }
+
+        .cgt-footer-input {
+            position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            .cgt-input-box {
+                background: #ffffff; border: 1px solid #e5e5e5; border-radius: 30px;
+                padding: 10px 15px; display: flex; align-items: center; gap: 12px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+                .icon-plus, .icon-mic { width: 22px; height: 22px; stroke: #8e8ea0; }
+                .placeholder { flex: 1; font-size: 16px; color: #8e8ea0; font-family: -apple-system, sans-serif; margin-left: 5px; }
+                .icon-wave-black {
+                    width: 32px; height: 32px; background: #000; border-radius: 50%; color: #fff;
+                    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+                    svg { width: 16px; height: 16px; stroke-width: 2.5; }
+                }
+            }
+        }
+    }
+}
+// ▼▼▼ [新增开始] AI 生成按钮 & 弹窗样式 (极简高级风) ▼▼▼
+.cp-ai-floating-btn {
+    position: absolute;
+    top: 58px; // 刚好和左边的返回键在同一水平线
+    right: 20px;
+    z-index: 1000;
+    background: #1a1a1a; // 高级黑
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+    cursor: pointer;
+    svg { width: 14px; height: 14px; }
+    &:active { transform: scale(0.95); }
+}
+
+.cp-ai-modal-card {
+    background: #fdfbf7; // 呼应查手机页面的奶油底色
+    border-radius: 24px;
+    padding: 0;
+    overflow: hidden;
+    width: 85%;
+    max-width: 340px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+
+    .ai-modal-header {
+        padding: 25px 20px 15px;
+        position: relative;
+        text-align: left;
+        h3 { font-size: 18px; color: #1a1a1a; margin: 0 0 6px; font-weight: 700; letter-spacing: 0.5px; }
+        p { font-size: 12px; color: #888; margin: 0; line-height: 1.4; }
+        .close-btn { 
+            position: absolute; top: 20px; right: 20px; background: none; border: none; 
+            font-size: 24px; color: #bbb; line-height: 1; padding: 0; cursor: pointer;
+            transition: 0.2s; &:active { color: #1a1a1a; }
+        }
+    }
+
+    .ai-modal-body {
+        padding: 5px 20px 20px;
+        max-height: 55vh;
+        overflow-y: auto;
+        &::-webkit-scrollbar { display: none; }
+        
+        .ai-checkbox-group { display: flex; flex-direction: column; gap: 10px; }
+        
+        .ai-checkbox-item {
+            display: flex; align-items: flex-start; gap: 12px;
+            background: #fff; border: 1px solid rgba(0,0,0,0.06);
+            padding: 14px; border-radius: 16px; cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+            
+            // 选中时的样式
+            input:checked + .custom-box {
+                background: #1a1a1a; border-color: #1a1a1a;
+                &::after { content: ''; position: absolute; left: 5px; top: 2px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+            }
+            &:has(input:checked) { border-color: #1a1a1a; background: #fafafa; }
+
+            input { display: none; }
+            .custom-box {
+                width: 18px; height: 18px; border: 1.5px solid #ccc; border-radius: 4px; 
+                margin-top: 2px; position: relative; transition: all 0.2s; flex-shrink: 0;
+            }
+            .text-info {
+                display: flex; flex-direction: column; gap: 3px;
+                .title { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+                .desc { font-size: 11px; color: #888; line-height: 1.4; }
+            }
+        }
+    }
+
+    .ai-modal-footer {
+        padding: 15px 20px; border-top: 1px solid rgba(0,0,0,0.05);
+        display: flex; gap: 12px; background: #fff;
+        
+        .btn-cancel {
+            flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #e0e0e0;
+            background: #fff; color: #666; font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        .btn-confirm {
+            flex: 2; padding: 12px; border-radius: 12px; border: none;
+            background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 600; 
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            &:active { opacity: 0.8; }
+        }
+    }
+}
+// ▲▲▲ [新增结束] ▲▲▲
+/* ===============================================
+   ▼▼▼ 【新增】查手机密码锁屏样式 (日杂极简风) ▼▼▼
+   =============================================== */
+.phone-lock-container {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 8px;
+  padding: 40px 30px 30px;
+  width: 80%;
+  max-width: 300px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  
+  &.shake {
+    animation: lock-shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  .lock-icon {
+    margin-bottom: 15px;
+    svg { width: 32px; height: 32px; stroke: #1a1a1a; }
+  }
+
+  #lock-name {
+    font-size: 20px; font-weight: 300; color: #1a1a1a; margin: 0 0 5px;
+    letter-spacing: 2px;
+  }
+
+  .lock-hint {
+    font-size: 10px; color: #aaa; letter-spacing: 3px; margin: 0 0 30px;
+  }
+
+  .lock-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #1a1a1a;
+    padding: 10px 0;
+    font-size: 24px;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    color: #1a1a1a;
+    letter-spacing: 8px;
+    outline: none;
+    margin-bottom: 10px;
+    transition: border-color 0.3s;
+    &::placeholder { font-size: 12px; letter-spacing: 1px; color: #ccc; font-family: -apple-system, sans-serif; }
+    &:focus { border-bottom-color: #d4a373; }
+  }
+
+  .lock-error {
+    font-size: 10px; color: #d0021b; height: 14px; margin-bottom: 30px; letter-spacing: 1px;
+  }
+
+  .lock-actions {
+    display: flex; gap: 10px;
+    button {
+      flex: 1; padding: 12px 0; border: none; font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; cursor: pointer; transition: 0.2s;
+      
+      &#lock-cancel-btn { background: #f5f5f5; color: #666; border-radius: 4px; }
+      &#lock-confirm-btn { 
+        background: #1a1a1a; color: #fff; border-radius: 4px; 
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        transition: all 0.3s;
+        
+        // 核心新增：加载中的动画状态
+        &.loading {
+          background: #444; color: #aaa; pointer-events: none;
+          &::before {
+            content: ''; width: 12px; height: 12px; flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff;
+            border-radius: 50%; animation: lock-btn-spin 0.8s linear infinite;
+          }
+        }
+      }
+      &:active { transform: scale(0.96); }
+    }
+  }
+}
+
+@keyframes lock-shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+// 核心新增：按钮内部的旋转动画
+@keyframes lock-btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===============================================
+   ▼▼▼ LoverSync 标记与弹窗高级样式 ▼▼▼
+   =============================================== */
+
+/* 1. 高级折角标记样式 */
+.lover-sync-pinned {
+    position: relative !important;
+    outline: 2px solid #1a1a1a !important; /* 纯黑边框 */
+    outline-offset: -2px;
+    border-radius: inherit;
+    transition: outline 0.2s ease;
+    
+    /* 右上角的黑色折角 */
+    &::after {
+        content: ''; position: absolute; top: 0; right: 0;
+        width: 0; height: 0; border-style: solid;
+        border-width: 0 24px 24px 0;
+        border-color: transparent #1a1a1a transparent transparent;
+        z-index: 100;
+    }
+    /* 白色的对勾 */
+    &::before {
+        content: '✓'; position: absolute; top: 1px; right: 3px;
+        color: #fff; font-size: 11px; font-weight: 900; z-index: 101;
+    }
+}
+/* 防止气泡圆角盖不住折角 */
+.msg-bubble.lover-sync-pinned { overflow: hidden; }
+
+/* 2. 对峙确认弹窗样式 */
+.sync-confirm-card {
+    padding: 0 !important; overflow: hidden;
+    width: 85%; max-width: 320px;
+    background: #fdfbf7; border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    
+    .sync-header {
+        padding: 25px 20px 10px; text-align: center;
+        h3 { margin: 0 0 6px; font-size: 18px; color: #1a1a1a; font-weight: 700; letter-spacing: 0.5px; }
+        p { margin: 0; font-size: 12px; color: #888; }
+    }
+    
+    .sync-list {
+        padding: 10px 20px 20px; max-height: 40vh; overflow-y: auto;
+        &::-webkit-scrollbar { display: none; }
+        
+        .sync-item {
+            background: #fff; border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 12px; padding: 12px; margin-bottom: 8px;
+            font-size: 13px; color: #333; line-height: 1.4;
+            display: flex; gap: 6px;
+            .idx { color: #1a1a1a; font-weight: 700; }
+            .txt { flex: 1; word-break: break-all; white-space: pre-wrap; }
+        }
+    }
+    
+    .sync-footer-refined {
+        display: flex; flex-direction: column; gap: 12px;
+        padding: 15px 20px 20px; background: #fff;
+        border-top: 1px dashed rgba(0,0,0,0.06);
+
+        .action-row {
+            display: flex; gap: 10px; width: 100%;
+            
+            button {
+                flex: 1; padding: 12px 0; border-radius: 12px;
+                font-size: 13px; font-weight: 600; cursor: pointer;
+                transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+            }
+            .btn-silent {
+                background: #fdfbf7; color: #8f7f74; border: 1px solid #e8e2d9;
+                &:active { background: #f4efe9; transform: scale(0.96); }
+            }
+            .btn-loud {
+                background: #5c544d; color: #fff; border: none;
+                box-shadow: 0 4px 10px rgba(92, 84, 77, 0.2);
+                &:active { transform: scale(0.96); }
+            }
+        }
+
+        .btn-text-cancel {
+            background: transparent; border: none; padding: 4px 0;
+            color: #a89b92; font-size: 12px; cursor: pointer;
+            text-decoration: underline; text-underline-offset: 3px;
+        }
+    }
+}
+
+.cp-character-payment-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 30050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0,0,0,0.28);
+}
+.cp-character-payment-card {
+    width: min(360px, 100%);
+    padding: 20px;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.cp-character-payment-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    span { display: block; margin-bottom: 5px; color: #999; font-size: 10px; letter-spacing: 1.2px; }
+    strong { font-size: 16px; }
+    button { border: 0; background: transparent; color: #777; font-size: 24px; }
+}
+.cp-character-payment-amount { margin: 22px 0 4px; font-size: 30px; font-weight: 700; }
+.cp-character-payment-hint,
+.cp-character-payment-error { margin: 0 0 12px; color: #888; font-size: 12px; }
+.cp-character-payment-error { min-height: 18px; color: #d14b4b; }
+.cp-character-payment-list { display: grid; gap: 8px; }
+.cp-character-payment-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #eee;
+    border-radius: 13px;
+    background: #fff;
+    text-align: left;
+    &.active { border-color: #222; background: #f8f8f8; }
+    strong, small { display: block; }
+    small { margin-top: 3px; color: #999; font-size: 11px; }
+    b { font-size: 12px; }
+}
+.cp-character-payment-confirm {
+    width: 100%;
+    margin-top: 4px;
+    padding: 12px;
+    border: 0;
+    border-radius: 13px;
+    background: #111;
+    color: #fff;
+    font-size: 14px;
+}
+.cp-phone-transfer-modal,
+.cp-phone-fake-image-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 30040;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0,0,0,0.28);
+    &[hidden] { display: none; }
+}
+.cp-phone-transfer-card,
+.cp-phone-fake-image-card {
+    width: min(360px, 100%);
+    padding: 20px;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    label { display: block; margin-top: 14px; color: #555; font-size: 12px; }
+    input {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        margin-top: 6px;
+        padding: 11px 12px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        outline: none;
+        background: #fafafa;
+        color: #222;
+        font-size: 14px;
+        &:focus { border-color: #222; background: #fff; }
+    }
+}
+.cp-phone-transfer-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    span { display: block; margin-bottom: 5px; color: #999; font-size: 10px; letter-spacing: 1.2px; }
+    h3 { margin: 0; font-size: 18px; }
+    button { border: 0; background: transparent; color: #777; font-size: 24px; }
+}
+.cp-phone-transfer-error { min-height: 18px; margin: 8px 0 0; color: #d14b4b; font-size: 12px; }
+.cp-phone-transfer-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    button {
+        flex: 1;
+        padding: 11px;
+        border: 0;
+        border-radius: 12px;
+        background: #f1f1f1;
+        color: #333;
+        &:last-child { background: #111; color: #fff; }
+    }
+}
+
+.cp-npc-finalize-modal {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    box-sizing: border-box;
+    z-index: 10050;
+    align-items: center;
+    justify-content: center;
+    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+    background: rgba(0, 0, 0, 0.38);
+    opacity: 0;
+    transition: opacity 0.18s ease;
+
+    &.active { opacity: 1; }
+
+    .cp-npc-finalize-card {
+        width: min(100%, 360px);
+        max-height: calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        overflow-y: auto;
+        box-sizing: border-box;
+        padding: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        background: #fdfbf7;
+        box-shadow: 0 18px 46px rgba(0, 0, 0, 0.2);
+    }
+
+    .cp-npc-finalize-heading {
+        margin-bottom: 16px;
+
+        span {
+            display: block;
+            margin-bottom: 6px;
+            color: #8a8178;
+            font-family: monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        h3 {
+            margin: 0;
+            color: #1a1a1a;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 7px 0 0;
+            color: #777;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    }
+
+    .cp-npc-finalize-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .cp-npc-finalize-option {
+        width: 100%;
+        min-height: 64px;
+        padding: 12px 14px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 8px;
+        background: #fff;
+        color: #1a1a1a;
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+
+        strong, small {
+            display: block;
+        }
+
+        strong {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        small {
+            margin-top: 4px;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        &.primary {
+            border-color: #1a1a1a;
+            background: #1a1a1a;
+            color: #fff;
+
+            small { color: rgba(255, 255, 255, 0.76); }
+        }
+
+        &.subtle {
+            background: #f3f1ed;
+            color: #5c544d;
+        }
+
+        &.continue {
+            border-style: dashed;
+            background: transparent;
+            color: #555;
+        }
+
+        &:active { transform: scale(0.98); }
+    }
+}
+
+@keyframes cpTakeoverNotice {
+    from { opacity: 0; transform: translateY(10px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cpTakeoverPulse {
+    70% { box-shadow: 0 0 0 8px rgba(255,204,102,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,204,102,0); }
+}
+@keyframes cpNpcMessageIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cpTakeoverSend {
+    from { opacity: 0; transform: translateX(18px) scale(0.96); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes cpTakeoverHeader {
+    0% { box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06); }
+    45% { box-shadow: inset 0 -2px 0 rgba(255,204,102,0.85); }
+    100% { box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06); }
+}

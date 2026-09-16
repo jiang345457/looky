@@ -1,0 +1,40 @@
+// 文件: /style/components/_timestamp.scss
+// 【最终完美版】
+
+// 1. 定义“外套”的样式
+.chat-timestamp {
+    display: flex;           // 使用 flex 布局
+    justify-content: center; // 唯一的任务：把里面的内容水平居中
+    margin: 16px 0;          // 上下留出间距
+    width: 100%;             // 确保外套自己占满一行
+    clear: both;
+}
+
+// 2. 定义“衬衫”的基础样式（新加的）
+.chat-timestamp-content {
+    display: inline-flex; // 让它自己和内部的图标/文字对齐
+    align-items: center;
+    line-height: 1.2;
+    font-size: 13px;
+    color: #ffffff;
+}
+
+// 3. 定义“药丸衬衫”的具体样式
+.chat-timestamp--pill-center {
+    padding: 5px 12px;
+    background-color: rgba(0, 0, 0, 0.20);
+    border-radius: 20px;
+    backdrop-filter: blur(2px);
+
+    .timestamp-icon {
+        width: 1em;
+        height: 1em;
+        margin-right: 6px;
+    }
+}
+
+// 4. 定义“简约衬衫”的具体样式
+.chat-timestamp--simple-center {
+    color: #8e8e93; // 灰色文字
+    background-color: transparent; // 透明背景
+}

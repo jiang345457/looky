@@ -1,0 +1,924 @@
+/* ======================================================
+ *  World Book Page Styles
+ * ====================================================== */
+
+// 通用页面布局和头部样式
+.screen {
+    background-color: #ffffff;
+    color: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* ======================================================
+ *  ↓↓↓【头部布局最终优化】↓↓↓
+ * ====================================================== */
+.page-header {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-bottom: 1px solid #f0f0f0;
+    z-index: 10;
+    flex-shrink: 0; // 防止在flex布局中被压缩
+    // [保持] 采用 Flexbox + Padding 的经典组合
+    display: flex;
+    align-items: center; // 垂直居中对齐所有子项
+    justify-content: space-between; // 两端对齐
+    padding: 40px 15px 12px;
+}
+.page-header .header-title {
+    flex: 1; 
+    min-width: 0; 
+    text-align: center; 
+    padding: 0 10px;
+    
+    /* [保留] 样式和溢出处理 */
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* [移除] max-width: 60%; 不再需要，由flex动态计算 */
+}
+.header-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    
+    // [保留] 设置一个最小宽度，保证布局稳定和点击区域
+    min-width: 40px; 
+    /* [移除] position: relative; z-index: 1; 不再需要层级修复 */
+    &:hover {
+        background-color: #f5f5f5;
+    }
+    &.save-btn {
+        font-size: 16px;
+        font-weight: 500;
+        color: #007aff;
+        border-radius: 8px;
+        padding: 6px 12px;
+    }
+}
+
+.page-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+
+// 世界书列表页特定样式
+#world-book-screen {
+    background-color: #f0f2f5; // 使用一个更柔和的背景灰
+    // 1. 【核心布局修改】让 header 独立在上方，body 在下方
+    display: flex;
+    flex-direction: column; // 主轴改为垂直
+    // 顶栏样式微调 (确保它在最上层)
+    .page-header {
+        background-color: #ffffff;
+        border-bottom: 1px solid #e8e8e8;
+        flex-shrink: 0; // 防止被压缩
+    }
+    // 2. 【新增】侧边栏和主内容的包裹容器
+    .wb-body-wrapper {
+      flex: 1; // 占据 header 下方所有剩余空间
+        display: flex;
+        padding: 12px; // 在四周留出空隙
+        gap: 12px;     // 侧边栏和主内容之间的间距
+        overflow: hidden; // 防止内容溢出
+        min-height: 0; 
+    }
+    // 3. 【新增】左侧边栏的“外框”样式
+    .wb-category-sidebar {
+        flex: 0 0 85px; // 固定宽度
+        background-color: #ffffff;
+        border-radius: 16px; // 大圆角
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07); // 添加精致阴影
+        padding: 12px 0; // 上下留出内边距
+        
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px; // 标签之间的间距
+        overflow-y: auto; // 当分组过多时，仅此区域滚动
+        // 美化滚动条 (可选)
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+    // 4. 【还原并优化】分组标签 .tab-item 的样式
+    .tab-item {
+        flex-shrink: 0; // 防止被压缩
+        width: 85%;
+        max-width: 65px;
+        padding: 8px 12px;
+        font-size: 14px;
+        font-weight: 500;
+        background-color: #f0f2f5; // 默认用背景灰
+        color: #555;
+        border: none;
+        border-radius: 18px; // 胶囊形状
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap; // 文字不换行
+        overflow: hidden;
+        text-overflow: ellipsis; // 超出部分显示...
+        
+        &.active {
+            background-color: #1a1a1a; // 激活时用深色
+            color: #ffffff;
+        }
+    }
+    
+  // 5. 【修改】右侧主内容区样式
+.world-book-main-content {
+    flex: 1;
+   background-color: #ffffff; 
+    border-radius: 16px;
+    padding: 0; // 移除内边距，让滚动条贴边
+    overflow-y: auto;
+    // (从原 world-book-list 选择器中移动过来的)
+    display: flex;
+    flex-direction: column;
+    gap: 12px; 
+    #world-book-list {
+        padding:  20px;
+    }
+}
+// 【新增】分组标题样式
+.wb-list-group-header {
+    font-size: 15px;
+    font-weight: 700;
+    color: #828282;
+
+    /* ▼▼▼ 【关键修改】 ▼▼▼ */
+    text-align: center;          /* 1. 实现文字水平居中 */
+    margin: 20px 0 10px 0;       /* 2. 调整外边距: 上40px, 左右0, 下16px */
+    /* ▲▲▲ 修改结束 ▲▲▲ */
+ position: relative; /* 1. 必须设置为相对定位，作为伪元素的定位基准 */
+    padding-bottom: 10px; /* 2. 为分隔线留出空间 */
+    &::after {
+        content: ''; /* 伪元素必须有 content 属性 */
+        position: absolute; /* 绝对定位，相对于父元素 .wb-list-group-header */
+        left: 50%; /* 从中心开始 */
+        bottom: 0; /* 定位在父元素的底部 */
+        transform: translateX(-50%); /* 向左移动自身宽度的一半，实现完美居中 */
+        
+        width: 50px; /* 分隔线的宽度 */
+        height: 2px; /* 分隔线的厚度 */
+        background-color: #e0e0e0; /* 分隔线的颜色，浅灰色 */
+        border-radius: 1px; /* 让线条边缘更圆润 */
+    }
+}
+
+
+// 【新增】空列表提示样式 (微调)
+.empty-list-placeholder {
+    text-align: center;
+    color: #999;
+    padding: 40px 15px;
+    line-height: 1.6;
+}
+/* --- 【全新】世界书卡片样式 --- */
+.world-book-item {
+    background-color: #ffffff;
+    border-radius: 14px;
+    padding: 18px; // 保持统一的内边距
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+    cursor: pointer;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    max-width: 80%;  /* 设置卡片最大宽度为其父容器的85% */
+    width: 100%;       /* 确保在小屏幕上能正常缩放 */
+    margin-left: auto; /* 实现水平居中 */
+    margin-right: auto;/* 实现水平居中 */
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+.item-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    // 防止标题过长破坏布局
+    flex-grow: 1;
+    padding-right: 10px;
+}
+.item-importance-badge {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 12px;
+    color: #fff;
+}
+// 配合JS，根据重要性设置徽章背景色
+.world-book-item[data-importance="high"] .item-importance-badge {
+    background-color: #ff6b6b;
+}
+.world-book-item[data-importance="medium"] .item-importance-badge {
+    background-color: #feca57;
+}
+.world-book-item[data-importance="low"] .item-importance-badge {
+    background-color: #48dbfb;
+}
+.item-content-preview {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+    // 多行省略效果 (可选，但推荐)
+    display: -webkit-box;
+    -webkit-line-clamp: 2; // 最多显示2行
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.item-meta {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+}
+}
+/* “添加”按钮的弹出菜单样式 */
+#world-book-add-menu {
+  position: absolute;
+  top: 70px; // 根据你的 header 高度微调
+  right: 15px;
+  width: 160px;
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--c-border-light);
+  z-index: 100;
+  padding: 8px 0;
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none; /* 隐藏时不可点击 */
+}
+#world-book-add-menu.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto; /* 显示时可点击 */
+}
+.action-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 15px;
+  cursor: pointer;
+  gap: 12px;
+  color: var(--c-text-primary);
+}
+.action-menu-item:hover {
+  background-color: var(--c-bg-tertiary);
+}
+.action-menu-item svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  flex-shrink: 0;
+  color: var(--c-text-secondary);
+}
+// 世界书编辑器页特定样式 (保持不变)
+#world-book-editor-screen {
+    // ... 编辑器样式 ...
+    .editor-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        height: 100%;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        &.full-height {
+            flex-grow: 1;
+        }
+    }
+    label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #444;
+    }
+    input[type="text"],
+    textarea {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-sizing: border-box;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        &:focus {
+            outline: none;
+            border-color: #007aff;
+            background-color: #fff;
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+        }
+    }
+    textarea {
+        height: 100%;
+        resize: none;
+        font-family: inherit;
+    }
+}
+/* 
+ * ======================================================================
+ *   ▼▼▼ 【新增】添加世界书弹窗专属样式 ▼▼▼
+ * ======================================================================
+ */
+#add-wb-entry-modal-overlay .modal-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+  }
+  .styled-input, .styled-textarea, .styled-select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f7f7f7;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    &:focus {
+      outline: none;
+      border-color: #007aff;
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+    }
+  }
+  textarea.styled-input {
+      resize: vertical;
+      min-height: 100px;
+  }
+  
+  select.styled-select {
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 20px;
+  }
+  .segmented-control {
+    display: flex;
+    width: 100%;
+    background-color: #e9e9eb;
+    border-radius: 8px;
+    padding: 2px;
+    
+    input[type="radio"] {
+      display: none;
+    }
+    label {
+      flex: 1;
+      text-align: center;
+      padding: 6px 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    input[type="radio"]:checked + label {
+      background-color: #ffffff;
+      color: #000;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+  }
+  .helper-text {
+    font-size: 12px;
+    color: #999;
+    margin: -4px 0 0 4px;
+  }
+}
+
+/* Android 键盘打开时，遮罩层要跟随现有的可视高度缩短，
+   卡片内部滚动，避免整页被系统顶起或滚动穿透。 */
+html.looky-native #add-wb-entry-modal-overlay {
+  box-sizing: border-box;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+html.looky-native body.android-viewport-sync #add-wb-entry-modal-overlay {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+html.looky-native #add-wb-entry-modal-overlay .wb-entry-modal-card {
+  box-sizing: border-box;
+  width: 92%;
+  max-width: 360px;
+  min-height: 0;
+  max-height: min(70vh, calc(var(--looky-app-height, 100%) - 24px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+/* 
+ * ======================================================================
+ *   ▼▼▼ 【新增】固定的放大镜图标样式 ▼▼▼
+ * ======================================================================
+ */
+.search-icon-fixed {
+    /* 1. 核心定位：使用绝对定位，相对于 .wb-body-wrapper */
+    position: absolute;
+    bottom: 25px; /* 距离父容器底部的间距 */
+    /* 2. 精准水平定位：计算位置使其在左侧边栏下方居中 */
+    /* 算法: 容器左内边距(12px) + 侧边栏宽度(85px)/2 - 图标自身宽度(60px)/2 */
+    left: calc(12px + 85px / 2 - 35px / 2);
+    /* 3. 外观样式 */
+    width: 35px;
+    height: 35px;
+    background-color: #1a1a1a; /* 使用和激活标签一致的深色，保持风格统一 */
+    color: white; /* SVG 图标颜色 */
+    border-radius: 50%; /* 变为圆形 */
+    border: none;
+    cursor: pointer;
+    
+    /* 4. Flex 布局使内部 SVG 完美居中 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 5. 添加阴影，营造悬浮感 */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    
+    /* 6. 【关键】设置层级，确保它在滚动列表的上方，不会被遮盖 */
+    z-index: 100; 
+    /* 7. 添加过渡效果，让交互更平滑 */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.search-icon-fixed:hover {
+    transform: translateY(-3px); /* 鼠标悬浮时轻微上移 */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+/* 调整 SVG 图标本身的大小 */
+.search-icon-fixed svg {
+    width: 18px;
+    height: 18px;
+}
+/* 
+ * ======================================================================
+ *   ▼▼▼ 【在这里添加以下代码】 ▼▼▼
+ * ======================================================================
+ */
+.wb-search-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 40px 15px 12px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+    
+    input[type="text"] {
+        flex-grow: 1;
+        height: 38px;
+        padding: 0 12px;
+        font-size: 15px;
+        border: none;
+        background-color: #f0f2f5;
+        border-radius: 10px;
+        &:focus {
+            outline: none;
+            background-color: #e8eaf0;
+        }
+    }
+    .wb-search-cancel-btn {
+        flex-shrink: 0;
+        background: none;
+        border: none;
+        font-size: 16px;
+        font-weight: 500;
+        color: #007aff;
+        cursor: pointer;
+        padding: 6px;
+    }
+}
+.page-header.search-mode-active {
+    .header-btn, .header-title {
+        opacity: 0;
+        pointer-events: none;
+    }
+    .wb-search-container {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+/* 
+ * ======================================================================
+ *   ▼▼▼ 【确保文件末尾有这些样式】 ▼▼▼
+ * ======================================================================
+ */
+/* 搜索结果项的高亮效果 */
+.world-book-item.highlight {
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 122, 255, 0.2);
+    border: 1.5px solid #007aff;
+}
+
+/* 扁平化搜索结果中，用于显示分类的元信息样式 */
+.world-book-item .item-meta {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+}
+
+/* ====================================================== */
+/* == 【恢复】极简黑白多选弹窗样式 (用于“添加世界书”的分类选择) == */
+/* ====================================================== */
+
+/* 弹窗卡片主体 */
+.minimal-dark-modal {
+  width: 90%;
+  max-width: 320px;
+  background-color: #1c1c1e; /* 深邃的黑色背景 */
+  color: #f2f2f7; /* 明亮的白色文字 */
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 1px solid #38383a;
+}
+
+.minimal-dark-modal .modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.minimal-dark-modal .modal-helper-text {
+  font-size: 0.8rem;
+  color: #8e8e93; /* 灰色辅助文字 */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 选项列表容器 */
+.minimal-dark-modal .selection-options-list {
+  max-height: 250px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: #555 #333;
+}
+
+/* 隐藏原生复选框 */
+.minimal-dark-modal .selection-options-list input[type="checkbox"] {
+  display: none;
+}
+
+/* 自定义复选框的标签样式 */
+.minimal-dark-modal .selection-options-list label {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  cursor: pointer;
+  border-bottom: 1px solid #38383a;
+  transition: background-color 0.2s ease;
+}
+.minimal-dark-modal .selection-options-list label:last-child {
+  border-bottom: none;
+}
+
+/* 自定义复选框的方框 */
+.minimal-dark-modal .selection-options-list .checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #8e8e93;
+  border-radius: 4px;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* 自定义复选框的对勾 SVG */
+.minimal-dark-modal .selection-options-list .checkbox-custom svg {
+  width: 14px;
+  height: 14px;
+  color: #fff;
+  stroke-width: 3;
+  opacity: 0; /* 默认隐藏 */
+  transform: scale(0.5);
+  transition: all 0.2s ease;
+}
+
+/* 当复选框被选中时的样式 */
+.minimal-dark-modal .selection-options-list input[type="checkbox"]:checked + .checkbox-custom {
+  background-color: #007aff; /* 蓝色高亮 */
+  border-color: #007aff;
+}
+.minimal-dark-modal .selection-options-list input[type="checkbox"]:checked + .checkbox-custom svg {
+  opacity: 1; /* 显示对勾 */
+  transform: scale(1);
+}
+
+/* 底部按钮 */
+.minimal-dark-modal .modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.minimal-dark-modal .btn {
+  flex: 1;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 12px;
+  border: none;
+}
+
+.minimal-dark-modal .btn-secondary {
+  background-color: #3a3a3c;
+  color: #f2f2f7;
+}
+
+.minimal-dark-modal .btn-danger {
+  background-color: #ae2a25; /* 更深沉的红色 */
+  color: #fff;
+}
+/* ====================================================== */
+/* == 【修正】挂载世界书弹窗样式 (白底黑字) == */
+/* ====================================================== */
+
+/* 弹窗卡片主体 */
+.light-selection-modal {
+  width: 90%;
+  max-width: 340px;
+  background-color: #f9f9f9;
+  color: #1c1c1e;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e8e8e8;
+}
+
+.light-selection-modal .modal-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.light-selection-modal .modal-helper-text {
+  font-size: 0.85rem;
+  color: #888;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 列表容器 */
+.light-selection-modal .mount-wb-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 5px;
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: #f0f0f0; }
+  &::-webkit-scrollbar-thumb { background: #ccc; }
+}
+
+/* 可折叠的分组 */
+.light-selection-modal .mount-wb-group {
+  margin-bottom: 10px;
+  &[open] > .mount-wb-group-title .chevron {
+    transform: rotate(90deg);
+  }
+}
+
+/* 分组标题 */
+.light-selection-modal .mount-wb-group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 5px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  list-style: none;
+  &::-webkit-details-marker {
+    display: none;
+  }
+  .chevron {
+    width: 16px;
+    height: 16px;
+    stroke: #aaa;
+    stroke-width: 2.5;
+    transition: transform 0.2s ease;
+  }
+}
+
+/* 分组下的条目列表 */
+.light-selection-modal .mount-wb-items {
+  padding-left: 10px;
+  border-left: 1px solid #e0e0e0;
+  margin-left: 5px;
+}
+
+/* 单个条目 */
+.light-selection-modal .mount-wb-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    display: none;
+  }
+
+  .checkbox-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      color: #fff;
+      stroke-width: 3;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s ease;
+    }
+  }
+  
+  span:last-child {
+    font-size: 0.95rem;
+    color: #1c1c1e;
+  }
+
+  input[type="checkbox"]:checked + .checkbox-custom {
+    background-color: #30d158;
+    border-color: #30d158;
+  }
+  
+  input[type="checkbox"]:checked + .checkbox-custom svg {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 底部按钮 */
+.light-selection-modal .modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.light-selection-modal .btn {
+  flex: 1;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 12px;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.light-selection-modal .btn-secondary {
+  background-color: #e5e5ea;
+  color: #1c1c1e;
+  &:hover { background-color: #dcdce0; }
+}
+
+.light-selection-modal .btn-primary {
+  background-color: #080808;
+  color: #fff;
+  &:hover { background-color: #0056b3; }
+}
+/* ========================================================== */
+/* == 【精修版】世界书在手机端的响应式微调 == */
+/* ========================================================== */
+@media (max-width: 600px) {
+  
+  /* --- 通用头部 --- */
+  .page-header {
+    padding: 10.25vw 3.84vw 3.07vw;
+    .header-title {
+      font-size: clamp(16px, 4.35vw, 17px);
+      padding: 0 2.56vw;
+    }
+    .header-btn {
+      padding: 2.05vw;
+      min-width: 10.25vw;
+    }
+  }
+
+  /* --- 列表页 --- */
+  #world-book-screen {
+    .wb-body-wrapper { padding: 3.07vw; gap: 3.07vw; }
+    .wb-category-sidebar {
+      flex-basis: 21.79vw;
+      border-radius: 4.1vw;
+      padding: 3.07vw 0;
+      gap: 2.56vw;
+    }
+    .tab-item {
+      max-width: 16.6vw;
+      padding: 2.05vw 3.07vw;
+      border-radius: 4.61vw;
+    }
+    .world-book-main-content {
+      border-radius: 4.1vw;
+      gap: 3.07vw;
+      #world-book-list { padding: 5.12vw; }
+    }
+    .wb-list-group-header {
+      margin: 5.12vw 0 2.56vw 0;
+      padding-bottom: 2.56vw;
+      &::after { width: 12.82vw; height: 0.51vw; }
+    }
+    .world-book-item {
+      border-radius: 3.58vw;
+      padding: 4.61vw;
+    }
+    .item-header { margin-bottom: 2.56vw; }
+    .item-title {
+      /* 【修改】将卡片标题字体彻底固定为 17px */
+      font-size: 17px;
+      padding-right: 2.56vw;
+    }
+  }
+
+  /* --- 搜索按钮和弹窗 (无字体修改) --- */
+  .search-icon-fixed {
+    bottom: 6.41vw;
+    left: calc(3.07vw + 21.79vw / 2 - 8.97vw / 2);
+    width: 8.97vw;
+    height: 8.97vw;
+    svg { width: 4.61vw; height: 4.8vw; }
+  }
+  .wb-search-container {
+    padding-top: 10.25vw;
+    input[type="text"] { height: 9.74vw; }
+  }
+}

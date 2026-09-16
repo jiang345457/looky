@@ -1,0 +1,2243 @@
+// 文件路径: styles/pages/_call.scss
+// 描述: 所有与语音/视频通话相关的界面样式，包括来电、通话中和菜单。
+
+// ======================================================================
+// === 【V2.1 视觉修缮版】AI 来电界面样式 (Incoming Call UI) ===
+// ======================================================================
+@keyframes breathing-glow {
+  0% {
+    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.2), 0 0 0px 0px rgba(255, 255, 255, 0.1) inset;
+  }
+  50% {
+    box-shadow: 0 0 20px 8px rgba(255, 255, 255, 0.4), 0 0 10px 2px rgba(255, 255, 255, 0.2) inset;
+  }
+  100% {
+    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.2), 0 0 0px 0px rgba(255, 255, 255, 0.1) inset;
+  }
+}
+
+.call-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20vw 8vw 15vw;
+  box-sizing: border-box;
+  color: white;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s 0.3s;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease;
+  }
+}
+
+.call-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(15px) brightness(0.3);
+  transform: scale(1.2);
+  z-index: -1;
+}
+
+.incoming-call-info {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+
+  img {
+    width: 25vw;
+    height: 25vw;
+    border-radius: 2vw;
+    border: none;
+    object-fit: cover;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    animation: breathing-glow 2.5s ease-in-out infinite;
+  }
+
+  h2 {
+    font-size: 6.4vw;
+    font-weight: 600;
+    margin: var(--space-sm) 0 0 0;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  }
+
+  p {
+    font-size: 4vw; // <-- 修改：缩小字体
+    opacity: 0.7;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    margin: 0;
+    margin-top: 2px; // <-- 修改：大幅减小与名字的间距
+  }
+}
+
+.incoming-call-actions {
+  position: absolute;
+  bottom: 12vh;
+  width: 100%;
+  padding: 0 10vw;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+// --- 【新增】接听/挂断按钮下的文字样式 ---
+.call-action-item > span {
+    color: white;
+    margin-top: var(--space-sm);
+    font-size: 3.5vw; // <-- 新增：定义文字大小
+}
+
+// --- 【新增】接听按钮的特殊样式 ---
+.call-action-btn.accept {
+  background-color: var(--c-accent-green);
+  &:active {
+    background-color: #25a25a; // 按下时颜色变深
+    transform: scale(0.95);
+  }
+}
+
+// --- 【新增】旋转挂断按钮中的图标 ---
+.call-action-btn.hang-up svg {
+  transform: rotate(135deg);
+}
+
+// ==========================================================================
+// === 【V-FINAL】语音通话界面最终正确样式 ===
+// ==========================================================================
+
+// --- 通话中界面 ---
+#page-voice-call {
+  background-color: #3e443a;
+  color: white;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0;
+  z-index: 150;
+}
+
+#voice-call-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(25px) brightness(0.6);
+  transform: scale(1.1);
+  z-index: -1;
+  opacity: 0.7;
+}
+
+// --- 顶部操作栏 ---
+.voice-call-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 44px var(--space-lg) 0;
+  flex-shrink: 0;
+}
+
+.call-header-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  opacity: 0.8;
+  svg {
+    width: 24px;
+    height: 24px;
+    stroke: white;
+    stroke-width: 2;
+    fill: none;
+  }
+}
+
+.voice-call-timer {
+  font-size: var(--font-md);
+  font-family: 'SF Mono', 'Courier New', Courier, monospace;
+}
+
+// --- 中间主要区域 ---
+.voice-call-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end; // 内容从底部开始堆叠
+  overflow: hidden;
+  padding: 0 var(--space-md);
+}
+
+.voice-call-char-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 40px;
+  margin-bottom: 15px;
+}
+
+#voice-call-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-xl);
+  object-fit: cover;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  margin-bottom: var(--space-xl);
+}
+
+#voice-call-name {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+#voice-call-status {
+  font-size: var(--font-sm);
+  color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 4px 12px;
+  border-radius: 12px;
+  margin: 0;
+}
+
+// --- 通话内消息列表 ---
+#voice-call-message-list {
+  position: relative;
+  flex-grow: 1;
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 12px);
+  overflow-y: auto;
+  background: transparent;
+  padding-bottom: var(--space-md);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+   // 【粘贴到这里】
+  // --- 通话内气泡的特定样式 ---
+
+  // 隐藏头像
+  .message-wrapper .chat-avatar-small {
+    display: none;
+  }
+ // ▼▼▼ 【修复：群聊语音通话中显示专属小头像】 ▼▼▼
+  &.is-group-call .message-wrapper.received {
+    .chat-avatar-small {
+      display: block; // 破除隐藏结界
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+      // 魔法布局：用 order 调换头像和气泡的先后顺序
+      order: 2; 
+      align-self: flex-end;
+      margin-left: -12px; // 向左拉，精准压在气泡右边界
+      margin-bottom: -6px; // 往下沉，挂在右下角
+    }
+    .message-bubble {
+      order: 1; // 气泡排在前面
+    }
+  }
+  // 接收到的消息 (白色毛玻璃)
+  .message-wrapper.received .message-bubble {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: white;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    
+    // 文字颜色需要覆盖 _message-bubble.scss 中的默认白色
+    p {
+       color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+  }
+  .message-translation {
+    color: #e3e3e3;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 12px 15px 8px;
+    margin-top: 2px;
+    font-size: 12px;
+    line-height: 1.45;
+    background: transparent;
+  }
+/* ====================================================================== */
+/* == 【V2.4 新增与隔离】通话中的加载动画 (Typing Indicator) == */
+/* ====================================================================== */
+
+// --- 通用动画定义 ---
+@keyframes typingBounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1.0);
+  }
+}
+
+// --- 1. 语音通话的加载动画 (小尺寸版) ---
+// 这段代码专门控制语音通话里那个变小后的动画
+ .voice-call-typing {
+  display: flex;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: flex-start; // 左对齐
+  padding: 5px 10px;         // 【修正】减小内边距
+  gap: 5px;                   // 【修正】减小点间距
+  background-color: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+
+  span {
+    height: 6px;                // 【修正】减小点的大小
+    width: 6px;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: block;
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite ease-in-out both;
+  }
+
+  span:nth-child(1) { animation-delay: -0.32s; }
+  span:nth-child(2) { animation-delay: -0.16s; }
+  span:nth-child(3) { animation-delay: 0s; }
+}
+
+
+// --- 2. 视频通话的加载动画 (横向布局版) ---
+// 这段代码专门控制视频通话里那个变成横向的动画
+@at-root #video-typing .typing-indicator {
+    display: flex;              // 【新增】设为 flex 布局，让它横过来
+    flex-direction: row;        // 【新增】强制横向排列
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;         // 合适的内边距
+    gap: 6px;                   // 点之间的间距
+    background-color: rgba(80, 80, 80, 0.4); // 使用视频通话的半透明背景
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+    
+    span {
+        width: 7px;               // 中等大小的点
+        height: 7px;
+        background: white;
+        border-radius: 50%;
+        margin: 0;
+        animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+    
+    span:nth-child(1) { animation-delay: -0.32s; }
+    span:nth-child(2) { animation-delay: -0.16s; }
+}
+
+
+
+
+// 将动画定义也放在这里，确保它一定会被加载
+@keyframes blink {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+}
+
+// --- 底部控制栏 ---
+.voice-call-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 0 var(--space-lg) calc(20px + env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+
+.voice-call-transcript-preview {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: left;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  max-height: 54px;
+  white-space: pre-wrap;
+}
+
+.voice-call-transcript-preview[hidden] {
+  display: none;
+}
+
+.voice-call-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+#voice-call-textarea {
+  flex-grow: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 10px 15px;
+  color: white;
+  font-size: 15px;
+  resize: none;
+  outline: none;
+  min-height: 20px;
+  max-height: 80px;
+  overflow-y: hidden;
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+#voice-call-send-btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background-color: var(--c-bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  svg {
+    stroke: var(--c-text-primary);
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.voice-call-actions-grid {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  transform: translateY(-5px);
+}
+
+.call-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 80px;
+  text-align: center;
+  span {
+    font-size: var(--font-xs);
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: var(--space-xs);
+    display: block;
+  }
+}
+
+.call-action-btn {
+  width: 18vw; // <-- 修改：缩小按钮尺寸
+  height: 18vw; // <-- 修改：缩小按钮尺寸
+  max-width: 70px;
+  max-height: 70px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s, transform 0.2s; // <-- 修改：增加 transform 过渡
+  
+&#toggle-mic-btn,
+&#toggle-speaker-btn,
+&.dark {
+  background-color: rgba(80, 80, 80, 0.8);
+}
+  &.hang-up {
+    background-color: var(--c-accent-red);
+  }
+  &:active {
+    filter: brightness(0.9);
+  }
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+#toggle-mic-btn svg { fill: #fff; }
+#toggle-mic-btn.is-listening {
+  background-color: var(--c-accent-green);
+  box-shadow: 0 0 0 5px rgba(76, 175, 80, 0.2), 0 2px 14px rgba(0, 0, 0, 0.18);
+}
+#toggle-speaker-btn svg { stroke: #fff; fill: #fff; }
+#hang-up-btn svg {
+  fill: #fff;
+}
+
+// ==========================================================================
+// === 通话功能弹出菜单样式 ===
+// ==========================================================================
+#call-menu-overlay {
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+    #call-menu-card {
+      transform: translateY(0);
+    }
+  }
+}
+
+#call-menu-card {
+  background-color: var(--c-bg-secondary);
+  width: 100%;
+  box-sizing: border-box;
+  border-top-left-radius: var(--radius-xl);
+  border-top-right-radius: var(--radius-xl);
+  padding: var(--space-xs);
+  padding-bottom: calc(var(--space-xs) + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.call-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  font-size: var(--font-md);
+  font-weight: 500;
+  color: var(--c-text-primary);
+  background-color: var(--c-bg-primary);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  &:not(.cancel) {
+    justify-content: flex-start;
+  }
+  &.cancel {
+    margin-top: var(--space-sm);
+  }
+  &:active {
+    background-color: var(--c-bg-tertiary);
+  }
+}
+
+.call-menu-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: var(--space-md);
+  fill: var(--c-text-primary);
+  stroke: var(--c-text-primary);
+  stroke-width: 2;
+}
+
+#video-call-btn .call-menu-icon { fill: none; }
+#voice-call-btn .call-menu-icon { stroke: none; }
+/* ========================================================== */
+/* == 【精修版】通话页面在手机端的响应式微调 == */
+/* ========================================================== */
+@media (max-width: 600px) {
+
+  /* --- 来电界面 --- */
+  .incoming-call-info p {
+    /* 【修改】来电提示语（如“AI语音来电...”）字体彻底固定为 14px */
+    font-size: 14px;
+    margin-top: 0.51vw; /* 2px */
+  }
+
+  /* --- 通话中界面 --- */
+  .voice-call-header { padding-top: var(--status-bar-height, 11.28vw); }
+  .call-header-btn {
+    padding: 2.05vw;
+    svg { width: 6.15vw; height: 6.15vw; }
+  }
+  .voice-call-main { padding: 0 var(--space-md); }
+  .voice-call-char-info { margin-top: 10.25vw; margin-bottom: 3.84vw; }
+  #voice-call-avatar {
+    width: 25.64vw;
+    height: 25.64vw;
+    margin-bottom: var(--space-xl);
+  }
+  #voice-call-name {
+    /* 【修改】大标题字体用 clamp() 严格控制在 22px-24px 之间 */
+    font-size: clamp(22px, 6.15vw, 24px);
+    margin-bottom: 2.05vw;
+  }
+  #voice-call-status { padding: 1.02vw 3.07vw; border-radius: 3.07vw; }
+
+  /* --- 输入框和按钮 --- */
+  .voice-call-footer {
+    gap: 3.84vw;
+    padding-bottom: calc(5.12vw + env(safe-area-inset-bottom));
+  }
+  .voice-call-input-container { gap: 2.56vw; }
+  #voice-call-textarea {
+    border-radius: 5.12vw;
+    padding: 2.56vw 3.84vw;
+    min-height: 5.12vw;
+    max-height: 20.51vw;
+  }
+  #voice-call-send-btn {
+    width: 11.28vw; height: 11.28vw;
+    svg { width: 5.64vw; height: 5.64vw; }
+  }
+  .call-action-item {
+    gap: 2.05vw;
+    width: 20.51vw;
+    span {
+      /* 【修改】底部按钮下方的文字（如“挂断”）彻底固定为 12px */
+      font-size: 12px;
+      margin-top: var(--space-xs); /* 使用变量间距 */
+    }
+  }
+  .call-action-btn svg { width: 7.17vw; height: 7.17vw; }
+  .call-menu-item { padding: 4.1vw; }
+}
+
+/* ====================================================================== */
+/* == 【V2.2 最终修正版】视频通话页面样式 (Video Call Page) == */
+/* ====================================================================== */
+#video-call-container {
+  background-color: #000;
+  flex-direction: column;
+  z-index: 150;
+  position: fixed; // 原来是 relative，iOS上会导致高度坍塌
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  // 在整体缩放模式里，尺寸必须跟随手机容器，不能再按真实视口计算
+  @supports not (height: 100dvh) {
+    height: 100%;
+  }
+  overflow: hidden;  
+  // 1. 背景画面层 (无变化)
+  .video-call-bg-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+  }
+
+  // 2. 自己的小窗
+  .local-view {
+    position: absolute;
+    // 【核心修正】强制上移：将 top 改为固定的 5vh (视口高度的5%)，不再依赖状态栏高度
+    top: 8vh; 
+    right: 15px;
+    width: 28vw;
+    height: 40vw;
+    max-width: 110px;
+    max-height: 156px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: #333;
+    z-index: 3;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    touch-action: none;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #111;
+    }
+  }
+  
+  // 3. 悬浮UI层
+  .video-call-overlay-ui {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    // 【核心修正】同步上移：顶部 padding 也改为 5vh，与小窗对齐
+    padding: 8vh 15px calc(20px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    pointer-events: none;
+  }
+
+  // 3.1 顶部信息 (参考图样式)
+  .video-call-top-info {
+    align-self: flex-start;
+    background-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    padding: 0;
+    color: white;
+    pointer-events: auto;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+
+    h2 {
+      // 【核心修正】显著加大字体
+      font-size: 24px; 
+      font-weight: 600;
+      margin: 0 0 5px 0;
+    }
+    span {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+  .video-call-timer-chip {
+      margin-top: 0;
+      background-color: rgba(0, 0, 0, 0.4); 
+      border-radius: 20px;
+      height: 32px;
+      box-sizing: border-box;
+      padding: 0 10px;
+      font-size: 13px;
+      font-family: 'SF Mono', monospace;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
+  // 3.2 底部交互区 (其余样式保持不变)
+  .video-call-bottom-controls {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    pointer-events: auto;
+
+    .video-call-input-wrapper {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border-radius: 22px;
+      padding: 5px;
+      padding-left: 15px;
+
+      input {
+        flex-grow: 1;
+        background: none;
+        border: none;
+        outline: none;
+        color: white;
+        font-size: 15px;
+        &::placeholder { color: rgba(255, 255, 255, 0.6); }
+      }
+
+      .video-call-send-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-left: 8px;
+        svg {
+          fill: rgb(0, 0, 0);
+          width: 20px;
+          height: 20px;
+          transform: rotate(-35deg) translateX(1px);
+        }
+      }
+    }
+
+    .video-call-main-actions {
+      display: flex;
+      justify-content: space-between; 
+      width: 100%;
+      max-width: 320px;
+    }
+    
+    .control-action-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+
+        .call-action-btn {
+            width: 64px;
+            height: 64px;
+            background-color: rgba(80, 80, 80, 0.6);
+            
+            svg { 
+              // 【核心修正】确保新图标颜色和大小正确
+              fill: white; 
+              width: 30px; 
+              height: 30px;
+            }
+            
+            &.hang-up {
+                background-color: #f85149;
+                svg { 
+                  transform: rotate(135deg); 
+                  // 挂断图标的尺寸通常比其他图标小一点，显得更精致
+                  width: 28px;
+                  height: 28px;
+                }
+            }
+
+            &.is-listening {
+                background-color: rgba(76, 175, 80, 0.9);
+                box-shadow: 0 0 0 5px rgba(76, 175, 80, 0.2);
+            }
+        }
+        span {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+    }
+  }
+}
+/* /styles/pages/_call.scss */
+
+/* ====================================================================== */
+/* == 【V2.3 新增】视频通话内消息列表 & 可拖拽窗口样式 == */
+/* ====================================================================== */
+
+#video-call-container {
+
+  // --- 可拖拽小窗的交互样式 ---
+  .local-view {
+    cursor: move; // 鼠标悬浮时显示为移动手势
+    // JS会动态改变 top 和 left，这里保持初始位置即可
+  }
+  // --- 视频通话内消息列表容器 ---
+  #video-call-message-list {
+    position: absolute;
+    
+    // 【核心修正】将 bottom 定位改为一个较小的值，主要靠 padding 撑开空间
+    bottom: calc(120px + env(safe-area-inset-bottom)); // 留出一点基础间距
+    top: 50%; 
+    left: 18px;
+    right: 18px;
+    z-index: 2; 
+    
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    
+    // 【新增】添加一个底部的 padding，数值约等于底部交互区的高度
+    padding-bottom: 55px; 
+    
+    -webkit-mask-image: linear-gradient(to top, black 85%, transparent 100%);
+    mask-image: linear-gradient(to top, black 85%, transparent 100%);
+    pointer-events: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    // --- 视频通话内的消息气泡特定样式 ---
+   .message-wrapper {
+      // 【核心修正】将最大宽度从 75% 增加到 85%
+      max-width: 85%;
+      // 隐藏头像 (保持不变)
+      .chat-avatar-small {
+        display: none;
+      }
+      
+      
+      // 统一设置气泡基础样式
+      .message-bubble {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: rgba(255, 255, 255, 0.95);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+ p {
+          padding: 8px 12px;
+          // 【核心修正】增加字体大小和行高，提升可读性
+          font-size: 16px;
+          line-height: 1.5;
+        }
+      }
+      
+      // 角色（对方）的气泡
+      &.received .message-bubble {
+        background-color: rgba(80, 80, 80, 0.4); // 半透明深灰色
+      }
+      
+      // 用户（自己）的气泡
+      &.sent .message-bubble {
+        background-color: rgba(80, 80, 80, 0.25); // 更浅的半透明深灰色
+      }
+    }
+  }
+}
+#video-call-container {
+  .video-call-bg-view img,
+  #group-video-grid img {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  #group-video-grid {
+    contain: layout paint style;
+  }
+
+  .video-call-overlay-ui {
+    background:
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0) 32%),
+      linear-gradient(to top, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0) 42%);
+  }
+
+  #video-call-message-list {
+    top: auto;
+    bottom: calc(180px + env(safe-area-inset-bottom));
+    max-height: 34dvh;
+    padding: 18px 2px 10px;
+    gap: 10px;
+    contain: layout paint style;
+    overscroll-behavior: contain;
+     -webkit-mask-image: none;
+     mask-image: none;
+
+    .message-wrapper.video-call-message {
+      width: fit-content;
+      max-width: min(88%, 340px);
+      contain: layout paint style;
+
+      &.sent {
+        align-self: flex-end;
+      }
+
+      &.received,
+      &.system {
+        align-self: flex-start;
+      }
+    }
+
+    .video-msg-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 100%;
+    }
+
+    .message-wrapper.sent .video-msg-container {
+      align-items: flex-end;
+    }
+
+    .message-wrapper.received .video-msg-container,
+    .message-wrapper.system .video-msg-container {
+      align-items: flex-start;
+    }
+
+    .message-bubble {
+      width: fit-content;
+      max-width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+
+      p {
+        margin: 0;
+        padding: 8px 12px;
+        font-size: 15px;
+        line-height: 1.45;
+        word-break: break-word;
+      }
+
+      &.spoken-content p {
+        font-weight: 650;
+      }
+    }
+
+    .message-wrapper.received .message-bubble {
+      background-color: rgba(80, 80, 80, 0.4);
+    }
+
+    .message-wrapper.sent .message-bubble {
+      background-color: rgba(80, 80, 80, 0.25);
+    }
+
+    .message-bubble .video-call-translation {
+      display: block;
+      width: auto;
+      box-sizing: border-box;
+      margin: 2px 12px 8px;
+      padding: 7px 0 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      color: #e3e3e3;
+      opacity: 0.92;
+      font-size: 12px;
+      line-height: 1.45;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.72);
+      word-break: break-word;
+    }
+  }
+
+  .video-call-transcript-preview {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 10px);
+    z-index: 4;
+    width: auto;
+    max-height: 48px;
+    margin: 0;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.56);
+  }
+}
+
+/* ====================================================================== */
+/* == 通话小窗 (Voice / Video) == */
+/* ====================================================================== */
+.global-call-widget {
+  position: fixed;
+  right: 12px;
+  top: 18%;
+  z-index: 260;
+  display: none;
+  align-items: flex-start;
+  pointer-events: auto;
+  width: 78px;
+  min-height: 78px;
+  box-sizing: border-box;
+  contain: layout style;
+  will-change: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+
+  &.is-compact {
+    .call-widget-panel {
+      display: none;
+    }
+  }
+
+  &.is-expanded {
+    .call-widget-compact {
+      display: none;
+    }
+  }
+
+  &[aria-hidden="true"] {
+    pointer-events: none;
+  }
+
+  .call-widget-compact {
+    width: 78px;
+    min-height: 78px;
+    position: relative;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 14px;
+    padding: 8px 7px 7px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    color: #1c1c1e;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+
+    .call-widget-compact-icon {
+      width: 24px;
+      height: 24px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: #475569;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      &.voice {
+        display: flex;
+      }
+    }
+
+    .call-widget-compact-label {
+      font-size: 12px;
+      line-height: 1.1;
+      color: #475569;
+      font-weight: 600;
+      text-align: center;
+      word-break: break-word;
+    }
+
+    .call-widget-compact-timer {
+      font-size: 9px;
+      line-height: 1;
+      color: #64748b;
+      font-family: 'SF Mono', 'Courier New', monospace;
+    }
+
+    .call-widget-compact-dot {
+      position: absolute;
+      right: 7px;
+      bottom: 7px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #ef4444;
+      border: 2px solid #fff;
+      box-sizing: border-box;
+      display: none;
+      pointer-events: none;
+
+      &[hidden] {
+        display: none !important;
+      }
+    }
+  }
+
+  &[data-mode="voice"] {
+    .call-widget-compact-dot {
+      display: block;
+    }
+  }
+
+  &[data-mode="video"] {
+    .call-widget-compact-icon.voice {
+      display: none;
+    }
+    .call-widget-compact-icon.video {
+      display: flex;
+
+      svg {
+        stroke: #475569;
+      }
+    }
+    .call-widget-compact-label {
+      color: #475569;
+    }
+  }
+
+  .call-widget-panel {
+    position: absolute;
+    top: 0;
+    left: auto;
+    right: auto;
+    width: min(92vw, 368px);
+    max-height: min(72vh, 560px);
+    border-radius: 16px;
+    padding: 8px 10px 10px;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &.edge-right {
+    .call-widget-panel {
+      right: calc(100% + 10px);
+      left: auto;
+      transform-origin: right top;
+    }
+  }
+
+  &.edge-left {
+    .call-widget-panel {
+      left: calc(100% + 10px);
+      right: auto;
+      transform-origin: left top;
+    }
+  }
+
+  &.edge-top {
+    .call-widget-panel {
+      top: calc(100% + 10px);
+      bottom: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      transform-origin: top center;
+    }
+  }
+
+  &.edge-bottom {
+    .call-widget-panel {
+      top: auto;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      transform-origin: bottom center;
+    }
+  }
+
+  &.is-dragging {
+    will-change: transform;
+    .call-widget-compact,
+    .call-widget-panel {
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      transition: none !important;
+    }
+
+    .call-widget-message-list {
+      overflow: hidden;
+      pointer-events: none;
+    }
+  }
+
+  .call-widget-drag-handle {
+    width: 36px;
+    height: 4px;
+    margin: 2px auto 0;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.12);
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .call-widget-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .call-widget-panel-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .call-widget-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #f2f2f2;
+  }
+
+  .call-widget-copy {
+    min-width: 0;
+    flex: 1;
+  }
+
+    .call-widget-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+  .call-widget-subtitle,
+  .call-widget-timer {
+    font-size: 11px;
+    color: #666;
+    white-space: nowrap;
+  }
+
+  .call-widget-message-list {
+    min-height: 168px;
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px 2px 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(71, 85, 105, 0.18) transparent;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.18);
+      border-radius: 999px;
+    }
+
+    .call-log-entry {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      max-width: 100%;
+    }
+
+    .call-log-entry.sent {
+      flex-direction: row-reverse;
+    }
+
+    .call-log-side {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .call-log-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #f2f2f2;
+      flex-shrink: 0;
+    }
+
+    .call-log-card {
+      flex: 1 1 auto;
+      min-width: 0;
+      padding: 8px 10px;
+      border-radius: 13px;
+      overflow: hidden;
+    }
+
+    .call-log-meta {
+      font-size: 9px;
+      letter-spacing: 0.02em;
+      margin-bottom: 3px;
+      color: #64748b;
+    }
+
+    .call-log-text {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .call-log-translation {
+      margin-top: 5px;
+      font-size: 9px;
+      line-height: 1.3;
+    }
+
+    .call-log-entry {
+      margin: 0;
+    }
+
+    .call-log-card {
+      background: rgba(246, 248, 250, 0.98);
+      border: 1px solid rgba(71, 85, 105, 0.08);
+      box-shadow: none;
+    }
+
+    .call-log-entry.sent .call-log-card {
+      background: rgba(240, 244, 248, 0.98);
+    }
+
+    .call-log-text,
+    .call-log-meta,
+    .call-log-translation {
+      color: #1f1f1f;
+      text-shadow: none;
+    }
+
+    .call-history-tts-btn {
+      background: rgba(71, 85, 105, 0.08);
+      color: #334155;
+    }
+
+    .call-widget-typing-wrapper {
+      display: flex;
+      justify-content: flex-start;
+      pointer-events: none;
+    }
+
+    .call-widget-typing {
+      display: flex;
+      flex-direction: row !important;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+      gap: 4px;
+      min-height: 28px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: rgba(71, 85, 105, 0.08);
+
+      span {
+        width: 5px;
+        height: 5px;
+        display: block !important;
+        flex: 0 0 5px;
+        background: #64748b;
+        animation: typingBounce 1.4s infinite ease-in-out both;
+      }
+    }
+  }
+
+  // 小窗复制的是 chat-ui.js 的通话消息节点，尺寸只在小窗内部缩小。
+  .call-widget-message-list .message-wrapper.in-call-history {
+    gap: 5px;
+    max-width: 100%;
+
+    .chat-avatar-small {
+      width: 24px;
+      height: 24px;
+      flex: 0 0 24px;
+    }
+
+    .message-bubble {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    .message-bubble p {
+      padding: 6px 9px;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .message-translation {
+      padding: 4px 8px 5px;
+      margin-top: 2px;
+      font-size: 9px;
+      line-height: 1.25;
+    }
+  }
+
+  .call-widget-panel-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .call-widget-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 2px;
+    padding: 10px 4px 0;
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  .call-widget-action-tools {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .call-widget-actions > .call-widget-btn {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 50%;
+  }
+
+  .call-widget-action-tools .call-widget-btn {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border-radius: 11px;
+    min-width: 0;
+  }
+
+  .call-widget-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .call-widget-input {
+    flex: 1;
+    height: 38px;
+    min-height: 38px;
+    max-height: 76px;
+    resize: none;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    background: rgba(248, 250, 252, 0.98);
+    color: #111;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    outline: none;
+    font-size: 13px;
+    line-height: 1.25;
+    overflow-y: auto;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  .call-widget-input-row,
+  .call-widget-panel {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .call-widget-send-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #334155;
+    color: #fff;
+    padding: 0;
+    flex-shrink: 0;
+
+    svg {
+      width: 17px;
+      height: 17px;
+      fill: currentColor;
+      transform: rotate(-35deg) translateX(1px);
+    }
+  }
+
+    .call-widget-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(71, 85, 105, 0.08);
+    color: #334155;
+    padding: 0;
+    flex-shrink: 0;
+
+    svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    &.hang-up {
+      background: #f85149;
+      color: #fff;
+
+      svg {
+        fill: currentColor;
+        stroke: none;
+      }
+    }
+
+    &.collapse {
+      background: rgba(71, 85, 105, 0.08);
+      color: #334155;
+    }
+
+    &.restore {
+      background: rgba(71, 85, 105, 0.08);
+      color: #334155;
+
+      svg {
+        stroke-width: 2.35;
+      }
+    }
+
+    &.regenerate {
+      background: rgba(71, 85, 105, 0.08);
+      color: #334155;
+    }
+
+    &.delete {
+      background: rgba(248, 81, 73, 0.1);
+      color: #c2413b;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .global-call-widget {
+    right: 10px;
+    top: auto;
+    bottom: calc(120px + env(safe-area-inset-bottom));
+
+    .call-widget-compact,
+    .call-widget-panel {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .call-widget-panel {
+      width: min(92vw, 320px);
+      max-height: min(70vh, 520px);
+    }
+
+    .call-widget-message-list {
+      min-height: 136px;
+      max-height: 224px;
+    }
+  }
+}
+
+.video-action-menu {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  min-width: 128px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(20, 20, 22, 0.94);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.video-action-menu-btn {
+  min-width: 64px;
+  height: 42px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: #f4f4f5;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.video-action-menu-btn.delete {
+  color: #ff6b6b;
+}
+
+.video-action-menu-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.14);
+  flex: 0 0 auto;
+}
+
+/* styles/pages/_call.scss */
+
+// --- 视频通话中的打字机动画 ---
+#video-typing {
+    margin-bottom: 10px;
+    
+    .typing-indicator {
+        display: flex;
+        flex-direction: row;  
+        align-items: center;
+        justify-content: center;
+        padding: 5px 10px;
+        border-radius: 20px;
+        
+        span {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+            
+            &:nth-child(1) { animation-delay: -0.32s; }
+            &:nth-child(2) { animation-delay: -0.16s; }
+        }
+    }
+}
+
+@keyframes typingBounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+// --- 视频通话记录弹窗 (强制深色高级模式) ---
+.modal-card.video-history-mode {
+    width: 90% !important;
+    max-width: 400px !important;
+    height: 80vh !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    border-radius: 24px;
+    overflow: hidden; 
+
+    // 头部样式
+    .call-history-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.5) !important; // 强制深色背景
+        backdrop-filter: blur(10px);
+        
+        h3 { 
+            color: rgba(255, 255, 255, 0.95) !important; // 强制白字
+        }
+        p { 
+            color: rgba(255, 255, 255, 0.7) !important; 
+        }
+    }
+    
+    // 内容区域透明
+    .modal-content {
+        background: transparent !important;
+        padding: 20px 15px;
+    }
+    
+    #call-history-message-list {
+        padding: 18px 14px 22px;
+        gap: 16px;
+    }
+
+    // --- 核心：消息气泡美化 (加强版) ---
+    .video-history-item {
+        margin-bottom: 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        width: 100%;
+        background: none !important; // 防止 wrapper 有背景色
+        border: none !important;
+        
+        // 1. 接收方（对方）：深黑磨砂
+        &.received {
+            justify-content: flex-start;
+            
+            .call-log-card {
+                // 【关键】强制覆盖白底
+                background-color: rgba(0, 0, 0, 0.6) !important; 
+                color: rgba(255, 255, 255, 0.9) !important;
+                border-radius: 14px;
+                border-top-left-radius: 5px;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            }
+        }
+        
+        // 2. 发送方（我）：浅白磨砂
+        &.sent {
+            justify-content: flex-end;
+            flex-direction: row-reverse;
+            
+            .call-log-card {
+                // 【关键】强制覆盖紫底/绿底
+                background-color: rgba(255, 255, 255, 0.15) !important; 
+                color: rgba(255, 255, 255, 0.95) !important;
+                border-radius: 14px;
+                border-top-right-radius: 5px;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                margin-left: auto;
+              }
+            
+            .call-log-side {
+                order: initial;
+            }
+        }
+        
+        // 3. 气泡通用重置
+        .call-log-card {
+            max-width: 80%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            line-height: 1.5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            
+            p { margin: 0; color: inherit !important; }
+        }
+
+        .call-log-side {
+            flex: 0 0 34px;
+            align-items: center;
+        }
+
+        .call-log-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            object-fit: cover;
+            filter: none;
+        }
+
+        .call-history-tts-btn {
+            width: 26px;
+            height: 26px;
+            margin-top: 6px;
+            border-radius: 50%;
+            color: #111;
+            background: rgba(255, 255, 255, 0.9);
+            border: 0;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+        }
+
+        .call-log-translation {
+            margin-top: 8px;
+            padding-top: 8px;
+            color: #e3e3e3;
+            border-top: 1px solid rgba(255, 255, 255, 0.14);
+        }
+    }
+    
+    // 底部样式
+    .call-history-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: blur(10px);
+    }
+}
+// ==========================================================================
+// === 【新增】群聊语音通话头像网格样式 ===
+// ==========================================================================
+.group-call-avatar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 70px;
+    animation: fadeIn 0.3s ease-in-out;
+
+    img {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        object-fit: cover;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        border: 2px solid transparent;
+        transition: border-color 0.2s;
+        
+        // 正在说话时边缘发光
+        &.speaking {
+            border-color: #34c759;
+            box-shadow: 0 0 15px rgba(52, 199, 89, 0.6);
+        }
+    }
+
+    span.name {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.85);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    }
+}
+
+// 供JS调用的横幅动画类
+#incoming-group-call-banner.show {
+    top: calc(env(safe-area-inset-top) + 15px) !important;
+}
+
+// ======================================================================
+// 通话设置与通话内快捷操作
+// ======================================================================
+.call-settings-modal-card {
+    width: min(92vw, 420px);
+    max-width: 420px;
+    max-height: min(82vh, 680px);
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#call-settings-overlay .call-settings-modal-card {
+    width: min(92%, 420px) !important;
+    max-width: 420px !important;
+}
+
+.call-settings-modal-card .notification-modal-close-btn,
+.call-quick-settings-card .notification-modal-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--c-text-secondary);
+    font-size: 20px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.call-settings-scroll {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: calc(82vh - 85px);
+    overflow-y: auto;
+    padding-right: 2px;
+}
+
+.call-settings-section {
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.call-settings-section .settings-item,
+.call-quick-settings-list .settings-item {
+    min-height: 48px;
+    padding: 0 16px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.call-settings-section .settings-item:last-child,
+.call-quick-settings-list .settings-item:last-child {
+    border-bottom: none;
+}
+
+.call-settings-section:last-child {
+    border-bottom: 0;
+}
+
+.call-audio-source-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 4px 16px 12px;
+}
+
+.call-audio-source-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid #ededed;
+    border-radius: 10px;
+    color: #333;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.call-audio-source-option.selected {
+    border-color: #111;
+    background: #f7f7f7;
+}
+
+.call-audio-source-option .selection-indicator {
+    width: 8px;
+    height: 8px;
+    border: 1px solid #bbb;
+    border-radius: 50%;
+}
+
+.call-audio-source-option.selected .selection-indicator {
+    border-color: #111;
+    background: #111;
+}
+
+.call-ambient-url-row {
+    display: flex;
+    gap: 8px;
+    margin: 0 16px 10px;
+}
+
+.call-ambient-url-row .styled-input {
+    min-width: 0;
+    margin: 0;
+}
+
+.call-ambient-url-row .btn {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+}
+
+.call-audio-preview-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 42px;
+    margin: 0 16px 8px;
+    color: #888;
+    font-size: 12px;
+}
+
+.call-audio-preview-row .preview-play-btn {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    padding: 0;
+    border: 1px solid #e3e3e3;
+    border-radius: 50%;
+    background: #f5f5f5;
+    color: #222;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    appearance: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.call-audio-preview-row .preview-play-btn:hover {
+    background: #ebebeb;
+    border-color: #cfcfcf;
+}
+
+.call-audio-preview-row .preview-play-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.call-range-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 6px;
+    color: #333;
+    font-size: 13px;
+}
+
+.call-range-row output {
+    color: #888;
+    font-variant-numeric: tabular-nums;
+}
+
+.call-settings-section > input[type="range"],
+.call-quick-settings-list > input[type="range"],
+.call-quick-settings-group > input[type="range"] {
+    display: block;
+    width: calc(100% - 32px);
+    margin: 0 16px 12px;
+    accent-color: #111;
+}
+
+.call-settings-note {
+    margin: 0 4px 4px;
+    color: #999;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.call-quick-settings-card {
+    width: min(86vw, 380px);
+    max-width: 380px !important;
+    padding-bottom: 10px;
+}
+
+.voice-call-only-setting[hidden] {
+    display: none !important;
+}
+
+.call-quick-settings-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.call-quick-settings-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.video-call-top-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.video-call-top-heading h2 {
+    min-width: 0;
+}
+
+#video-call-settings-btn-legacy {
+    display: none !important;
+}
+
+.video-call-settings-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.28);
+    color: #fff;
+    cursor: pointer;
+}
+
+.video-call-settings-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.video-call-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+#voice-call-message-list .message-wrapper.in-call-history,
+.global-call-widget .message-wrapper.in-call-history {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#voice-call-message-list .call-log-entry,
+.global-call-widget .call-log-entry {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#call-history-message-list .call-log-entry {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    align-items: flex-start;
+    column-gap: 8px;
+    row-gap: 8px;
+    width: 92%;
+    max-width: 92%;
+    box-sizing: border-box;
+}
+
+#call-history-message-list .call-log-side {
+    flex: 0 0 30px;
+    grid-column: 1;
+    grid-row: 1;
+}
+
+#call-history-message-list .call-log-card {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+#call-history-message-list .call-log-entry.sent {
+    grid-template-columns: minmax(0, 1fr) 30px;
+}
+
+.voice-call-description {
+    flex: 0 0 100%;
+    order: 3;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 92%;
+    margin: 2px auto 0;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.18);
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 11px;
+    line-height: 1.45;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+}
+
+#call-history-message-list .voice-call-description {
+    flex: initial;
+    order: initial;
+    grid-column: 2;
+    grid-row: 2;
+    max-width: none;
+    margin: 0;
+}
+
+#call-history-message-list .call-log-entry.sent .voice-call-description {
+    grid-column: 1;
+}
+
+#call-history-message-list .call-log-entry.sent .call-log-side {
+    grid-column: 2;
+}
+
+#call-history-message-list .call-log-entry.sent .call-log-card {
+    grid-column: 1;
+}
+

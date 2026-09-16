@@ -1,0 +1,184 @@
+// 文件路径: styles/layout/_page.scss
+// 描述: 应用内所有二级页面的通用布局，包括头部和内容区域。
+
+.app-page {
+  display: none; // 由 JS 控制显示
+  position: absolute;
+  top: var(--app-page-offset, 0px) !important;
+  left: 0;
+  width: 100%;
+  height: calc(100% - var(--app-page-offset, 0px)) !important;
+  background-color: transparent;
+  z-index: 50;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Native Android keeps the page frame anchored to the full WebView. Applying
+   the optional display offset as a transform avoids creating a blank strip at
+   the top by shrinking the page's layout height. */
+html.looky-native .app-page {
+  top: 0 !important;
+  height: 100% !important;
+  transform: translateY(var(--app-page-offset, 0px));
+}
+
+#page-couple-period,
+#page-couple-coupon {
+  min-height: calc(100dvh - var(--app-page-offset, 0px)) !important;
+  max-height: calc(100dvh - var(--app-page-offset, 0px)) !important;
+}
+/* ✅✅✅ 替换原本的 .app-header 代码 ✅✅✅ */
+.app-header {
+  /* 
+   * 【改为固定高度】
+   * 不再询问浏览器是否有刘海，不再使用 env()。
+   * 直接给 30px，这个高度刚好能放下普通手机的状态栏，
+   * 即使在游戏模式下没有状态栏，这个间距也就是普通的顶部留白，看着很舒服。
+   */
+  padding-top: 35px; 
+  padding-bottom: 10px; // 底部留一点点空隙即可
+  padding-left: var(--space-md);
+  padding-right: var(--space-md);
+  box-sizing: border-box;
+
+  /* --- 尺寸和布局 --- */
+  min-height: 50px; // 稍微减小一点最小高度，更紧凑
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  background-color: transparent;
+  z-index: 100;
+
+  /* --- 边框逻辑 (保持不变) --- */
+  .app-page:not([id^="page-settings"]):not(#page-chat):not(#page-dynamics):not(#page-profile) & {
+    border-bottom: 1px solid var(--c-border-light);
+  }
+}
+
+
+
+
+
+
+.app-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  margin: 0;
+}
+.app-content {
+  flex-grow: 1;
+  min-height: 0;
+  /* ✅ 修改 padding，底部增加安全距离防止被手机横条遮挡 */
+  padding: var(--space-lg);
+  padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
+  
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* 让苹果手机滚动更顺滑 */
+  display: flex;
+  flex-direction: column;
+  background-color: var(--c-bg-primary); // 默认背景色
+  background-size: cover;
+  background-position: center;
+}
+
+/* 👇👇👇 在这里插入这条针对 #page-dynamics 的特例 👇👇👇 */
+#page-dynamics .app-content {
+  background-color: #ffffff; /* 强制纯白背景 */
+}
+
+
+
+// --- 通用头部按钮 ---
+
+.header-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  line-height: 0;
+  position: absolute;
+}
+
+.back-button {
+  left: var(--space-md);
+
+  .back-button-icon-wrapper {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    stroke: #333;
+    stroke-width: 2.5;
+  }
+}
+
+#page-looky-pay .lp-header .back-button.header-button {
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#page-looky-pay .lp-header .back-button.header-button > svg {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: block;
+}
+/* ✅✅✅ 替换文件最底部的 @media 代码 ✅✅✅ */
+@media (max-width: 600px) {
+  .app-header {
+    /* 
+     * 手机端适配：
+     * 直接设为 8vw (大约是30px)，固定不变。
+     * 无论是否开启游戏模式，这个顶部距离永远锁死。
+     */
+    padding-top: 13vw; 
+    padding-bottom: 2.5vw;
+    min-height: 14vw; 
+  }
+
+  .back-button .back-button-icon-wrapper {
+    width: 5.64vw;
+    height: 5.64vw;
+  }
+
+  .header-button {
+    padding: 2.05vw;
+  }
+}
+/* ======================================================= */
+/* === ✅ 【终极解决方案】强制动态页面为纯白背景 === */
+/* ======================================================= */
+#page-dynamics .app-content {
+  /* 
+   * 1. 用 !important 覆盖 JS 添加的行内 background-image。
+   *    这是战胜 element.style 的唯一方法。
+   */
+  background-image: none !important;
+
+  /* 
+   * 2. 设置我们期望的纯白背景。
+   *    因为上一步解除了 _chat.scss 的绑定，这里可以放心设置。
+   */
+  background-color: #ffffff;
+}
+

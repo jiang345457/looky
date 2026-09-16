@@ -1,0 +1,5830 @@
+$life-bg: #F2F2F2;           
+$life-text-main: #000000;    
+$life-text-sub: #888888;
+#page-life {
+    #life-top-bar {
+    // 1. 调大顶栏尺寸
+    height: 90px;             // 设定一个较高的固定高度
+    padding-top: 40px;        // 留出上方状态栏的空间
+    padding-bottom: 10px;     // 增加底边距，让内容不要贴底
+    box-sizing: border-box;   // 确保内边距不会撑大盒子
+    
+    // 2. 布局对齐
+    display: flex;
+    align-items: flex-end;    // 让按钮和标题靠下方对齐
+    justify-content: center;  // 标题居中
+    // 3. 返回按钮微调 (防止它乱跑)
+    .back-button {
+      position: absolute;     // 绝对定位，固定在左侧
+      left: 16px;
+      bottom: 10px;           // 距离底部的位置
+      z-index: 2;
+    }
+    // 4. 新增的标题样式
+    .life-nav-title {
+      font-size: 17px;        // 字体大小
+      font-weight: 600;       // 字体加粗
+      color: #000000;         // 黑色字体
+      opacity: 0;             // 【关键】默认是透明的（看不见）
+      transition: opacity 0.3s ease; // 渐变动画
+      margin-bottom: 8px;     // 微调文字垂直位置
+    }
+    // 5. 当页面滑动后 (JS添加了.scrolled类名)
+    &.scrolled {
+      background-color: rgba(255, 255, 255, 0.98) !important; // 背景变白
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      
+      // 滑动后，让标题显示出来
+      .life-nav-title {
+        opacity: 1;           // 变成不透明（看见了！）
+      }
+    }
+  }
+  // 1. 页面容器
+  .app-content.life-content-container {
+    background-color: $life-bg;
+    // 上方留出 80px 给那个悬浮的返回按钮，避免太拥挤
+    padding: 80px 24px 40px; 
+    display: flex;
+    flex-direction: column;
+    gap: 32px; // 增加模块之间的呼吸感
+    min-height: 100vh; // 确保占满全屏高度
+  }
+  // 2. 艺术大标题区域
+  .life-art-header {
+    // 稍微做个入场动画效果（可选）
+    animation: fadeIn 0.8s ease-out;
+    .art-title {
+      font-family: 'Didot', 'Bodoni MT', 'Times New Roman', serif; 
+      font-size: 56px; // 再次加大字体，极大！
+      font-weight: 700;
+      color: $life-text-main;
+      margin: 0;
+      line-height: 0.9; // 紧凑行高
+      letter-spacing: -2px; 
+    }
+    
+    .art-subtitle {
+      font-family: -apple-system, sans-serif;
+      font-size: 13px;
+      color: $life-text-sub;
+      margin: 12px 0 0;
+      font-weight: 500;
+      letter-spacing: 2px; // 字间距拉宽
+      text-transform: uppercase;
+      opacity: 0.6;
+    }
+  }
+  // 4. 搜索框 (极简线条风)
+  .life-search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #000; // 黑色粗边框，波普艺术感
+    border-radius: 30px;    // 胶囊形
+    padding: 12px 16px;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+      stroke: #000;
+      margin-right: 10px;
+    }
+
+    input {
+      flex-grow: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 15px;
+      font-weight: 500;
+      color: #000;
+      &::placeholder { color: #aaa; font-weight: 400; }
+    }
+  }
+
+  // 5. 服务入口 (黑白实心图标)
+  .life-services-grid {
+    display: flex;
+    justify-content: space-between; // 两端对齐，自动计算间距
+    padding: 10px 4px;
+    
+    .service-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      
+      &:active { transform: scale(0.9); }
+    }
+
+    .service-icon {
+      width: 56px;
+      height: 56px;
+      background-color: #fff;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      // 关键：柔和的投影让它浮起来
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+      
+      svg {
+        width: 26px;
+        height: 26px;
+        color: #000; // 实心黑色
+      }
+    }
+    
+    .service-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #000;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  // 6. 状态小组件 (黑白卡片)
+  .life-dashboard-row {
+    display: flex;
+    gap: 16px;
+
+    .dashboard-card {
+      flex: 1;
+      background-color: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100px;
+
+      // 让天气卡片变黑，形成视觉反差
+      &.weather {
+        background-color: #000;
+        .info-title { color: #fff; }
+        .info-desc { color: rgba(255,255,255,0.7); }
+        .card-icon svg { stroke: #fff; }
+      }
+
+      .card-icon {
+        margin-bottom: 10px;
+        svg {
+          width: 24px;
+          height: 24px;
+          stroke: #000;
+        }
+      }
+
+      .card-info {
+        .info-title {
+          font-size: 16px;
+          font-weight: 700;
+          color: #000;
+          display: block;
+        }
+        .info-desc {
+          font-size: 12px;
+          color: #888;
+          margin-top: 4px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // 7. 推荐列表 (大图杂志风)
+  .life-feed-section {
+    .section-title {
+      font-family: 'Didot', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #000;
+      margin: 10px 0 16px;
+    }
+
+    .feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px; // 加大间距
+    }
+
+    .feed-item {
+      // 这是一个大图卡片布局
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      cursor: pointer;
+      
+      &:active { opacity: 0.8; }
+
+      .feed-img-box {
+        width: 100%;
+        height: 180px; // 大图高度
+        border-radius: 20px;
+        background-color: #ddd; // 灰色占位
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+        
+        svg { width: 40px; height: 40px; opacity: 0.3; }
+        
+        // 可以在这里加一个伪元素做遮罩
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.1));
+        }
+      }
+
+      .feed-content {
+        padding: 0 4px;
+
+        .shop-name {
+          font-size: 18px;
+          font-weight: 700;
+          color: #000;
+          margin-bottom: 6px;
+        }
+
+        .shop-tags {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 12px;
+          color: #666;
+          font-weight: 500;
+          
+          .tag {
+            // 简单的文字标签，不用背景块
+            &::after { content: '•'; margin-left: 8px; color: #ccc; }
+            &:last-child::after { content: ''; }
+          }
+          .dist { margin-left: auto; font-family: monospace; }
+        }
+
+        .shop-desc {
+          display: none; // 这种风格下，隐藏描述更简洁
+        }
+      }
+    }
+  }
+}
+/* --- 外卖页面样式 (强力修复版) --- */
+#page-life-food {
+    background-color: #F8F8F8;
+    position: relative;
+    z-index: 1; /* 建立新的层叠上下文 */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+  }
+
+/* 1. 顶部导航：极简紧凑版 */
+.food-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* 【修改】总高度减小到 50px，加上顶部避让其实并不高 */
+    height: 50px;         
+    padding-top: 35px;    /* 留给状态栏的空间 */
+    display: flex;
+    align-items: center;  /* 垂直居中 */
+    justify-content: center;
+    background: transparent; 
+    z-index: 100;
+    transition: all 0.3s ease;
+}
+
+.food-header-title {
+    font-weight: 600;
+    font-size: 16px;
+    opacity: 0;           
+    transform: translateY(5px);
+    transition: all 0.3s ease;
+    color: #000;
+}
+
+/* 滑动后的样式 */
+.food-header.scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+    /* 滑动后保持紧凑 */
+    padding-top: 35px; 
+    height: 50px;
+}
+.food-header.scrolled .food-header-title {
+    opacity: 1;
+    transform: translateY(0);
+}
+/* --- 修复：顶栏两侧按钮定位 --- */
+
+/* 1. 强制让左侧返回按钮固定在左下角 */
+.food-header .back-button {
+    position: absolute !important; /* 加权确保生效 */
+    left: 16px;
+    bottom: 10px; /* 距离底部的高度，保持垂直居中 */
+    z-index: 101;
+}
+
+/* 2. 新增：右侧加号按钮样式 */
+.food-add-btn {
+    position: absolute;
+    right: 16px;
+    bottom: 10px; /* 与返回按钮保持水平一致 */
+    background: transparent;
+    border: none;
+    padding: 4px; /* 增加一点点击范围 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000; /* 黑色图标 */
+    z-index: 101;
+}
+
+.food-add-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* 2. 内容容器 */
+.food-content-wrapper {
+    padding: 85px 16px 20px; 
+    flex: 1;        
+    overflow-y: auto !important; 
+    -webkit-overflow-scrolling: touch; 
+    overflow-x: hidden;
+    display: flex;       
+    flex-direction: column;
+}
+
+/* 顶部 Banner */
+.food-header-banner {
+    margin-bottom: 12px;
+    flex-shrink: 0;      /* 防止被压缩 */
+}
+.food-header-banner h2 {
+    font-family: 'Didot', serif;
+    font-size: 30px;     /* 稍微调小一点点让比例更协调 */
+    margin: 0;
+    color: #000;
+    line-height: 1.1;
+}
+.food-header-banner p {
+    font-size: 13px;
+    color: #888;
+    margin: 4px 0 0;
+    letter-spacing: 1px;
+}
+/* --- 新增：外卖搜索框样式 --- */
+.food-search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #000;   /* 黑色边框，保持生活页风格 */
+    border-radius: 30px;      /* 圆润造型 */
+    padding: 10px 16px;
+    margin-bottom: 20px;      /* 这里的间距很重要，推开下面的分类栏 */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+.food-search-bar svg {
+    width: 18px;
+    height: 18px;
+    stroke: #000;
+    margin-right: 10px;
+    opacity: 0.6;
+}
+.food-search-bar input {
+    flex-grow: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+    color: #000;
+    font-weight: 500;
+}
+.food-search-bar input::placeholder {
+    color: #aaa;
+}
+/* 3. 分类栏 (解决遮挡的核心) */
+.food-category-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    /* 【强力修复】强制占高，防止高度塌陷 */
+    min-height: 40px;    
+    padding: 2px 2px 10px 2px; /* 底部留白给滚动条/阴影 */
+    
+    /* 【强力修复】强制推开下方的瀑布流 */
+    margin-bottom: 20px; 
+    
+    /* 【强力修复】提高层级，压在瀑布流上面 */
+    position: relative;
+    z-index: 10;         
+    
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    flex-shrink: 0;      /* 禁止被压缩 */
+}
+.food-category-scroll::-webkit-scrollbar {
+    display: none; 
+}
+
+.cat-pill {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 18px; /* 稍微圆润一点 */
+    font-size: 12px;     /* 字体精致一点 */
+    font-weight: 500;
+    color: #555;
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    transition: all 0.2s;
+    /* 确保每个按钮都有高度 */
+    height: fit-content; 
+}
+.cat-pill.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* 4. 瀑布流布局 */
+.food-masonry-grid {
+    column-count: 2;
+    column-gap: 12px;
+    width: 100%;
+    /* 【强力修复】降低层级，确保不遮挡上面 */
+    position: relative;
+    z-index: 1;
+}
+
+.food-card {
+    /* 防止卡片内部断裂 */
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    /* 解决部分浏览器渲染重叠问题 */
+    transform: translateZ(0); 
+}
+
+.card-img {
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+.delivery-time {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+}
+.card-info { padding: 10px; }
+.card-info h3 { font-size: 14px; margin: 0 0 4px; color: #333; }
+.card-meta { display: flex; justify-content: space-between; font-size: 12px; color: #888; }
+.card-meta .star { color: #ff9500; font-weight: 600; }
+/* 新增：悬浮购物车样式 */
+.food-floating-cart {
+    position: fixed;       /* 固定定位，悬浮在屏幕上 */
+    bottom: 30px;          /* 距离底部 30px */
+    right: 20px;           /* 距离右侧 20px */
+    width: 50px;           /* 宽度 */
+    height: 50px;          /* 高度 */
+    background-color: #000;/* 黑底 */
+    color: #fff;           /* 白图标 */
+    border-radius: 50%;    /* 圆形 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); /* 阴影 */
+    z-index: 200;          /* 层级很高，防止被遮挡 */
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:active { transform: scale(0.9); } /* 点击时的缩放效果 */
+
+    svg { width: 24px; height: 24px; } /* 图标大小 */
+
+    /* 红色小红点 */
+    .cart-badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        background: #ff3b30;
+        color: #fff;
+        font-size: 10px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        border: 2px solid #fff;
+    }
+}
+/* ======================================================================
+   ▼▼▼ 【新增】商品详情弹窗样式 ▼▼▼
+   ====================================================================== */
+#food-detail-modal-overlay {
+  position: fixed !important; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100dvh; 
+  z-index: 2000;
+  align-items: flex-end; 
+  pointer-events: none; 
+  &.visible {
+    pointer-events: auto; 
+    .food-detail-card {
+      transform: translateY(0); 
+    }
+  }
+}
+
+.food-detail-card {
+  width: 100%;
+  max-width: 100%;
+  height: 85vh; // 占据屏幕85%的高度
+  margin: 0;
+  padding: 0;
+  background-color: #F8F8F8;
+  border-radius: 20px 20px 0 0; // 只有顶部是圆角
+  box-shadow: 0 -5px 30px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%); // 默认藏在屏幕下方
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  position: relative;
+}
+// 可滚动的内容区
+.food-detail-scroll-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  background-color: #fff; /* 新增：把滚动区的背景也变成白色 */
+}
+
+// 商品大图
+.food-detail-image {
+  width: 100%;
+  height: 250px;
+  background-size: cover;
+  background-position: center;
+  background-color: #E0E0E0; // 占位背景色
+}
+
+// 商品信息区
+.food-detail-content {
+  padding: 20px;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  margin-top: -20px; // 向上覆盖图片底部，形成圆角效果
+  position: relative;
+  z-index: 2;
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 10px 0;
+  }
+  
+  .detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 16px;
+    
+    .star { color: #ff9500; font-weight: 600; }
+  }
+  
+  .detail-price {
+    margin-bottom: 24px;
+    color: #d93025;
+    .price-symbol { font-size: 16px; font-weight: 500; }
+    .price-value { font-size: 28px; font-weight: 700; }
+  }
+  
+  .detail-description {
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+    h4 { font-size: 15px; margin: 0 0 8px 0; font-weight: 600; }
+    p { font-size: 14px; color: #555; line-height: 1.6; margin: 0; }
+  }
+}
+
+// 底部操作栏
+.food-detail-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); // 适配iPhone底部安全区
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+
+  .price-summary {
+    color: #d93025;
+    font-weight: 700;
+    font-size: 14px;
+    
+    strong { font-size: 22px; margin-left: 2px; }
+  }
+  
+  .add-to-cart-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+// 关闭按钮
+.food-detail-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.4);
+  color: #fff;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 5;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* ======================================================================
+   ▼▼▼ 【新增】添加商品弹窗样式 ▼▼▼
+   ====================================================================== */
+#add-food-modal-overlay {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100dvh;
+  z-index: 2000;
+  align-items: flex-end;
+  pointer-events: none;  
+  &.visible {
+    pointer-events: auto;
+    .add-food-card {
+      transform: translateY(0);
+    }
+  }
+}
+.add-food-card {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 90vh;
+  margin: 0;
+  padding: 0;
+  background-color: #F8F8F8;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.add-food-header {
+  padding: 16px 20px;
+  text-align: center;
+  position: relative;
+  flex-shrink: 0;
+  border-bottom: 1px solid #f0f0f0;
+h3 { margin: 0; font-size: 16px; font-weight: 600; color: #000; }
+  
+  .close-btn {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #e9e9eb;
+    border: none;
+    color: #8a8a8e;
+    font-size: 24px;
+    cursor: pointer;
+    /* ▼▼▼ 新增下面三行，让叉号居中 ▼▼▼ */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.add-food-content {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  label { font-size: 14px; font-weight: 500; color: #555; }
+  
+  input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 15px;
+    outline: none;
+    box-sizing: border-box;
+    &:focus { border-color: #000; }
+  }
+  textarea { resize: vertical; }
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  .form-group { flex: 1; }
+}
+
+.image-upload-box {
+  width: 100%;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background-color: #f0f0f0;
+
+  #image-upload-placeholder {
+    display: flex; flex-direction: column; align-items: center; gap: 8px; color: #888;
+    svg { width: 32px; height: 32px; stroke: #aaa; }
+  }
+  
+  #add-food-image-preview {
+    position: absolute;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: none; // 默认隐藏
+  }
+}
+
+.add-food-footer {
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  
+  .save-btn {
+    width: 100%;
+    padding: 14px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+
+/* 新增的次级按钮样式 */
+.action-btn-sub {
+    color: #fff;            /* 白色文字 */
+    border: none;           /* 无边框 */
+    border-radius: 16px;    /* 圆角稍微小一点 */
+    padding: 10px 14px;     /* 内边距小一点，显得精致 */
+    font-size: 13px;        /* 字体小一点 */
+    font-weight: 600;       /* 字体加粗 */
+    cursor: pointer;
+    white-space: nowrap;    /* 防止文字换行 */
+    transition: transform 0.1s;
+}
+/* 点击时的缩放效果 */
+.action-btn-sub:active {
+    transform: scale(0.95);
+}
+/* ======================================================================
+   ▼▼▼ 【新增】购物车弹窗样式 ▼▼▼
+   ====================================================================== */
+#cart-modal-overlay {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100dvh;
+  z-index: 2000;
+  align-items: flex-end;  
+  &.visible {
+    .cart-modal-card { transform: translateY(0); }
+  }
+}
+.cart-modal-card {
+  width: 100%;
+  max-width: 100% !important; 
+  margin: 0 !important;       
+  max-height: 90vh;  
+  min-height: 70vh; 
+  background-color: #fff;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  padding: 0; 
+}
+
+.cart-header {
+  padding: 16px 20px;
+  background: #F8F8F8;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  
+  h3 { margin: 0; font-size: 16px; color: #333; }
+  .clear-btn {
+    border: none; background: transparent; color: #999; font-size: 12px;
+    display: flex; align-items: center; gap: 4px; cursor: pointer;
+  }
+}
+
+.cart-list-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px 20px;
+  min-height: 150px;
+}
+
+.cart-empty-state {
+    text-align: center; color: #ccc; margin-top: 40px; font-size: 14px;
+}
+
+/* 单个商品行样式 */
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f9f9f9;
+  
+  .item-info {
+    h4 { margin: 0; font-size: 15px; color: #333; font-weight: 500; }
+    span { font-size: 13px; color: #d93025; font-weight: 600; margin-top: 2px; display: block;}
+  }
+  .item-controls {
+    display: flex; align-items: center; gap: 12px; /* 【修改】间距稍微拉大一点 */
+    
+    button {
+      /* ▼▼▼ 【修改】按钮变大，手指更好按 ▼▼▼ */
+      width: 32px; 
+      height: 32px; 
+      /* ▲▲▲ 修改结束 ▲▲▲ */
+      
+      border-radius: 50%; border: 1px solid #ddd;
+      background: #fff; color: #333; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 18px; line-height: 1; /* 字体也稍微改大 */
+      &.btn-add { background: #000; color: #fff; border: none; }
+    }
+    .count { font-size: 16px; font-weight: 600; min-width: 20px; text-align: center;}
+  }
+}
+
+.cart-footer {
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid #eee;
+  display: flex; justify-content: space-between; align-items: center;
+  
+  .cart-total-info {
+    display: flex; align-items: baseline; gap: 6px;
+    span { font-size: 13px; color: #666; }
+    .price { font-size: 24px; font-weight: 700; color: #333; }
+  }
+  
+  .pay-btn {
+    background: #000; color: #fff; border: none; padding: 12px 30px;
+    border-radius: 30px; font-size: 15px; font-weight: 600;
+  }
+}
+
+/* ======================================================================
+   ▼▼▼ 【新增】结算选择弹窗样式 ▼▼▼
+   ====================================================================== */
+#pay-method-modal-overlay {
+  align-items: center; /* 居中显示 */
+  justify-content: center;
+}
+
+.pay-method-card {
+  width: 85%;
+  max-width: 340px;
+  background: #fff;
+  border-radius: 24px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pay-hint {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  margin: 10px 0 25px 0;
+}
+
+#pay-options-wrapper {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.pay-option-btn {
+  flex: 1;
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pay-option-btn:active {
+  transform: scale(0.96);
+  background: #f0f0f0;
+}
+
+.pay-option-btn .solid-icon {
+  width: 48px;
+  height: 48px;
+  background: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.pay-option-btn .solid-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.pay-option-btn span {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.pay-option-btn .sub-text {
+  font-size: 11px;
+  color: #999;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+/* 角色列表样式 */
+#pay-char-list-wrapper {
+  animation: fadeIn 0.3s ease;
+}
+
+.char-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 15px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.back-to-options {
+  position: absolute;
+  left: 0;
+  color: #007aff;
+  cursor: pointer;
+}
+
+.pay-char-list {
+  max-height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pay-char-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+.pay-char-item:active { background: #e0e0e0; }
+
+.pay-char-item img {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+}
+
+.pay-char-item span {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+/* ======================================================================
+   ▼▼▼ 【新增/修改】修复结算弹窗头部和关闭按钮样式 ▼▼▼
+   ====================================================================== */
+/* 1. 优化弹窗头部的布局，让标题和按钮左右对齐 */
+.pay-method-card .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;       
+  margin-bottom: 5px;         
+  position: relative;          
+  padding-bottom: 15px;          
+  border-bottom: 1px solid #f5f5f5; 
+}
+
+/* 2. 强制标题居中 */
+.pay-method-card .modal-header h3 {
+  flex: 1;              
+  text-align: center;    
+  margin: 0;           
+  font-size: 17px;    
+  font-weight: 600;  
+  color: #000;         
+}
+
+/* 3. 美化关闭按钮  */
+#pay-method-close-btn {
+  position: absolute; 
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) translateY(-7px); 
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;  
+  background-color: #f2f2f2;
+  border: none;            
+  color: #999;              
+  font-size: 20px;
+  line-height: 1;    
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s;  
+}
+#pay-method-close-btn:active {
+  background-color: #e0e0e0; 
+  color: #333;         
+  transform: translateY(-50%) translateY(-7px) scale(0.9); 
+}
+
+/* ======================================================================
+   ▼▼▼ 【新增】商品规格弹窗样式 ▼▼▼
+   ====================================================================== */
+#food-specs-modal-overlay {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100dvh;
+  z-index: 2001; 
+  align-items: flex-end;
+  
+  &.visible {
+    .specs-card { transform: translateY(0); }
+  }
+}
+
+.specs-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.specs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+
+  .specs-food-info {
+    display: flex;
+    gap: 12px;
+    
+    img {
+      width: 80px; height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #eee;
+    }
+    .info-text {
+      display: flex; flex-direction: column; justify-content: space-between;
+      h3 { font-size: 16px; margin: 0; color: #333; font-weight: 600; }
+      .price { color: #d93025; font-size: 14px; font-weight: 600; span { font-size: 20px; } }
+    }
+  }
+  
+  .close-btn {
+    background: #f5f5f5; border: none; width: 24px; height: 24px;
+    border-radius: 50%; color: #999; font-size: 18px; line-height: 1;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+}
+
+.specs-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+
+  .specs-group {
+    margin-bottom: 20px;
+    .group-title { font-size: 14px; color: #666; margin-bottom: 10px; }
+    
+    .specs-tags {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      
+      .spec-tag {
+        padding: 8px 16px;
+        background: #f5f5f5;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #333;
+        cursor: pointer;
+        border: 1px solid transparent;
+        
+        &.active {
+          background: #fff8e1; /* 浅黄色背景 */
+          color: #b87a00;      /* 深黄色文字 */
+          border-color: #ffd54f;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+.specs-footer {
+  .confirm-btn {
+    width: 100%;
+    padding: 14px;
+    background: #000; /* 黑色按钮 */
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    &:active { transform: scale(0.98); }
+  }
+}
+/* ====================================================== */
+/* == 【新增】行程页面 (#page-life-ride) 样式 == */
+/* ====================================================== */
+#page-life-ride {
+  .ride-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    padding-top: env(safe-area-inset-top, 20px);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    z-index: 10;
+
+    .back-button, .ride-history-btn {
+      position: absolute;
+      bottom: 10px;
+      color: #000;
+    }
+    .back-button {
+      left: 16px;
+    }
+    .ride-history-btn {
+      right: 16px;
+      svg { width: 22px; height: 22px; }
+    }
+
+    .ride-header-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &.scrolled {
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      .ride-header-title {
+        opacity: 1;
+      }
+    }
+  }
+  .ride-content-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    background-image: url('../images/map-light.png') !important; 
+    background-size: auto 55% !important; 
+    background-position: top center !important;  
+    background-repeat: no-repeat !important;
+    background-color: #e5e5e7 !important; // 兜底背景色
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; 
+  }
+  .ride-booking-sheet {
+    background: rgba(249, 249, 253, 0.85); // 半透明材质
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px 24px 0 0;
+    padding: 12px 20px calc(20px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .sheet-handle {
+    width: 40px;
+    height: 5px;
+    background-color: rgba(0,0,0,0.15);
+    border-radius: 2.5px;
+    margin: 0 auto;
+    flex-shrink: 0;
+  }
+
+  .ride-nav-tabs {
+    display: flex;
+    background-color: rgba(118, 118, 128, 0.12);
+    border-radius: 10px;
+    padding: 3px;
+    
+    .ride-tab-item {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      transition: all 0.3s;
+      
+      &.active {
+        background-color: #fff;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.12), 0 3px 1px rgba(0,0,0,0.04);
+        color: #000;
+      }
+    }
+  }
+
+  .ride-tab-content {
+    .tab-pane {
+      display: none;
+      &.active {
+        display: block;
+        animation: fadeIn 0.4s;
+      }
+    }
+  }
+
+  .pane-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    text-align: center;
+  }
+
+  .car-options-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .car-option-card {
+    flex: 1;
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 16px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    .car-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      svg {
+        width: 24px;
+        height: 24px;
+        fill: #333; // 纯色图标
+      }
+    }
+    
+    .car-name { font-size: 14px; font-weight: 600; }
+    .car-count { font-size: 11px; color: #999; }
+    .car-price { font-size: 16px; font-weight: 700; margin-top: 4px; }
+
+    &.selected {
+      background-color: #fff;
+      transform: translateY(-8px);
+      border-color: transparent;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      .car-icon { background-color: #000; svg { fill: #fff; } }
+      .car-price { color:#f5b639; }
+    }
+  }
+
+  .trip-details-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+    
+    .divider {
+      width: 4px; height: 4px;
+      background-color: #ccc;
+      border-radius: 50%;
+    }
+  }
+
+  .booking-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    
+    .action-time-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      border: 1px solid #e5e5e5;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      svg { width: 22px; height: 22px; color: #333; }
+    }
+
+    .action-book-btn {
+      flex-grow: 1;
+      height: 52px;
+      border: none;
+      background-color: #000;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 16px;
+    }
+  }
+}
+/* ====================================================== */
+/* == 【新增】行程预订弹窗样式 & 地图图钉 == */
+/* ====================================================== */
+
+/* 1. 地图上的随机图钉 */
+.map-pin-marker {
+  position: absolute;
+  z-index: 1; /* 在背景图之上，但在底部面板之下 */
+  width: 32px;
+  height: 32px;
+  // 使用纯色 SVG 图标作为背景
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='%23EA4335' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); // 给图钉加点投影，更有立体感
+  transform: translate(-50%, -100%) scale(0); // 默认缩小(用于动画)
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); // 弹跳动画曲线
+  
+  &.visible {
+    transform: translate(-50%, -100%) scale(1);
+  }
+}
+
+/* 2. 预订弹窗样式 */
+.ride-book-card {
+  width: 90%;
+  max-width: 340px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+
+  .modal-header {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    border-bottom: 1px solid #f5f5f5;
+    
+    h3 { margin: 0; font-size: 17px; font-weight: 600; color: #000; }
+    .modal-close-btn {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      background: #f2f2f2; width: 28px; height: 28px; border-radius: 50%;
+      border: none; color: #999; display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+  }
+
+  .modal-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* 输入框 */
+  .ride-input-group {
+    display: flex;
+    align-items: center;
+    background: #f7f7f7;
+    padding: 12px 16px;
+    border-radius: 12px;
+    
+    .input-icon-dot {
+      width: 8px; height: 8px; border-radius: 50%; margin-right: 12px;
+      &.green { background-color: #34c759; box-shadow: 0 0 0 2px rgba(52, 199, 89, 0.2); }
+    }
+    input {
+      border: none; background: transparent; width: 100%; outline: none;
+      font-size: 15px; color: #000; font-weight: 500;
+      &::placeholder { color: #aaa; }
+    }
+  }
+
+  /* 类型切换 */
+  .ride-type-switch {
+    display: flex;
+    background: #f7f7f7;
+    padding: 4px;
+    border-radius: 12px;
+    
+    .type-btn {
+      flex: 1; padding: 8px; border: none; background: transparent;
+      border-radius: 8px; font-size: 13px; color: #888; font-weight: 500;
+      transition: all 0.2s; cursor: pointer;
+      
+      &.active {
+        background: #fff; color: #000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+    }
+  }
+
+  /* 选项网格 */
+  .ride-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 两列 */
+    gap: 10px;
+  }
+
+  .ride-option-chip {
+    padding: 12px;
+    border: 1px solid #eee;
+    background: #fff;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #333;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &:hover { border-color: #ccc; }
+    &.active {
+      border-color: #000;
+      background: #000;
+      color: #fff;
+    }
+    
+    /* 自定义输入的小样式 */
+    &.is-input { padding: 0; overflow: hidden; display: flex; }
+    input.custom-time-input {
+      width: 100%; height: 100%; border: none; text-align: center;
+      outline: none; font-size: 13px;
+      background: transparent; color: inherit;
+    }
+  }
+
+  /* 4. 见面选项 (美化版) */
+  .ride-meet-container {
+    background-color: #f0f7ff; /* 淡蓝色背景，突出显示 */
+    border: 1px solid #dbeafe; /* 淡淡的边框 */
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .ride-meet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .meet-label {
+        font-size: 15px; 
+        font-weight: 600; 
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    }
+
+    .ride-meet-hint {
+      margin: 0;
+      font-size: 11px;
+      color: #7d8fa9; /* 稍微深一点的灰蓝色文字 */
+      line-height: 1.4;
+      text-align: left;
+    }
+  }
+
+
+  .modal-footer {
+    padding: 16px 24px 24px;
+    border-top: none;
+  }
+}
+/* ====================================================== */
+/* == 【新增】行程流程样式 (加载 & 行程单) == */
+/* ====================================================== */
+
+/* 1. 寻找司机加载动画 */
+.finding-loader {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #000; /* 黑色转圈 */
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 2. 行程确认单样式 */
+.driver-info-card {
+  background-color: #f9f9f9;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+  
+  .driver-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+    
+    .plate-number {
+      font-size: 18px;
+      font-weight: 700;
+      color: #000;
+      background-color: #ffda44; /* 车牌黄底 */
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .car-type {
+      font-size: 13px;
+      color: #666;
+    }
+  }
+  
+  .driver-detail {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .avatar-placeholder {
+      width: 40px; height: 40px;
+      background-color: #ddd;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #666; font-weight: 600;
+    }
+    .text {
+      .name { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 2px; }
+      .star { color: #f5a623; font-size: 12px; margin-left: 4px; }
+      .sub { font-size: 12px; color: #999; }
+    }
+  }
+}
+
+.trip-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  
+  .trip-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    .label { font-size: 12px; color: #888; }
+    .value { 
+      font-size: 18px; font-weight: 700; color: #000;
+      &.big { font-size: 24px; color: #007aff; } /* 预计到达时间用蓝色大字 */
+    }
+  }
+}
+/* ====================================================== */
+/* == 【升级】行程确认单 UI (高级感) == */
+/* ====================================================== */
+
+/* 1. 顶部车辆展示区 (Hero Area) */
+/* 1. 顶部车辆展示区 (Hero Area) - 放大版 */
+.ride-confirm-hero {
+  position: relative;
+  background: linear-gradient(to bottom, #f3f4f6 0%, #ffffff 100%);
+  /* 增加高度，给大车留空间 */
+  padding: 40px 0 50px; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #f0f0f0;
+  overflow: visible; /* 允许图片稍微超出一点 */
+}
+.vehicle-image-wrapper {
+  /* 宽度加大 */
+  width: 260px; 
+  /* 高度加大 */
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 负边距调整，让车轮压在下面的车牌上，更有层次感 */
+  margin-bottom: -25px; 
+  z-index: 1;
+  /* 增加一个入场动画，车子从旁边滑入 */
+  animation: slideInCar 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.vehicle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* 投影加深，增强悬浮感 */
+  filter: drop-shadow(0 15px 25px rgba(0,0,0,0.25)); 
+  transform: scale(1.2); /* 简单粗暴：直接放大1.2倍 */
+}
+@keyframes slideInCar {
+  from { transform: translateX(50px) scale(0.8); opacity: 0; }
+  to { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+/* 车牌胶囊 */
+.plate-capsule {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  z-index: 2; /* 在车上面 */
+  letter-spacing: 1px;
+}
+
+/* 2. 司机与行程信息卡片 */
+.ride-info-card {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  padding: 10px 0;
+}
+
+/* 左侧司机 */
+.driver-profile {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.driver-avatar-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #333; /* 深色背景 */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.driver-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #000;
+}
+
+.star-badge {
+  font-size: 10px;
+  background-color: #fff4d6;
+  color: #f5a623;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.car-model {
+  font-size: 12px;
+  color: #888;
+}
+
+/* 中间分割线 */
+.vertical-divider {
+  width: 1px;
+  height: 30px;
+  background-color: #eee;
+  margin: 0 16px;
+}
+
+/* 右侧 Meta 信息 */
+.trip-meta-info {
+  display: flex;
+  gap: 16px;
+  text-align: right;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  
+  .label { font-size: 10px; color: #999; }
+  .value { font-weight: 700; color: #000; }
+  
+  .value.time { font-size: 16px; color: #fdb43e; } /* 蓝色时间 */
+  .value.price { font-size: 16px; }
+}
+/* ====================================================== */
+/* == 【更新】行程胶囊样式 (头像 + 关闭按钮) == */
+/* ====================================================== */
+.ride-status-capsule {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%; /* 稍微加宽一点，容纳按钮 */
+  max-width: 350px;
+  height: 64px;
+  z-index: 99;
+  
+  background-color: #fcfcfb; 
+  border-radius: 32px;
+  box-shadow: 
+    0 8px 20px rgba(92, 64, 51, 0.08), 
+    0 2px 6px rgba(0,0,0,0.02),
+    0 0 0 1px rgba(0,0,0,0.02);
+  
+  overflow: hidden;
+  animation: floatIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  .capsule-track-bg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: repeating-linear-gradient(
+      -45deg,
+      #ffe4e1,
+      #ffe4e1 5px,
+      #e6e6fa 5px,
+      #e6e6fa 10px
+    );
+    opacity: 0.8;
+    animation: tapeFlow 20s linear infinite;
+  }
+
+  .capsule-content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 12px 0 6px; /* 调整内边距 */
+    z-index: 2;
+  }
+
+  /* 1. 用户头像圈圈 */
+  .user-avatar-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #fff; /* 白圈描边 */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    overflow: hidden; /* 裁剪图片 */
+    margin-right: 10px;
+    flex-shrink: 0;
+    background-color: #f0f0f0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  /* 中间文字 (保持微调) */
+  .ride-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    margin-right: 8px; /* 给右边留点空隙 */
+
+    .info-top {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+      
+      .status-text {
+        font-size: 13px;
+        font-weight: 600;
+        color: #5d4037;
+        white-space: nowrap;
+      }
+      .dot { margin: 0 4px; color: #ccc; }
+      .car-info {
+        font-size: 11px;
+        color: #9e9e9e;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .cute-progress-bar {
+      width: 100%;
+      height: 6px;
+      background-color: #f0f0f0;
+      border-radius: 3px;
+      overflow: hidden;
+      
+      .progress-fill {
+        width: 0%;
+        height: 100%;
+        background-color: #81d4fa;
+        border-radius: 3px;
+        position: relative;
+        overflow: hidden;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: linear-gradient(
+            45deg,
+            rgba(255,255,255,.2) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255,255,255,.2) 50%,
+            rgba(255,255,255,.2) 75%,
+            transparent 75%,
+            transparent
+          );
+          background-size: 10px 10px;
+          animation: stripMove 1s linear infinite;
+        }
+      }
+    }
+  }
+
+  /* 右侧时间胶囊 */
+  .time-pill {
+    background-color: #333;
+    color: #fff;
+    padding: 4px 10px; /* 稍微缩小一点 */
+    border-radius: 12px;
+    display: flex;
+    align-items: baseline;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+    
+    span {
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Didot', serif;
+      line-height: 1;
+    }
+    small { font-size: 10px; margin-left: 2px; opacity: 0.8; }
+  }
+
+  /* 2. 关闭按钮样式 */
+  .capsule-close-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #f2f2f7; /* 浅灰底 */
+    border: none;
+    color: #8e8e93; /* 灰色图标 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px; /* 离时间胶囊一点距离 */
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+
+    &:active {
+      background-color: #ff3b30; /* 按下变红 */
+      color: #fff;
+    }
+
+    svg { width: 14px; height: 14px; }
+  }
+}
+/* ====================================================== */
+/* == 【修改】飞机标签页样式 (#ride-tab-flight) == */
+/* ====================================================== */
+#ride-tab-flight {
+  display: flex;
+  flex-direction: column;
+  // 1. 【调整】左右边距不需那么大 -> 改为 0，让它更宽，由父级控制边距
+  padding: 10px 0; 
+  gap: 20px;
+
+  // 搜索容器
+  .flight-search-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  // 大标题
+  .pane-title {
+    text-align: left;
+    font-size: 26px !important; // 稍微调小一点点显得更精致
+    font-weight: 700;
+    margin: 0 !important;
+    padding-left: 4px; // 稍微给点左缩进对齐
+  }
+ // 顶部 Tab (放大版)
+  .flight-trip-type-tabs {
+    display: flex;
+    background-color: #f2f2f7; 
+    border-radius: 14px; // 圆角加大
+    padding: 5px; // 容器内边距加大
+    
+    .flight-trip-type-btn {
+      flex: 1;
+      padding: 10px 4px; // 【关键】增加高度，让按钮更大
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      color: #8e8e93;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      
+      // 图标稍微放大
+      svg { width: 18px; height: 18px; margin-right: 6px; }
+      .text-col {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        text-align: left;
+        
+        // 字体稍微加大
+        .cn { font-size: 14px; font-weight: 600; }
+        .en { font-size: 10px; font-weight: 400; opacity: 0.9; margin-top: 2px;}
+      }
+      &.active {
+        background: #fff;
+        color: #000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      }
+    }
+  }
+
+  // 中间表单卡片
+  .flight-search-form {
+    background: #fff;
+    border-radius: 16px;
+    padding: 10px 16px; // 内部边距
+    // 增加一点柔和的投影，更有质感
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
+    display: flex;
+    flex-direction: column;
+    gap: 0; // 内部间距由元素自己控制
+  }
+
+  // 2. 【调整】出发和目标城市改成两排
+  .location-inputs-wrapper {
+    display: flex;
+    flex-direction: column; // 垂直排列
+    position: relative;     // 为绝对定位的按钮做参照
+
+    .location-input-group {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0; // 稍微减小一点内边距
+      
+      // 3. 【调整】修复奇怪的图标 (保持不变)
+      .icon-wrapper { 
+        color: #b0b0b5; 
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        
+        svg { 
+            width: 20px; 
+            height: 20px; 
+            stroke-width: 2px;
+        }
+      }
+
+      .input-text-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px; // 减小标签和输入框的间距
+
+        label { 
+            font-size: 10px; // 标签字体更小
+            color: #8e8e93; 
+            font-weight: 500;
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        
+        // 4. 【调整】字体缩小，样式增强
+        input { 
+          border: none; 
+          background: transparent; 
+          outline: none;
+          font-size: 16px; // 从 18px 缩小到 16px
+          font-weight: 600; 
+          color: #000;
+          padding: 4px 0; // 给输入框一点点击空间
+          width: 100%;
+          font-family: -apple-system, sans-serif;
+          
+          &::placeholder { color: #ccc; font-weight: 400; } // 占位符样式
+        }
+      }
+    }
+    
+    // 中间分割线
+    .location-divider-line {
+      width: calc(100% - 40px);
+      height: 1px;
+      background-color: #f0f0f0;
+      margin-left: 38px; 
+    }
+    
+      // 5. 【调整】切换按钮：放大 + 方底 + 黑色
+    .swap-locations-btn {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width: 44px; // 【放大】从 32px 改为 44px
+      height: 44px; // 【放大】
+      background: #000; 
+      color: #fff;      
+      border: 3px solid #fff; // 白色描边加粗一点
+      border-radius: 12px; // 【改方】圆角 12px，不是 50% 了
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+      
+      // 图标也稍微放大一点点
+      svg { width: 20px; height: 20px; stroke-width: 2px; } 
+    }
+  }
+
+
+  // 日期、人数部分
+  .flight-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 16px;
+    padding-bottom: 6px;
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f9f9fb; // 淡淡的底色块
+      padding: 10px;
+      border-radius: 10px;
+
+      .icon-wrapper { color: #8e8e93; }
+      .detail-text-content {
+        label { font-size: 10px; color: #8e8e93; display: block; margin-bottom: 2px;}
+        .value { font-size: 14px; font-weight: 600; color: #000; display: block; }
+      }
+    }
+  }
+// 【新增】去见Ta 开关区域样式
+  .meet-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff; // 浅黄色背景，温馨提示
+    border: 1px solid #ababab; // 黄色边框
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-top: 16px; // 与上方隔开
+    .meet-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      // 爱心图标颜色
+      svg { width: 22px; height: 22px; color:#f5ca23; fill: currentColor; }
+      
+      .text {
+        display: flex;
+        flex-direction: column;
+        .title { font-size: 14px; font-weight: 600; color: #333; }
+        .desc { font-size: 10px; color:#7c7c7c; margin-top: 2px; }
+      }
+    }
+    // 复用通用的 switch 样式，稍作微调
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+      
+      input { opacity: 0; width: 0; height: 0; }
+      
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #e0e0e0;
+        transition: .4s;
+        border-radius: 24px;
+        
+        &::before {
+          position: absolute;
+          content: "";
+          height: 20px;
+          width: 20px;
+          left: 2px;
+          bottom: 2px;
+          background-color: white;
+          transition: .4s;
+          border-radius: 50%;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+      }
+      
+      input:checked + .slider { background-color: #000; } // 选中变黑
+      input:checked + .slider::before { transform: translateX(20px); }
+    }
+  }
+  // 4. 底部按钮组 (双按钮布局)
+  .flight-actions-footer {
+    display: flex;
+    gap: 12px; // 两个按钮之间的间距
+    margin-top: 20px; // 与上方内容的间距
+
+    // 通用按钮样式
+    button {
+      border: none;
+      border-radius: 28px; // 胶囊圆角
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      height: 52px; // 统一高度
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease;
+      
+      &:active { transform: scale(0.98); } // 点击缩放效果
+    }
+
+    // 左侧：找Ta代付 (次要按钮)
+    .btn-sub {
+      flex: 1.2; // 占比稍小
+      background-color: #e6e6e6; // 浅灰背景
+      color: #000; // 黑色文字
+      gap: 6px; // 图标和文字的间距
+      
+      svg { width: 18px; height: 18px; }
+    }
+
+    // 右侧：购买机票 (主要按钮)
+    .btn-main {
+      flex: 2; // 占比大
+      background-color: #000; // 纯黑背景
+      color: #fff; // 白色文字
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); // 柔和阴影
+    }
+  }
+}
+/* ====================================================== */
+/* == 【修复版】图片Banner + 真实吐票 + 黑白金配色 == */
+/* ====================================================== */
+
+// 颜色定义：纯粹的黑白金
+$t-gold: #CFA966; 
+$t-black: #000000;
+$t-grey: #666666;
+
+#ticket-animation-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  /* 靠上对齐，方便定位 */
+  align-items: flex-start; 
+  
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+    
+    // 播放动画
+    .boarding-pass-container {
+      animation: print-ticket 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    // 绿灯
+    .printer-light {
+        background-color: #4cd964; 
+        box-shadow: 0 0 8px #4cd964;
+    }
+  }
+}
+
+// 1. 出票口 (层级最高)
+.printer-slot-housing {
+  position: absolute;
+  top: 15%; /* 固定在屏幕上方 */
+  width: 320px;
+  height: 50px;
+  
+  // 机器外壳：深灰渐变
+  background: linear-gradient(to bottom, #333, #1a1a1a);
+  border-radius: 25px;
+  border-bottom: 1px solid #444; 
+  
+  // 关键：层级20，压住机票
+  z-index: 20; 
+  
+  // 悬浮阴影
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  .printer-mouth {
+      width: 280px;
+      height: 6px;
+      background-color: #000;
+      border-radius: 3px;
+      margin-top: 5px;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+  }
+  
+  .printer-light {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background-color: #333; 
+      margin-bottom: 4px;
+      transition: background-color 0.2s;
+  }
+}
+
+// 2. 机票容器
+.boarding-pass-container {
+  position: absolute;
+  // 这里的计算很重要：
+  // top 设为 housing 的底部位置，稍微往上一点点(减去缝隙的高度)，保证无缝衔接
+  top: calc(15% + 50px); 
+  left: 50%;
+  
+  // 初始状态：完全向上平移 (-100%)，藏在 z-index 更高的 housing 后面
+  transform: translateX(-50%) translateY(-100%);
+  
+  width: 270px; // 宽度适中
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  
+  // 层级10，比 housing 低
+  z-index: 10; 
+  overflow: hidden; // 关键：防止内部元素溢出变长条
+  
+  display: flex;
+  flex-direction: column;
+}
+
+// ★★★ 核心修复：图片区域样式 ★★★
+.ticket-banner-image {
+    width: 100%;
+    height: 130px; // 【强制高度】防止图片过长
+    position: relative;
+    background-color: #000; // 图片加载前的底色
+    
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; // 【关键】裁剪图片，填满区域，不拉伸
+        display: block;
+        // 自动变黑白，符合你的配色要求
+        filter: grayscale(100%) contrast(1.2); 
+    }
+    
+    // 金色遮罩，给黑白照片增加一点高级感
+    .gold-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba($t-gold, 0.1), transparent);
+        mix-blend-mode: overlay;
+    }
+}
+
+// 上半部分信息
+.ticket-body-upper {
+    padding: 16px 20px 10px;
+    background: #fff;
+}
+
+.route-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    .city-col {
+        display: flex; flex-direction: column;
+        
+        // 【Changed】 缩小字体，加粗
+        .code { 
+            font-size: 24px; // 从 32px 缩小到 24px
+            font-weight: 800; 
+            color: $t-black; 
+            line-height: 1.1; 
+            letter-spacing: 0.5px;
+        }
+        // 【Changed】 新的固定文案样式
+        .static-label {
+            font-size: 8px; // 很小的字，显得精致
+            color: $t-gold; // 金色
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+        &.right { text-align: right; }
+    }
+    
+    .plane-divider {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 0 12px; // 稍微增加间距
+        color: #ddd; // 飞机颜色改淡一点，不抢视觉
+        
+        .line { flex: 1; height: 1px; background-color: #eee; }
+        .plane-icon { width: 16px; height: 16px; margin: 0 6px; transform: rotate(90deg); color: $t-black;}
+    }
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    
+    .info-item {
+        display: flex; flex-direction: column;
+        label { font-size: 9px; color: $t-grey; margin-bottom: 2px; }
+        strong { font-size: 12px; color: $t-black; font-weight: 700; }
+    }
+}
+
+// 撕票线
+.ticket-separator {
+    position: relative;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    
+    .dashed-line {
+        width: 100%;
+        height: 1px;
+        border-top: 1px dashed #ddd;
+        margin: 0 16px;
+    }
+    
+    .notch {
+        position: absolute;
+        width: 16px; height: 16px;
+        background-color: #333; // 模拟背景色
+        border-radius: 50%;
+        top: 4px;
+        &.left { left: -8px; }
+        &.right { right: -8px; }
+    }
+}
+
+// 下半部分
+.ticket-body-lower {
+    padding: 0 20px 20px;
+    background: #fff;
+}
+
+.passenger-row {
+    margin-bottom: 16px;
+    .info-item {
+        display: flex; flex-direction: column;
+        label { font-size: 9px; color: $t-grey; margin-bottom: 4px; }
+        
+        .passenger-value {
+            display: flex; align-items: center; justify-content: space-between;
+            strong { font-size: 15px; font-weight: 700; color: $t-black; }
+            
+            .seat-badge {
+                font-size: 10px;
+                color: #fff;
+                font-weight: 700;
+                background-color: $t-black; // 黑色背景
+                padding: 2px 6px;
+                border-radius: 4px;
+                border: 1px solid #ffffff; // 金色边框
+                color:#ffffff; // 金色字
+            }
+        }
+    }
+}
+
+.barcode-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    
+    .barcode-lines {
+        width: 100%;
+        height: 30px;
+        // 纯CSS条形码
+        background: repeating-linear-gradient(
+            to right,
+            #000, #000 2px,
+            transparent 2px, transparent 4px,
+            #000 4px, #000 5px,
+            transparent 5px, transparent 8px,
+            #000 8px, #000 11px
+        );
+        opacity: 0.8;
+    }
+    .ticket-number { font-size: 9px; color: #ccc; letter-spacing: 2px; font-family: monospace; }
+}
+
+// 3. 悬浮按钮 (黑金风格)
+.take-ticket-floating-btn {
+    position: absolute;
+    bottom: 10%;
+    width: 180px;
+    padding: 12px 0;
+    
+    background-color: $t-black;
+    color:#ffffff;
+    border: 1px solid #ffffff00; 
+    
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    
+    opacity: 0;
+    animation: fadeInBtn 0.8s 1.0s ease-out forwards; // 延迟显示
+    transition: transform 0.1s;
+    
+    &:active { transform: scale(0.96); background-color: #111; }
+}
+
+// 动画：从收起状态(-100%) 滑动到 展开状态(0%)
+@keyframes print-ticket {
+  0% {
+    transform: translateX(-50%) translateY(-105%);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0%);
+  }
+}
+
+@keyframes fadeInBtn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* ====================================================================== */
+/* == 【紧凑版】真实登机牌悬浮条 (Compact Realistic Boarding Pass) == */
+/* ====================================================================== */
+.flight-status-capsule {
+  position: absolute;
+  top: 85px; /* 稍微往上提一点，因为它变扁了 */
+  left: 50%;
+  transform: translateX(-50%);
+  
+  width: 94%; 
+  max-width: 390px; /* 稍微宽一点点，让横向排布更宽松 */
+  height: auto; 
+  
+  background-color: #fff; 
+  border: 1px solid #d0d0d0;
+  border-radius: 6px; /* 圆角稍微改小，更像票据 */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* 投影变轻一点 */
+  overflow: hidden;
+  
+  display: flex; 
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif; /* 尝试用工业字体感 */
+  z-index: 99;
+
+  animation: slideDownFade 0.5s ease-out;
+}
+
+// 主票根
+.bp-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+// 头部 - 【极度压缩高度】
+.bp-header {
+  background-color: #222; 
+  color: #fff;
+  padding: 3px 10px; /* 减少内边距 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 22px; /* 固定头部高度 */
+
+  .bp-header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    .bp-title-cn { font-size: 11px; font-weight: 600; }
+    .bp-title-en { font-size: 7px; opacity: 0.7; letter-spacing: 0.5px; }
+  }
+  .bp-header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    font-weight: 500;
+    .bp-plane-icon-header { width: 12px; height: 12px; fill: #fff; }
+  }
+}
+
+// 票根信息主体 - 【减少内边距】
+.bp-body {
+  display: flex;
+  align-items: center; 
+  padding: 6px 8px; /* 这里的 padding 决定了整体高度 */
+  gap: 8px;
+}
+
+// 左侧条形码
+.bp-barcode {
+  width: 14px; /* 变窄 */
+  height: 45px; /* 限制条形码高度 */
+  align-self: center;
+  flex-shrink: 0;
+  background: repeating-linear-gradient(to bottom, #222, #222 1px, transparent 1px, transparent 2px);
+}
+
+// 右侧信息网格 - 【紧凑布局核心】
+.bp-info-grid {
+  flex-grow: 1;
+  display: grid;
+  // 保持三列，但调整比例
+  grid-template-columns: 1.2fr auto 1.2fr; 
+  grid-template-rows: auto auto auto;    
+  row-gap: 2px; /* 极小的行间距 */
+  column-gap: 4px;
+  align-items: center;
+
+  .info-item, .info-item-large, .info-pill {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    line-height: 1; /* 紧凑行高 */
+
+    label { 
+      font-size: 7px; /* 标签字号极小 */
+      color: #888; 
+      transform: scale(0.9); /* 视觉上更小 */
+      margin-bottom: 1px;
+    }
+    strong, span { 
+      font-size: 13px; 
+      font-weight: 700; 
+      color: #111; 
+    }
+  }
+  
+  // 时间和目的地 - 稍微大一点
+  .info-item-large {
+    &.time span { font-size: 13px; font-weight: 800; letter-spacing: -0.5px;}
+    &.dest span { font-size: 13px; font-weight: 700; }
+  }
+
+  // 飞机图标分割线
+  .plane-divider-small {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    svg { width: 12px; height: 12px; fill: #ccc; transform: rotate(90deg); }
+    .dot { display: none; } /* 空间不够，隐藏圆点 */
+  }
+  
+  // 中间的圆圈 - 【缩小】
+  .flight-no-circle {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 4px; /* 改成小圆角矩形，比圆圈省空间 */
+    padding: 2px 6px;
+    font-size: 9px;
+    font-weight: 800;
+    color: #333;
+    grid-column: 2 / 3; 
+    margin: 1px auto;
+    width: auto;
+    height: auto;
+  }
+  
+  // 黑色胶囊 - 【扁平化】
+  .info-pill {
+    background-color: #222;
+    color: #fff;
+    border-radius: 4px;
+    padding: 2px 0;
+    label { color: rgba(255,255,255,0.6); }
+    span { color: #fff; font-size: 10px; font-weight: 500;}
+  }
+}
+
+// 撕票虚线
+.bp-divider {
+  width: 1px;
+  background-image: linear-gradient(to bottom, #ccc 40%, transparent 40%);
+  background-size: 1px 5px;
+  margin: 4px 0;
+}
+
+// 存根部分 - 【微调下移版】
+.bp-stub {
+  width: 75px; 
+  flex-shrink: 0;
+  // 原来是 padding: 6px 8px; 改为下面这行：
+  padding: 23px 8px 6px; // 顶部加大到10px，让内容下移
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  gap: 5px; // 稍微拉大间距（原来是4px）
+  background-color: #f9f9f9; 
+
+  .stub-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    line-height: 1;
+    label { font-size: 6px; color: #999; transform: scale(0.9); transform-origin: left; }
+    strong { font-size: 9px; font-weight: 700; color: #222; }
+    
+    &:nth-child(3), &:nth-child(4) { display: none; } 
+  }
+  
+  // 登机按钮
+  .flight-board-btn {
+    width: 100%;
+    margin-top: 20px; // 稍微加大上边距
+    padding: 6px 0;
+    background-color: #000;
+    color: #ffd700; 
+    border: none;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 1px;
+    
+    &:active { opacity: 0.8; }
+  }
+}
+/* style/main.css */
+
+/* --- 高铁页面专属样式 --- */
+.train-search-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 10px 4px;
+}
+
+/* 1. 文件夹组合容器 */
+.folder-group-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* 底部对齐 */
+    position: relative;
+    padding: 10px 0;
+}
+
+/* 交换按钮 (居中悬浮) */
+.train-swap-btn {
+    position: absolute;
+    left: 50%;
+    bottom: 25px; /* 位于文件夹中间 */
+    transform: translateX(-50%);
+    width: 36px;
+    height: 36px;
+    background: #000;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+.train-swap-btn svg { width: 18px; height: 18px; }
+
+/* 文件夹单体 */
+.station-folder {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    max-width: 48%; /* 留出中间空隙 */
+}
+
+/* 文件夹顶部标签 (梯形效果) */
+.folder-tab {
+    background-color: #e0e0e0;
+    color: #666;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px 6px 0 0;
+    width: fit-content;
+    margin-bottom: -1px; /* 压住下面的线 */
+    z-index: 2;
+    border: 1px solid #ccc;
+    border-bottom: none;
+}
+
+/* 文件夹主体 */
+.folder-body {
+    background-color: #f5f5f7;
+    border: 1px solid #ccc;
+    border-radius: 0 8px 8px 8px; /* 左上角直角，模拟文件夹 */
+    padding: 12px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.05); /* 厚度感 */
+    position: relative;
+}
+.station-folder.to .folder-tab {
+    align-self: flex-end; /* 到达站标签靠右 */
+    border-radius: 6px 6px 0 0;
+}
+.station-folder.to .folder-body {
+    border-radius: 8px 0 8px 8px; /* 改变圆角方向 */
+}
+
+/* 输入框样式 */
+.folder-body input {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    width: 100%;
+    outline: none;
+    font-family: -apple-system, sans-serif;
+    margin-bottom: 4px;
+}
+.folder-body .station-code {
+    font-size: 32px;
+    font-weight: 900;
+    color: rgba(0,0,0,0.06); /* 极淡的水印效果 */
+    position: absolute;
+    bottom: 5px;
+    right: 8px;
+    pointer-events: none;
+}
+
+/* 2. 日期选择条 */
+.train-date-bar {
+    display: flex;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 12px 16px;
+    position: relative;
+    cursor: pointer;
+}
+.train-date-bar .label {
+    display: block;
+    font-size: 10px;
+    color: #999;
+    margin-bottom: 2px;
+}
+.train-date-bar .value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #000;
+}
+.train-date-bar > div {
+    flex: 1; /* 让两个块平分宽度 */
+    cursor: pointer; /* 鼠标变小手 */
+}
+
+/* 3. 席位选择 */
+.train-section-title {
+    font-size: 12px;
+    color: #888;
+    margin: 8px 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.seat-selection-row {
+    display: flex;
+    gap: 8px;
+}
+.seat-card {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.seat-card .seat-name { font-size: 13px; color: #333; margin-bottom: 4px; }
+.seat-card .seat-price { font-size: 15px; font-weight: 700; color: #000; }
+.seat-card .seat-remain { font-size: 10px; color: #999; margin-top: 2px; }
+
+/* 选中状态 */
+.seat-card.selected {
+    background: #000;
+    border-color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.seat-card.selected .seat-name,
+.seat-card.selected .seat-price,
+.seat-card.selected .seat-remain { color: #fff; }
+
+/* 商务座特殊样式 */
+.seat-card.business .seat-price { color: #d4a017; } /* 金色 */
+.seat-card.business .vip-tag {
+    position: absolute;
+    top: -6px; right: -6px;
+    background: #d4a017;
+    color: #fff;
+    font-size: 8px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* 4. 开关区域 */
+.train-toggles-area {
+    background: #fff;
+    border-radius: 12px;
+    padding: 4px 16px;
+    border: 1px solid #eee;
+}
+.toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+}
+.divider-line { height: 1px; background: #f5f5f5; }
+.toggle-info { display: flex; flex-direction: column; }
+.toggle-info .main-text { font-size: 14px; font-weight: 600; color: #333; }
+.toggle-info .sub-text { font-size: 10px; color: #999; margin-top: 2px; }
+
+/* 5. 底部按钮组 */
+.train-actions-footer {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+.train-actions-footer button {
+    height: 50px;
+    border-radius: 25px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+.train-actions-footer .btn-sub {
+    flex: 1;
+    background: #f0f0f0;
+    color: #333;
+}
+.train-actions-footer .btn-main {
+    flex: 2;
+    background: #000;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+/* style/main.css */
+
+/* --- 高铁票弹窗样式 --- */
+#train-ticket-overlay {
+    align-items: center; /* 垂直居中 */
+    justify-content: center;
+    backdrop-filter: blur(10px); /* 背景模糊 */
+}
+
+.train-ticket-card {
+    width: 320px;
+    background: #fff;
+    border-radius: 16px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    overflow: visible;
+    padding: 24px;
+    animation: slideUpFade 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 顶部打孔装饰 */
+.ticket-punch-hole {
+    position: absolute;
+    top: 140px; /* 位于分割线位置 */
+    width: 24px;
+    height: 24px;
+    background-color: #000; /* 应该是遮罩层的颜色，为了简单这里用黑色或透明 */
+    border-radius: 50%;
+    z-index: 2;
+}
+/* 这里的颜色需要配合遮罩层的背景色，如果是黑色半透明遮罩，这里其实可以设置成 transparent 
+   配合 box-shadow 模拟镂空，或者简单点设为跟背景一样的颜色 */
+.modal-overlay .ticket-punch-hole { background-color: #222; } /* 模拟深色背景 */
+.ticket-punch-hole.left { left: -12px; }
+.ticket-punch-hole.right { right: -12px; }
+
+/* 1. 头部 */
+.train-ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.train-no {
+    font-size: 24px;
+    font-weight: 800;
+    color: #000;
+    font-family: 'Didot', serif; /* 稍微带点衬线感 */
+}
+.ticket-type {
+    font-size: 10px;
+    color: #fff;
+    background-color: #000;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* 2. 车站行 */
+.train-station-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.station-col {
+    display: flex;
+    flex-direction: column;
+}
+.station-col.to { text-align: right; }
+.station-col h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 4px 0;
+}
+.station-col .time {
+    font-size: 28px;
+    font-weight: 400; /* 细字体 */
+    color: #000;
+    font-family: monospace; /* 等宽字体风格 */
+}
+.station-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #ccc;
+}
+.station-arrow svg { width: 40px; height: 20px; }
+.station-arrow .duration { font-size: 10px; margin-bottom: 2px; }
+
+/* 3. 信息网格 */
+.train-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.info-cell {
+    display: flex;
+    flex-direction: column;
+}
+.info-cell label {
+    font-size: 10px;
+    color: #999;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+}
+.info-cell span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+}
+.info-cell.price span {
+    color: #d93025; /* 价格红 */
+    font-size: 16px;
+}
+
+/* 分割线 */
+.train-ticket-divider {
+    height: 1px;
+    border-top: 2px dashed #eee;
+    margin: 0 -24px 20px; /* 抵消 padding */
+    position: relative;
+}
+
+/* 4. 条形码 */
+.train-barcode-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.8;
+}
+.barcode-graphic {
+    height: 40px;
+    width: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        #000 0px, #000 2px,
+        transparent 2px, transparent 4px,
+        #000 4px, #000 7px,
+        transparent 7px, transparent 10px
+    );
+}
+.security-code {
+    font-size: 10px;
+    color: #999;
+    letter-spacing: 2px;
+}
+
+/* 5. 底部按钮 (在卡片外部) */
+.ticket-floating-actions {
+    position: absolute;
+    bottom: -70px; /* 悬浮在卡片下方 */
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+.ticket-floating-actions button {
+    flex: 1;
+    height: 44px;
+    border-radius: 22px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.1s;
+}
+.ticket-floating-actions button:active { transform: scale(0.95); }
+
+.ticket-floating-actions .btn-ghost {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #fff;
+}
+.ticket-floating-actions .btn-solid {
+    background: #fff;
+    color: #000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+// 确保在深色模式或背景下，票据依然清晰
+.dark-theme .train-ticket-card {
+    background-color: #f0f2f5; // 比纯白更柔和
+}
+/* ======================================================
+   == 【精修】生活-购物子页面样式 (6px 极窄 + 强对齐版) ==
+   ====================================================== */
+#page-life-shop {
+  background-color: #f7f7f7;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+
+  // 1. 顶部固定导航栏
+  .shop-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    // 【对齐】左右内边距改为 6px
+    padding: 45px 6px 10px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    background: transparent;
+    transition: all 0.3s ease;
+    z-index: 100;
+
+    .back-button {
+      position: absolute;
+      left: 6px; // 【对齐】靠左 6px
+      bottom: 10px;
+      width: 32px; height: 32px;
+      padding: 0; border: none; background: transparent;
+      color: #000;
+      z-index: 101;
+      // 让图标在按钮内居中，视觉上更稳
+      display: flex; align-items: center; justify-content: center;
+      svg { width: 26px; height: 26px; }
+    }
+
+    .shop-header-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #000;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      margin-bottom: 5px;
+    }
+
+    .shop-header-actions {
+      position: absolute;
+      right: 6px; // 【对齐】靠右 6px
+      bottom: 10px;
+      z-index: 101;
+      
+      .shop-action-btn {
+        width: 32px; height: 32px;
+        background: transparent; border: none; padding: 0;
+        color: #000;
+        display: flex; align-items: center; justify-content: center;
+        svg { width: 24px; height: 24px; }
+      }
+    }
+
+    &.scrolled {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+      
+      .shop-header-title {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  // 2. 可滚动内容区
+  .shop-content-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding-top: 0;
+    padding-bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px; // 板块垂直间距也收紧
+    background-color: #f7f7f7;
+    &::-webkit-scrollbar { display: none; }
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    contain: content;
+  }
+
+  // 顶部大标题和搜索框
+  .shop-page-title-area {
+    // 【对齐】左右内边距 6px
+    padding: 100px 6px 10px;
+    background: #f7f7f700;
+    
+    .big-title {
+      font-family: 'Didot', serif;
+      font-size: 42px;
+      font-weight: 800;
+      color: #000;
+      // 【关键修复】移除左边距 (原 4px -> 0)，确保与下方内容垂直对齐
+      margin: 0 0 16px 0;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .shop-search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 2px solid #000;
+      border-radius: 30px;
+      // 搜索框内部文字会有天然缩进，这里外部盒子是对齐的
+      padding: 10px 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      
+      svg { width: 18px; height: 18px; stroke: #000; }
+      span { color: #999; font-size: 14px; font-weight: 500; }
+    }
+  }
+
+  // 通用分区标题
+  h3 {
+    font-size: 18px;
+    font-weight: 800;
+    // 【对齐】左右外边距 6px
+    margin: 0 6px 10px;
+    color: #000;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    span {
+      font-size: 12px;
+      font-weight: 400;
+      color: #999;
+      font-family: -apple-system, sans-serif;
+    }
+  }
+
+  // 轮播图
+  .shop-carousel-section {
+    // 【对齐】左右内边距 6px
+    padding: 0 6px;
+    position: relative;
+
+    .shop-carousel-item {
+      position: relative;
+      border-radius: 12px; // 圆角稍微变小，适配窄边距
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      background: #000;
+
+      .placeholder-banner {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #333 0%, #000 100%);
+      }
+
+      .text-overlay {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: #fff;
+        z-index: 2;
+        h2 { font-size: 22px; font-weight: 800; margin: 0 0 6px; letter-spacing: 0.5px; }
+        p { font-size: 12px; margin: 0; opacity: 0.8; letter-spacing: 1px; }
+      }
+    }
+    .shop-carousel-dots {
+      position: absolute;
+      bottom: 12px;
+      left: 20px;
+      display: flex;
+      gap: 6px;
+      .dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        &.active { background: #fff; width: 16px; border-radius: 3px; }
+      }
+    }
+  }
+
+  // 分类
+  .shop-category-section {
+    .category-scroll-list {
+      display: flex;
+      gap: 6px; // 间距 6px
+      overflow-x: auto;
+      // 【对齐】左右内边距 6px
+      padding: 0 6px;
+      &::-webkit-scrollbar { display: none; }
+      scrollbar-width: none;
+    }
+
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 60px;
+      flex-shrink: 0;
+      
+      .icon-bg {
+        width: 50px; // 稍微调小
+        height: 50px;
+        background: #fff;
+        border-radius: 16px;
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        margin-bottom: 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        color: #333;
+        
+        svg { width: 20px; height: 20px; }
+      }
+      
+      .name { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 2px;}
+      .desc { font-size: 9px; color: #bbb; text-transform: uppercase; font-weight: 500;}
+    }
+  }
+
+  // 优惠活动
+  .shop-promo-section {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 6px; // 间距 6px
+    // 【对齐】左右内边距 6px
+    padding: 0 6px;
+    height: 220px;
+
+    .promo-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      
+      .img-placeholder {
+        position: absolute;
+        border-radius: 12px;
+        &.main {
+            bottom: -20px; right: -20px; width: 130px; height: 130px;
+            background: #e0e0e0; border-radius: 50%;
+        }
+        &.sub {
+            bottom: -10px; right: -10px; width: 70px; height: 70px;
+            background: #f0f0f0; border-radius: 12px;
+        }
+      }
+    }
+
+    .large {
+      background: #f4f4f4;
+      justify-content: space-between;
+      .promo-text {
+        z-index: 2;
+        span { display: block; font-size: 10px; color: #888; letter-spacing: 1px; }
+        strong { display: block; font-size: 30px; color: #000; margin: 4px 0; font-family: impact, sans-serif; }
+      }
+      button {
+        position: relative; z-index: 2;
+        background: #000; color: #fff;
+        border: none; padding: 8px 14px;
+        border-radius: 20px; font-size: 10px; font-weight: 700;
+        align-self: flex-start;
+        margin-top: auto;
+      }
+    }
+    
+    .promo-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px; // 间距 6px
+      height: 100%;
+
+      .small {
+        flex: 1;
+        background: #fff;
+        justify-content: center;
+        border: 1px solid rgba(0,0,0,0.03);
+        
+        .text-wrap { z-index: 2; position: relative; }
+        h4 { margin: 0; font-size: 14px; font-weight: 700; color: #000; }
+        p { margin: 4px 0 0; font-size: 10px; color: #999; }
+      }
+    }
+  }
+
+  // 推荐商品
+  .shop-recommend-section {
+    padding-bottom: 20px;
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      // 【对齐】左右外边距 6px
+      margin: 0 6px 12px;
+      h3 { margin: 0; }
+      a { text-decoration: none; color: #999; font-size: 18px; }
+    }
+
+    .product-list {
+      display: flex;
+      gap: 6px; // 间距 6px
+      overflow-x: auto;
+      // 【对齐】左右内边距 6px
+      padding: 0 6px;
+      &::-webkit-scrollbar { display: none; }
+      scrollbar-width: none;
+
+      .product-card {
+        flex-shrink: 0;
+        width: 145px; // 卡片宽度
+        background: #fff;
+        border-radius: 12px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+
+        .product-img-placeholder {
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          background-color: #f2f2f2;
+          border-radius: 8px;
+          &.dark { background-color: #333; }
+        }
+
+        .product-info {
+          h4 { font-size: 13px; font-weight: 700; margin: 0 0 4px; color: #333; }
+          p { font-size: 10px; color: #aaa; margin: 0 0 8px; }
+          
+          .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            
+            .price { font-size: 14px; font-weight: 700; color: #000; }
+            .buy-btn {
+              border: 1px solid #eee;
+              background: transparent;
+              border-radius: 10px;
+              padding: 4px 8px;
+              font-size: 10px;
+              font-weight: 600;
+              color: #333;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // 3. 底部固定导航栏 (保持不变)
+  .shop-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 10;
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border: none;
+      background: transparent;
+      color: #ccc;
+      cursor: pointer;
+      flex: 1;
+      
+      svg { width: 22px; height: 22px; fill: currentColor; }
+      span { font-size: 10px; font-weight: 500; }
+      
+      &.active { color: #000; }
+    }
+  }
+}
+/* ======================================================
+   == 【修复】购物分类页面样式 (独立样式表) ==
+   ====================================================== */
+#page-life-shop-category {
+  background-color: #fff;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 禁止整个页面滚动，只让内容区滚动 */
+
+  /* --- 1. 强制修复顶栏 (绝对定位) --- */
+  .shop-header {
+    position: absolute; /* 固定在顶部 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    padding: 45px 6px 10px; /* 适配状态栏 */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff; /* 白色背景，遮挡内容 */
+    border-bottom: 1px solid #f5f5f5;
+    z-index: 100; /* 层级最高 */
+
+    .back-button {
+      position: absolute;
+      left: 6px;
+      bottom: 10px;
+      width: 32px; height: 32px;
+      padding: 0; border: none; background: transparent;
+      color: #000;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 101;
+      svg { width: 26px; height: 26px; }
+    }
+
+    .shop-header-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #000;
+    }
+
+    .shop-header-actions {
+      position: absolute;
+      right: 6px;
+      bottom: 10px;
+      .shop-action-btn {
+        width: 32px; height: 32px;
+        background: transparent; border: none; padding: 0;
+        display: flex; align-items: center; justify-content: center;
+      }
+    }
+  }
+
+  /* --- 2. 修复中间布局 (左右分栏) --- */
+  .shop-category-layout {
+    display: flex;
+    flex: 1; 
+    margin-top: 90px; /* 【关键】给顶栏留出位置 */
+    margin-bottom: 65px; /* 【关键】给底栏留出位置 */
+    height: calc(100vh - 155px); /* 限制高度 */
+    overflow: hidden;
+  }
+
+  /* 左侧边栏 (灰色) */
+  .shop-sidebar {
+    width: 86px;
+    height: 100%;
+    background-color: #f7f7f7;
+    overflow-y: auto;
+    flex-shrink: 0;
+    
+    &::-webkit-scrollbar { display: none; }
+
+    .sidebar-item {
+      padding: 16px 4px;
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+      position: relative;
+      cursor: pointer;
+ user-select: none;              /* 禁止标准浏览器选中文字 */
+      -webkit-user-select: none;      /* 禁止 Safari/Chrome 选中文字 */
+      -webkit-touch-callout: none;    /* 【关键】禁止 iOS 长按弹出系统菜单 */
+      -webkit-tap-highlight-color: transparent; /* 移除点击时的高亮色块，让App感更强 */
+      &.active {
+        background-color: #fff;
+        color: #000;
+        font-weight: 700;
+        /* 左侧黑色小条 */
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0; top: 50%; transform: translateY(-50%);
+          width: 4px; height: 16px;
+          background-color: #000;
+          border-radius: 0 2px 2px 0;
+        }
+      }
+    }
+  }
+
+  /* 右侧内容区 (白色) */
+  .shop-right-content {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto; /* 允许滚动 */
+    padding: 10px 6px;
+    background-color: #fff;
+    &::-webkit-scrollbar { display: none; }
+    -webkit-overflow-scrolling: touch;
+    contain: content;
+    .category-banner {
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(135deg, #1a1a1a, #000);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex; align-items: center; padding: 0 20px; box-sizing: border-box;
+      color: #fff;
+      .banner-text {
+        h3 { margin: 0 0 4px; font-size: 18px; font-weight: 800; }
+        p { margin: 0; font-size: 10px; opacity: 0.8; letter-spacing: 1px; }
+      }
+    }
+
+    .category-group-title {
+      font-size: 14px; font-weight: 700; color: #000;
+      margin-bottom: 10px; padding-left: 4px;
+    }
+
+    .category-product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 24px;
+     // 样式1：限时特惠 (横向滚动布局，突出特惠感)
+      &#cat-discount-grid {
+        display: flex;       // 改为弹性布局
+        overflow-x: auto;    // 允许横向滚动
+        padding-bottom: 10px; // 给滚动条留点位置
+        gap: 10px;
+        
+        // 隐藏滚动条
+        &::-webkit-scrollbar { display: none; }
+        
+        .cat-product-item {
+          min-width: 100px; // 固定宽度
+          background: #aaaaaa; // 淡红色背景
+          padding: 6px;
+          border-radius: 8px;
+          
+          .img-box {
+            height: 80px; // 图片稍小
+            border: 1px solid #ffffff;
+          }
+          span { color: #ffffff; } // 文字变红
+        }
+      }
+      // 样式2：本季新品 (2列大图布局，更有质感)
+      &#cat-new-grid {
+        grid-template-columns: repeat(2, 1fr); // 改为2列
+        gap: 10px;
+        
+        .cat-product-item {
+          background: #f9f9f9;
+          padding: 8px;
+          border-radius: 12px;
+          
+          .img-box {
+            aspect-ratio: 4/3; // 图片比例更扁长
+            background-color: #e0e0e0;
+          }
+          span { font-size: 13px; font-weight: 700; margin-top: 6px;}
+        }
+      }
+      // 样式3：猜你喜欢 (3列密集布局，稍微有点阴影)
+      &#cat-like-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        
+        .cat-product-item {
+          box-shadow: 0 2px 6px rgba(0,0,0,0.03); // 加一点阴影
+          border-radius: 8px;
+          overflow: hidden;
+          padding-bottom: 6px;
+          
+          .img-box {
+            border-radius: 8px 8px 0 0;
+          }
+        }
+      }
+      
+      .cat-product-item {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        .img-box {
+          width: 100%;
+          aspect-ratio: 1 / 1; // 正方形
+          background-color: #f0f0f0; // 改回浅灰色块
+          border-radius: 12px;
+          // 移除 background-image 相关属性
+        }
+
+        span { font-size: 11px; color: #333; }
+      }
+    }
+  }
+
+  /* --- 3. 强制修复底栏 (固定底部) --- */
+  .shop-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 10;
+
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; border: none; background: transparent; color: #ccc; cursor: pointer; flex: 1;
+      
+      svg { width: 22px; height: 22px; fill: currentColor; }
+      span { font-size: 10px; font-weight: 500; }
+      
+      &.active { color: #000; }
+    }
+  }
+}
+/* ======================================================
+   == 【新增】购物车页面样式 (Cart Page) ==
+   ====================================================== */
+#page-life-shop-cart {
+  background-color: #fff;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* 1. 复用顶栏样式 (确保位置一致) */
+  .shop-header {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 90px;
+    padding: 45px 6px 10px;
+    box-sizing: border-box;
+    display: flex; align-items: center; justify-content: center;
+    background-color: #fff;
+    border-bottom: 1px solid #f5f5f5;
+    z-index: 100;
+
+    .back-button {
+      position: absolute; left: 6px; bottom: 10px;
+      width: 32px; height: 32px; border: none; background: transparent; color: #000;
+      display: flex; align-items: center; justify-content: center; z-index: 101;
+      svg { width: 26px; height: 26px; }
+    }
+    .shop-header-title { font-size: 17px; font-weight: 600; color: #000; }
+    .shop-header-actions {
+      position: absolute; right: 6px; bottom: 10px;
+      .shop-action-btn { width: 32px; height: 32px; background: transparent; border: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #000; }
+    }
+  }
+
+  /* 2. 购物车主体布局 */
+  .shop-cart-layout {
+    flex: 1;
+    margin-top: 90px;
+    margin-bottom: 65px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-color: #f7f7f7;
+    height: calc(100vh - 155px); /* 【关键修复】强制限制高度：100vh - 顶栏90 - 底栏65 */
+    overflow: hidden; /* 防止整体滚动 */
+  }
+
+
+  /* 切换条 (Tabs) */
+  .cart-switcher-wrapper {
+    padding: 10px 16px;
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    
+    .cart-switcher {
+      display: flex;
+      background-color: #f2f2f2;
+      border-radius: 8px;
+      padding: 3px;
+      
+      .switch-item {
+        flex: 1;
+        text-align: center;
+        padding: 8px 0;
+        font-size: 13px;
+        color: #888;
+        font-weight: 500;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        
+        &.active {
+          background-color: #fff;
+          color: #000;
+          font-weight: 600;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+      }
+    }
+  }
+  /* 滚动列表区 */
+  .cart-scroll-area {
+    flex: 1;
+    overflow-y: auto; /* 确保y轴可滚动 */
+    -webkit-overflow-scrolling: touch; /* iOS顺滑滚动 */
+    padding: 12px 16px;
+    /* 去掉之前的 &::-webkit-scrollbar { display: none; } 以便调试，或者保留它 */
+    &::-webkit-scrollbar { display: none; }
+  }
+
+
+  /* 空状态占位 */
+  .empty-state-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding-top: 60px;
+    svg { width: 48px; height: 48px; margin-bottom: 10px; opacity: 0.5; }
+    p { font-size: 13px; color: #999; }
+  }
+
+  /* 商品行样式 */
+  .cart-product-row {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+
+    /* 勾选圈圈 */
+    .check-circle {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid #ddd;
+      flex-shrink: 0;
+      cursor: pointer;
+      &.active {
+        border-color: #000;
+        background-color: #000;
+        position: relative;
+        &::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            width: 4px; height: 8px;
+            border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff;
+            margin-top: -1px;
+        }
+      }
+    }
+
+    .cp-img {
+      width: 80px; height: 80px;
+      border-radius: 8px;
+      background-color: #f0f0f0;
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+    }
+
+    .cp-info {
+      flex: 1;
+      display: flex; flex-direction: column; justify-content: space-between;
+      height: 80px;
+      
+      .cp-title { font-size: 14px; font-weight: 600; color: #000; margin-bottom: 2px; }
+      .cp-specs { font-size: 11px; color: #999; background: #f5f5f5; width: fit-content; padding: 2px 6px; border-radius: 4px; }
+      
+      .cp-bottom {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        
+        .cp-price { font-size: 16px; font-weight: 700; color: #000; }
+        
+        .cp-stepper {
+          display: flex; align-items: center; gap: 8px;
+          button {
+            width: 24px; height: 24px; border: 1px solid #eee; background: #fff;
+            border-radius: 4px; font-size: 14px; display: flex; align-items: center; justify-content: center;
+          }
+          span { font-size: 13px; font-weight: 600; width: 16px; text-align: center; }
+        }
+      }
+    }
+  }
+
+  /* 悬浮结算栏 */
+  .cart-checkout-bar {
+    position: absolute;
+    bottom: 10px; 
+    left: 16px; right: 16px;
+    margin-bottom: env(safe-area-inset-bottom); 
+    background: #fff;
+    border-radius: 30px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    z-index: 10;
+
+    .select-all {
+      display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666;
+      .check-circle { 
+        width: 18px; height: 18px; border: 2px solid #ddd; border-radius: 50%; 
+        &.active { background: #000; border-color: #000; }
+      }
+    }
+
+    .total-info {
+      display: flex; gap: 6px; align-items: baseline;
+      span { font-size: 13px; color: #333; }
+      .total-price { font-size: 18px; font-weight: 700; color: #d93025; }
+    }
+
+    .btn-checkout {
+      background: #000; color: #fff;
+      border: none; border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 13px; font-weight: 600;
+    }
+  }
+
+  /* 3. 复用底栏样式 (保持一致) */
+  .shop-bottom-nav {
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    display: flex; justify-content: space-around; align-items: center; z-index: 10;
+
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; border: none; background: transparent; color: #ccc; cursor: pointer; flex: 1;
+      svg { width: 22px; height: 22px; fill: currentColor; }
+      span { font-size: 10px; font-weight: 500; }
+      &.active { color: #000; }
+    }
+  }
+}
+/* ======================================================
+   == 【新增】生活-购物个人中心样式 (Profile Page) ==
+   ====================================================== */
+#page-life-shop-profile {
+  background-color: #f7f7f7;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+
+  /* 复用 Header 样式 (微调) */
+  .shop-header {
+    position: absolute; top: 0; left: 0; width: 100%; height: 90px;
+    padding: 45px 6px 10px;
+    box-sizing: border-box;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    
+    .back-button {
+      position: absolute; left: 6px; bottom: 10px; width: 32px; height: 32px; border: none; background: transparent; color: #000;
+      display: flex; align-items: center; justify-content: center; z-index: 101;
+      svg { width: 26px; height: 26px; }
+    }
+    .shop-header-title { font-size: 17px; font-weight: 600; color: #000; }
+    .shop-header-actions {
+      position: absolute; 
+      right: 16px; /* 原来是 6px，改成 16px 与下方内容对齐 */
+      bottom: 12px; /* 稍微往上提一点点 */
+      
+      .shop-action-btn { 
+        width: 24px; /* 原来是 32px，改小 */
+        height: 24px; 
+        background: transparent; 
+        border: none; 
+        padding: 0; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: #000;
+        
+        /* 确保图标也随之缩小 */
+        svg { 
+            width: 20px; 
+            height: 20px; 
+        } 
+      }
+    }
+
+  }
+
+  /* 内容容器 */
+  .shop-profile-content {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 90px;
+    margin-bottom: 65px;
+    padding: 0 16px;
+    background-color: #f7f7f7;
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  /* 用户卡片 */
+  .user-info-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0 30px;
+    
+    .avatar-ring {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      overflow: hidden;
+      img { width: 100%; height: 100%; object-fit: cover; }
+    }
+    
+    .user-text {
+      h2 { font-size: 22px; font-weight: 700; color: #000; margin: 0 0 4px 0; }
+      .vip-badge {
+        font-size: 10px; color: #fff; background-color: #000;
+        padding: 2px 8px; border-radius: 10px; font-weight: 600; letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  /* 订单状态栏 */
+  .order-status-bar {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 10px;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+
+    .status-item {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      cursor: pointer;
+      
+      .icon-box {
+        position: relative;
+        svg { width: 24px; height: 24px; stroke: #333; }
+        .badge {
+          position: absolute; top: -5px; right: -8px;
+          background-color: #000; color: #fff;
+          font-size: 10px; min-width: 14px; height: 14px;
+          border-radius: 7px; display: flex; align-items: center; justify-content: center;
+          border: 1px solid #fff;
+        }
+      }
+      span { font-size: 12px; color: #666; font-weight: 500; }
+    }
+  }
+
+  /* 订单列表 */
+  .my-orders-list {
+    h3 { font-size: 16px; font-weight: 700; margin: 0 0 16px 4px; color: #000; }
+    
+    .order-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      
+      .order-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 14px; border-bottom: 1px solid #f9f9f9; padding-bottom: 10px;
+        .shop-title { font-size: 13px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 4px; }
+        .shop-title::after { content: '›'; color: #ccc; font-size: 16px; font-weight: 400; }
+        .status-text { font-size: 13px; color: #666; font-weight: 500; }
+        .status-text.blue { color: #000; font-weight: 600; }
+      }
+      
+      .order-body {
+        display: flex; gap: 12px; margin-bottom: 14px;
+        .product-thumb {
+          width: 70px; height: 70px; border-radius: 8px;
+          background-color: #f0f0f0; background-size: cover; background-position: center;
+          flex-shrink: 0;
+        }
+        .product-detail {
+          flex: 1;
+          .name { font-size: 14px; font-weight: 600; color: #000; margin-bottom: 4px; line-height: 1.4; }
+          .spec { font-size: 11px; color: #999; background: #f7f7f7; padding: 2px 6px; border-radius: 4px; display: inline-block; }
+        }
+        .price-col {
+          text-align: right;
+          .price { font-size: 14px; font-weight: 600; color: #000; margin-bottom: 4px; }
+          .count { font-size: 12px; color: #999; }
+        }
+      }
+      
+      .order-footer {
+        display: flex; justify-content: space-between; align-items: center;
+        .total { font-size: 13px; font-weight: 600; color: #333; }
+        .btn-group {
+          display: flex; gap: 8px;
+          .btn {
+            background: #fff; border: 1px solid #ddd; border-radius: 14px;
+            padding: 6px 12px; font-size: 12px; font-weight: 500; color: #333;
+            &.primary { background: #000; color: #fff; border-color: #000; }
+          }
+        }
+      }
+    }
+  }
+
+  /* 底部导航 (复用) */
+  .shop-bottom-nav {
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    display: flex; justify-content: space-around; align-items: center; z-index: 10;
+
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; border: none; background: transparent; color: #ccc; cursor: pointer; flex: 1;
+      svg { width: 22px; height: 22px; fill: currentColor; }
+      span { font-size: 10px; font-weight: 500; }
+      &.active { color: #000; }
+    }
+  }
+}
+/* ======================================================
+   == 【新增】商品详情页样式 (Product Detail Page) ==
+   ====================================================== */
+#page-life-product-detail {
+  background-color: #fff;
+  z-index: 200; /* 确保覆盖在列表页之上 */
+}
+
+/* 1. 顶部导航 (悬浮) */
+.shop-detail-header {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 90px;
+  padding: 45px 16px 10px;
+  box-sizing: border-box;
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 10;
+  pointer-events: none; /* 让点击穿透到图片，除了按钮 */
+}
+.shop-detail-header button {
+  pointer-events: auto;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(0,0,0,0.05);
+  display: flex; align-items: center; justify-content: center;
+  color: #000;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+// --- 修复苹果手机上编辑和分享图标不显示的问题 ---
+.shop-detail-header .header-actions {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shop-detail-header .header-actions .icon-btn {
+  pointer-events: auto;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+.shop-detail-header .header-actions .icon-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke: #000;
+}
+.shop-detail-header .back-button { position: static; } /* 重置绝对定位 */
+
+/* 2. 滚动内容 */
+.shop-detail-scroll-container {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  overflow-y: auto;
+  background-color: #f7f7f7;
+  display: flex; flex-direction: column; gap: 12px;
+  padding-bottom: 80px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  contain: content;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+
+  // iOS 可能从子元素开始触发长按选择，统一关闭详情内容的选择行为。
+  * {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* 大图 */
+.product-hero-image {
+  width: 100%; height: 380px;
+  background-color: #e0e0e0;
+  background-size: cover; background-position: center;
+  background-repeat: no-repeat;
+  contain: paint;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  flex-shrink: 0;
+}
+
+/* 主要信息 */
+.product-main-info {
+  background: #fff; padding: 16px; margin: -20px 12px 0;
+  border-radius: 16px; position: relative; z-index: 2;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+.product-main-info .price-row {
+  color: #000; display: flex; align-items: baseline; margin-bottom: 8px;
+}
+.product-main-info .currency { font-size: 16px; font-weight: 600; }
+.product-main-info .amount { font-size: 28px; font-weight: 800; margin-left: 2px; font-family: 'Didot', serif; }
+.product-main-info .sales { font-size: 12px; color: #999; margin-left: auto; font-weight: 400; }
+
+.product-main-info .product-title {
+  font-size: 18px; font-weight: 700; color: #000; margin: 0 0 12px 0; line-height: 1.4;
+}
+.product-main-info .product-tags {
+  display: flex; gap: 6px;
+}
+.product-main-info .tag {
+  font-size: 10px; color: #666; background: #f2f2f2;
+  padding: 2px 6px; border-radius: 4px;
+}
+
+/* 单元格组 */
+.product-cell-group {
+  background: #fff; padding: 0 16px;
+  margin: 0 12px; border-radius: 16px;
+}
+.cell-row {
+  display: flex; align-items: center; padding: 16px 0;
+  border-bottom: 1px solid #f9f9f9;
+  font-size: 13px;
+}
+.cell-row:last-child { border-bottom: none; }
+.cell-row .label { color: #999; width: 40px; }
+.cell-row .value { color: #333; font-weight: 500; flex: 1; }
+.cell-row .arrow { color: #ccc; font-size: 16px; }
+
+/* 评论区 */
+.product-comments-section {
+  background: #fff; padding: 16px; margin: 0 12px; border-radius: 16px;
+}
+.product-comments-section .section-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+}
+.section-header h3 { margin: 0; font-size: 15px; font-weight: 700; }
+.section-header .more { font-size: 12px; color:#000000; cursor: pointer; } /* 稍微加点强调色 */
+
+.comment-item { margin-bottom: 20px; }
+.comment-item:last-child { margin-bottom: 0; }
+.comment-item .user-row { display: flex; align-items: center; margin-bottom: 8px; }
+.comment-item .avatar { width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; background: #eee; }
+.comment-item .name { font-size: 12px; color: #666; margin-right: auto; }
+.comment-item .time { font-size: 10px; color: #ccc; }
+.comment-item .content { font-size: 13px; color: #333; line-height: 1.5; margin: 0 0 8px; }
+.comment-img-grid { display: flex; gap: 6px; }
+.comment-img-grid .c-img { width: 80px; height: 80px; border-radius: 8px; background-size: cover; }
+
+/* 底部图文详情 */
+.product-rich-details {
+  margin: 10px 12px; text-align: center;
+}
+.detail-divider {
+  font-size: 12px; color: #ccc; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.detail-divider::before, .detail-divider::after {
+  content: ''; width: 30px; height: 1px; background: #eee;
+}
+.detail-placeholder-img {
+  width: 100%; height: 300px; background: #e0e0e0; border-radius: 12px; margin-bottom: 10px;
+}
+.detail-placeholder-img.short { height: 180px; }
+
+/* 3. 底部操作栏 (Fix) */
+.shop-detail-footer {
+  position: fixed; bottom: 0; left: 0; width: 100%;
+  min-height: 60px; 
+  height: auto; 
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  display: flex; align-items: center;
+  z-index: 20; box-sizing: border-box;
+}
+
+.left-icons {
+  display: flex; gap: 10px; margin-right: 8px; 
+}
+.icon-action {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border: none; background: transparent; color: #333; cursor: pointer; gap: 2px; padding: 0;
+}
+.icon-action svg { width: 20px; height: 20px; }
+.icon-action span { font-size: 10px; font-weight: 500; }
+
+.right-buttons {
+  flex: 1; display: flex; gap: 5px;
+  justify-content: flex-end;
+}
+.shop-detail-footer .action-btn {
+   flex: 1;              /* 【修改】改为 1，让右侧三个按钮平分剩余空间 */
+  min-width: 0;         /* 防止文字挤压 */
+  height: 36px;         /* 高度保持 */
+  border-radius: 18px;  
+  border: none;
+  font-size: 11px;      
+  font-weight: 600;
+  cursor: pointer;
+}
+.shop-detail-footer .action-btn.secondary {
+  background: #f0f0f0; color: #333; border: 1px solid #e0e0e0;
+}
+.shop-detail-footer .action-btn.primary {
+  background: #000; color: #fff;
+}
+/* --- 购物专用规格弹窗样式 --- */
+#shop-specs-modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  align-items: flex-end; /* 底部对齐 */
+  pointer-events: none; /* 默认穿透 */
+}
+#shop-specs-modal-overlay.visible {
+  pointer-events: auto;
+}
+#shop-specs-modal-overlay.visible .shop-specs-card {
+  transform: translateY(0);
+}
+.shop-specs-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+  /* 【核心修复】赋予特权，允许图片突破顶部边界，不被一刀切断 */
+  overflow: visible !important; 
+}
+
+.shop-specs-header {
+  display: flex; gap: 12px; margin-bottom: 20px; position: relative;
+}
+.shop-specs-header .thumb-img {
+  width: 100px; height: 100px;
+  border-radius: 8px; background-color: #f0f0f0;
+  /* 【核心修改】改为 contain 保证显示全貌，并加 flex-shrink: 0 防止被长名字挤扁 */
+  background-size: contain; background-position: center; background-repeat: no-repeat; flex-shrink: 0;
+  margin-top: -40px; /* 让图片突出去一点，更有设计感 */
+  border: 4px solid #fff;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.shop-specs-header .main-info {
+  display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 4px;
+}
+.shop-specs-header .price { font-size: 24px; color: #000; font-weight: 700; margin-bottom: 4px; }
+.shop-specs-header .selected-text { font-size: 12px; color: #888; }
+.shop-specs-header .close-btn {
+  position: absolute; top: 0; right: 0;
+  width: 24px; height: 24px; border: none; background: #f5f5f5; border-radius: 50%;
+  color: #999; font-size: 18px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.shop-specs-body {
+  flex: 1; overflow-y: auto; margin-bottom: 20px;
+}
+.shop-spec-group { margin-bottom: 16px; }
+.shop-spec-title { font-size: 13px; color: #333; margin-bottom: 8px; font-weight: 600; }
+.shop-spec-options { display: flex; flex-wrap: wrap; gap: 10px; }
+.shop-spec-opt {
+  padding: 6px 16px; border-radius: 16px; background: #f5f5f5; color: #333; font-size: 12px;
+  border: 1px solid transparent; cursor: pointer;
+}
+.shop-spec-opt.active {
+  background: #000; color: #fff; border-color: #000;
+}
+
+.shop-specs-footer {
+  border-top: 1px solid #f0f0f0; padding-top: 16px;
+}
+.shop-specs-footer .qty-control {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+  font-size: 14px; font-weight: 600;
+}
+.shop-specs-footer .stepper {
+  display: flex; align-items: center; gap: 10px;
+}
+.shop-specs-footer .stepper button {
+  width: 28px; height: 28px; border: 1px solid #ddd; background: #fff; border-radius: 4px;
+}
+.shop-specs-footer .confirm-btn {
+  width: 100%; background: #000; color: #fff; padding: 14px; border-radius: 30px;
+  font-size: 16px; font-weight: 600; border: none; cursor: pointer;
+}
+
+/* --- 购物页吊牌弹窗样式 --- */
+.shop-tag-card {
+  width: 280px;
+  background: #fff;
+  border-radius: 4px; /* 稍微方一点，像硬卡纸 */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  padding: 20px 20px 15px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* 动画：像吊牌一样摆动出现 */
+  animation: swingIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: top right;
+}
+
+@keyframes swingIn {
+  0% { transform: rotate(-10deg) translateY(-20px); opacity: 0; }
+  100% { transform: rotate(0) translateY(0); opacity: 1; }
+}
+
+/* 装饰孔 */
+.tag-hole {
+  position: absolute; top: 15px; right: 15px;
+  width: 12px; height: 12px;
+  background: #333; border-radius: 50%;
+  border: 2px solid #e0e0e0;
+}
+/* 装饰线 (假装连着按钮) */
+.tag-string {
+  position: absolute; top: -60px; right: 20px;
+  width: 2px; height: 80px;
+  background: #333;
+  z-index: -1;
+}
+
+/* 顶部 Tab */
+.tag-tabs {
+  display: flex; border-bottom: 2px solid #f0f0f0; margin-bottom: 15px;
+  .tag-tab {
+    flex: 1; background: transparent; border: none; padding: 10px 0;
+    font-size: 13px; font-weight: 600; color: #999; cursor: pointer;
+    &.active { color: #000; border-bottom: 2px solid #000; margin-bottom: -2px; }
+  }
+}
+
+/* 内容区 */
+.tag-content { display: none; flex-direction: column; gap: 12px; 
+  &.active { display: flex; }
+}
+
+/* 输入框样式 */
+.tag-input-group {
+  display: flex; flex-direction: column; gap: 4px;
+  flex: 1; // 【新增】让在 row 里的输入框组平分空间
+  min-width: 0; // 【新增】防止输入框内容过长撑开父容器
+  label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  input, select {
+    width: 100%; // 【新增】确保充满父级
+    box-sizing: border-box; // 【新增】防止 padding 撑开宽度
+    border: 1px solid #eee; padding: 8px; font-size: 13px;
+    border-radius: 4px; outline: none; background: #fafafa;
+    &:focus { border-color: #000; background: #fff; }
+  }
+}
+.tag-row { display: flex; gap: 10px; width: 100%;}
+.tag-hint { font-size: 10px; color: #ccc; text-align: center; margin-top: 20px; }
+
+/* 图片上传 */
+.tag-upload-box {
+  width: 100%; height: 120px; background: #f4f4f4;
+  border: 1px dashed #ccc; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; cursor: pointer; position: relative;
+  img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
+  .placeholder { display: flex; flex-direction: column; align-items: center; color: #999; font-size: 10px; gap: 4px;}
+}
+
+/* 底部按钮 */
+.tag-footer {
+  margin-top: 20px; display: flex; gap: 10px;
+  button {
+    flex: 1; border: none; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+    border-radius: 2px;
+  }
+  .btn-cancel { background: #fff; border: 1px solid #eee; color: #666; }
+  .btn-confirm { background: #000; color: #fff; }
+}
+
+/* --- 购物页面批量删除样式 (轻盈半透明版) --- */
+.shop-delete-bar {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    height: 60px;
+    /* 1. 背景改为半透明磨砂白，不再是死黑 */
+    background-color: rgba(255, 255, 255, 0.85); 
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,0,0,0.05); /* 淡淡的描边 */
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px; /* 内边距微调 */
+    box-sizing: border-box;
+    z-index: 200;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* 投影更柔和 */
+    animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.shop-delete-bar .bar-btn {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666; /* 取消按钮改为灰色 */
+    padding: 0 24px;
+    height: 44px;
+    border-radius: 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.shop-delete-bar .bar-btn:active {
+    background-color: rgba(0,0,0,0.05);
+}
+
+/* 删除按钮样式优化 */
+.shop-delete-bar .bar-btn.danger {
+    /* 2. 红色改为稍微鲜艳但有质感的红，或者半透明红 */
+    background-color: #ff3b30; 
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3); /* 红色光晕 */
+}
+
+.shop-delete-bar .bar-btn.danger:active {
+    transform: scale(0.96);
+    background-color: #d93025;
+}
+
+#shop-delete-count {
+    color: #000; /* 中间文字改为黑色 */
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* --- 选中状态优化 --- */
+
+/* 1. 选中时，图片本身变暗一点点，不需要粗黑框了 */
+.cat-product-item.selected .img-box {
+    position: relative;
+    /* 给图片加一个半透明遮罩 */
+    box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.4); 
+    transition: box-shadow 0.2s;
+}
+
+/* 2. 对勾图标：改为半透明圆底 */
+.cat-product-item.selected .img-box::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    width: 32px; height: 32px; /* 稍微大一点 */
+    background-color: rgba(255, 255, 255, 0.2); /* 淡淡的半透明白底 */
+    border: 2px solid #fff; /* 白色描边 */
+    border-radius: 50%;
+    /* 这是一个白色的勾 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+    background-size: 18px;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 10;
+    backdrop-filter: blur(4px); /* 图标本身也有磨砂感 */
+    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+// ... style/_life.scss 文件末尾 ...
+
+/* ======================================================================
+   ▼▼▼ 【新增】购物结算弹窗样式 (Shop Checkout Modal) ▼▼▼
+   ====================================================================== */
+#shop-checkout-modal-overlay {
+  position: fixed !important;
+  top: 0; left: 0; width: 100%; height: 100dvh;
+  z-index: 2100; // 比普通弹窗高一点
+  align-items: flex-end; // 底部对齐
+  background-color: rgba(0, 0, 0, 0.4); // 遮罩颜色
+  
+  &.visible {
+    .shop-checkout-card { transform: translateY(0); }
+  }
+}
+
+.shop-checkout-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 24px 24px 0 0; // 顶部大圆角
+  padding: 24px 20px 40px; // 底部留出空间
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%); // 默认藏在底部
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+}
+
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  h3 { 
+    font-size: 18px; 
+    font-weight: 700; 
+    color: #000; 
+    margin: 0; 
+  }
+  
+  .close-btn {
+    width: 30px; height: 30px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    color: #666;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:active { background: #e0e0e0; }
+  }
+}
+
+.checkout-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; // 按钮之间的间距
+}
+
+.checkout-option-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  background-color: #F9F9F9; // 浅灰底色
+  border: 1px solid transparent;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  // 图标容器
+  .icon-box {
+    width: 44px; height: 44px;
+    background: #fff;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    
+    svg { width: 22px; height: 22px; stroke: #333; }
+  }
+  
+  // 文字区域
+  .text-content {
+    display: flex; flex-direction: column; align-items: flex-start;
+    flex: 1;
+    
+    .title {
+      font-size: 15px; font-weight: 600; color: #333;
+      margin-bottom: 4px;
+    }
+    .desc {
+      font-size: 12px; color: #999; font-weight: 400;
+    }
+  }
+  
+  // 右侧箭头
+  .arrow {
+    font-size: 18px; color: #ccc; margin-left: 8px; font-family: monospace;
+  }
+
+  // 点击态
+  &:active {
+    transform: scale(0.98);
+    background-color: #f0f0f0;
+  }
+  
+  // 悬停/选中态（可选）
+  &:hover {
+    border-color: #000; // 黑色边框
+    .icon-box { background: #000; svg { stroke: #fff; } } // 图标反色
+  }
+}
+
+/* ======================================================================
+   ▼▼▼ 【新增】购物分享弹窗样式 (Shop Share Modal) ▼▼▼
+   ====================================================================== */
+#shop-share-modal-overlay {
+  /* 基础遮罩样式已在行内样式定义，这里定义动画状态 */
+  &.visible {
+    .shop-share-card { transform: translateY(0); }
+  }
+}
+
+.shop-share-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24px 24px 0 0; /* 顶部大圆角 */
+  padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(100%); /* 默认藏在底部 */
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+}
+
+.share-header {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 24px;
+  
+  span {
+    font-size: 14px;
+    color: #999; /* 浅灰色标题 */
+    font-weight: 500;
+  }
+}
+
+.share-options-grid {
+  display: flex;
+  gap: 30px; /* 图标之间的间距 */
+  width: 100%;
+  margin-bottom: 30px;
+  justify-content: flex-start; /* 靠左排列 */
+  padding-left: 10px;
+}
+
+.share-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  
+  .share-icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #f5f5f5; /* 浅灰背景 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    
+    svg {
+      width: 28px;
+      height: 28px;
+      stroke: #333; /* 深灰图标 */
+    }
+  }
+  
+  .share-label {
+    font-size: 12px;
+    color: #333;
+    font-weight: 500;
+  }
+
+  /* 点击效果 */
+  &:active {
+    .share-icon-circle {
+      background-color: #e0e0e0;
+      transform: scale(0.95);
+    }
+  }
+}
+
+.share-cancel-btn {
+  width: 100%;
+  padding: 14px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  font-size: 15px;
+  color: #333;
+  font-weight: 600;
+  cursor: pointer;
+  
+  &:active {
+    background-color: #fafafa;
+  }
+}
+
+/* ======================================================================
+   ▼▼▼ 【新增】购物转发弹窗样式 (Shop Forward Modal) ▼▼▼
+   ====================================================================== */
+#shop-forward-modal-overlay {
+  /* 继承通用遮罩样式 */
+  background-color: rgba(0, 0, 0, 0.4);
+  &.visible {
+    .shop-forward-card { transform: translateY(0); }
+  }
+}
+
+.shop-forward-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px 40px; /* 底部留白 */
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh; /* 最大高度 */
+  min-height: 50vh;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+}
+
+.forward-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  
+  h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: #000;
+  }
+  
+  .close-btn {
+    width: 28px; height: 28px;
+    background: #f5f5f5;
+    border-radius: 50%;
+    border: none;
+    color: #999;
+    font-size: 20px;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+}
+
+.forward-search {
+  display: flex;
+  align-items: center;
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  
+  svg {
+    width: 16px; height: 16px;
+    stroke: #ccc;
+    margin-right: 8px;
+  }
+  
+  input {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    width: 100%;
+    outline: none;
+    &::placeholder { color: #ccc; }
+  }
+}
+
+.forward-list-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* 隐藏滚动条 */
+  &::-webkit-scrollbar { display: none; }
+  
+  .loading-placeholder {
+    text-align: center;
+    color: #999;
+    margin-top: 40px;
+    font-size: 13px;
+  }
+}
+
+/* 好友列表项 */
+.forward-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+  
+  &:active {
+    background-color: #f2f2f2;
+  }
+  
+  img {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+    background-color: #eee;
+    border: 1px solid #f0f0f0;
+  }
+  
+  .name {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .send-btn {
+    padding: 6px 14px;
+    background: #000;
+    color: #fff;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    pointer-events: none; /* 让点击事件冒泡到整行 */
+  }
+}
+/* --- 立即购买弹窗专属样式 --- */
+.shop-buy-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+
+  .buy-scroll-content {
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+
+  .buy-section {
+    margin-bottom: 20px;
+    .section-label { font-size: 12px; color: #999; margin-bottom: 8px; text-transform: uppercase; }
+    textarea, input {
+      width: 100%; border: none; background: #f7f7f7; border-radius: 12px;
+      padding: 12px; font-size: 14px; margin-bottom: 8px; box-sizing: border-box;
+      outline: none;
+    }
+    textarea { height: 60px; resize: none; }
+  }
+ .specs-section {
+    .spec-group { margin-bottom: 12px; }
+    .spec-title { font-size: 12px; color: #999; margin-bottom: 8px; }
+    .spec-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .spec-tag {
+      padding: 6px 12px; background: #f2f2f2; border-radius: 8px;
+      font-size: 12px; color: #333; cursor: pointer; transition: 0.2s;
+      &.active { background: #000; color: #fff; }
+    }
+  }
+    /* --- 新增：给角色买按钮样式 --- */
+  .buy-for-char-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to right, #fff9e0, #fffae6); /* 淡粉背景 */
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 16px; /* 和下方商品拉开距离 */
+    cursor: pointer;
+    border: 1px solid #fff9e0;
+    
+    .left {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color:#e3b420; /* 红色文字 */
+    }
+    .right { font-size: 16px; color: #ccc; font-family: monospace; }
+  }
+
+  /* --- 选中角色后的地址栏样式 (美化版) --- */
+  .char-address-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f9f9f9; /* 更干净的浅灰底色 */
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #eee; /* 增加极淡的边框 */
+    
+    img {
+      width: 44px; height: 44px; /* 头像稍微加大 */
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff; /* 头像加白边 */
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05); /* 头像加投影 */
+    }
+    
+    .char-info {
+      display: flex; 
+      flex-direction: column;
+      justify-content: center;
+      /* 删掉了 gap，改用 margin-bottom 精确控制间距 */
+
+      /* ▼▼▼ 修改点：类名从 .name 改为 .char-name ▼▼▼ */
+      .char-name { 
+        font-size: 16px;      
+        font-weight: 600;     
+        color: #000000;       
+        line-height: 1.3;     
+        margin-bottom: 3px;   
+        letter-spacing: 0.5px; 
+      }
+      
+      /* ▼▼▼ 修改点：类名从 .phone 改为 .char-phone ▼▼▼ */
+      .char-phone { 
+        font-size: 13px;      
+        color: #888888;       
+        font-weight: 400;     
+        font-family: monospace; 
+        display: flex;
+        align-items: center;
+        
+        &::before {
+            content: '';
+            display: inline-block;
+            width: 12px; height: 12px; 
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='%23888888' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-right: 5px; 
+            position: relative;
+            top: 1px; 
+        }
+      }
+    }
+
+  }
+
+  .buy-product-mini {
+    display: flex; gap: 12px; background: #f9f9f9; padding: 12px; border-radius: 16px; margin-bottom: 20px;
+    .mini-img { width: 60px; height: 60px; border-radius: 8px; background-color: #eee; background-size: cover; }
+    .mini-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; }
+    .mini-price { font-size: 16px; font-weight: 700; color: #000; }
+  }
+
+  .time-chips {
+    display: flex; gap: 8px;
+    
+    .time-chip {
+      /* 这里的 padding 稍微改小一点点，给输入框留位置 */
+      padding: 0 12px; 
+      background: #f2f2f2; 
+      border-radius: 20px; 
+      font-size: 12px; 
+      color: #666;
+      height: 28px; /* 固定高度，保证对齐 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid transparent; /* 预留边框位置防止抖动 */
+
+      &.active { 
+        background: #000; 
+        color: #fff; 
+        
+        /* 选中时，里面的输入框文字也要变白 */
+        .chip-inner-input {
+            color: #fff;
+            &::placeholder { color: rgba(255,255,255,0.7); }
+        }
+      }
+
+      /* ▼▼▼ 新增：嵌入式输入框的样式 ▼▼▼ */
+      .chip-inner-input {
+        background: transparent;
+        border: none;
+        outline: none;
+        width: 50px; /* 控制输入框宽度 */
+        text-align: center;
+        font-size: 12px;
+        color: #666; /* 默认灰色 */
+        padding: 0;
+        margin: 0;
+        
+        /* 去掉数字输入框右边的上下小箭头 */
+        &::-webkit-inner-spin-button, 
+        &::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+      }
+    }
+  }
+
+  .buy-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid #eee; padding-top: 16px; padding-bottom: env(safe-area-inset-bottom);
+    .total-bar {
+      span { font-size: 14px; color: #666; }
+      .price { font-size: 22px; font-weight: 800; color: #000; margin-left: 4px; }
+    }
+    .btn-pay {
+      background: #000; color: #fff; border: none; padding: 12px 30px; border-radius: 30px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+  }
+}
+
+/* 激活状态 */
+#shop-buy-modal-overlay.visible .shop-buy-card { transform: translateY(0); }
+.specs-section {
+  .spec-group { margin-bottom: 12px; }
+  .spec-title { font-size: 12px; color: #999; margin-bottom: 8px; text-transform: uppercase; }
+  .spec-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .spec-tag {
+    padding: 6px 12px; background: #f2f2f2; border-radius: 8px;
+    font-size: 12px; color: #333; cursor: pointer; transition: 0.2s;
+    &.active { background: #000; color: #fff; }
+  }
+}
+/* ===============================================
+▼▼▼ 【新增】精致物流翻转卡片 (Logistics Card) - 修复版 ▼▼▼
+=============================================== */
+.message-bubble.is-logistics-card {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 260px;
+  max-width: 100%;
+  perspective: 1000px; /* 3D透视 */
+  margin-top: 10px;
+  overflow: visible !important; /* 关键：允许子元素3D翻转超出平面 */
+}
+
+.logistics-card {
+  width: 100%;
+  height: 140px; /* 固定高度，防止翻转时塌陷 */
+  position: relative;
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 加点回弹效果更生动 */
+  transform-style: preserve-3d; /* 关键：保留3D空间 */
+  cursor: pointer;
+
+  &.flipped {
+    transform: rotateY(180deg);
+  }
+
+  /* 通用面样式 */
+  .card-face {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  /* --- 正面 (z-index 确保默认在上面) --- */
+ .face-front {
+    z-index: 2;
+    /* 还原为最基础的 0度 */
+    transform: rotateY(0deg);
+    padding: 16px;
+    
+    .front-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f5f5f5;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      
+      .brand { font-size: 10px; font-weight: 800; color: #000; letter-spacing: 1px; }
+      .icon { width: 14px; height: 14px; color: #333; }
+    }
+
+    .front-body {
+      flex: 1;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start; /* 顶部对齐 */
+      
+      .thumb {
+        width: 48px; height: 48px; 
+        background: #f9f9f9; 
+        border-radius: 6px;
+        background-size: cover; background-position: center;
+        border: 1px solid #eee;
+        flex-shrink: 0;
+      }
+      .info {
+        flex: 1;
+        display: flex; flex-direction: column; gap: 2px;
+        .title { 
+            font-size: 13px; font-weight: 600; color: #333; line-height: 1.3;
+            display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        /* ▼▼▼ 新增：规格样式 ▼▼▼ */
+        .specs {
+            font-size: 10px; color: #999; background: #f5f5f5; 
+            padding: 1px 4px; border-radius: 4px; width: fit-content;
+            margin-bottom: 2px;
+        }
+        .status { 
+            font-size: 10px; color: #fff; background: #000; 
+            padding: 2px 6px; border-radius: 4px; width: fit-content;
+            margin-top: auto; /* 推到底部 */
+        }
+      }
+    }
+
+    .front-footer {
+      margin-top: 8px;
+      font-size: 10px; color: #ccc; text-align: right;
+      display: flex; align-items: center; justify-content: flex-end; gap: 4px;
+    }
+  }
+
+  /* --- 背面 (预先旋转180度) --- */
+ .face-back {
+    /* 还原为最基础的 180度 */
+    transform: rotateY(180deg);
+    z-index: 1;
+    background: #fdfdfd;
+    padding: 16px;
+    justify-content: center;
+
+    .back-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: #333;
+      
+      .label { 
+        color: #999; width: 60px; flex-shrink: 0; font-size: 10px; text-transform: uppercase;
+      }
+      .value { 
+        font-weight: 500; line-height: 1.4; word-break: break-all;
+        &.highlight { color: #000; font-weight: 700; border-bottom: 1px solid #000; padding-bottom: 2px;}
+      }
+    }
+    
+    .back-barcode {
+      margin-top: auto;
+      height: 24px;
+      width: 100%;
+      background: repeating-linear-gradient(
+        to right,
+        #333 0px, #333 2px,
+        transparent 2px, transparent 4px,
+        #333 4px, #333 5px
+      );
+      opacity: 0.15;
+    }
+  }
+}
+#shop-pay-friend-fill-modal-overlay.visible .shop-buy-card { transform: translateY(0); }
+#shop-cart-fill-modal-overlay.visible .shop-buy-card {
+  transform: translateY(0);
+}
+/* 让购物车-找人代付弹窗显示出来 */
+#shop-cart-pay-friend-modal-overlay.visible .shop-buy-card {
+  transform: translateY(0);
+}
+
+/* ======================================================
+   ▼▼▼ 【重构】奢侈品级礼盒动画样式 (Black & White Luxury) ▼▼▼
+   ====================================================== */
+
+/* 1. 全屏遮罩：改为自带颗粒感的深邃夜空黑，凸显中间的高光 */
+.gift-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, rgba(80, 80, 80, 0.5) 0%, rgba(0, 0, 0, 0.85) 100%);
+    backdrop-filter: blur(8px); /* 模糊度稍微降一点，让轮廓更清晰 */
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    
+    &.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+/* 2. 礼盒容器：增加高光发光效果底座 */
+.gift-box-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    cursor: pointer;
+    /* 缓慢的呼吸浮动 */
+    animation: giftFloatLuxury 4s ease-in-out infinite; 
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    
+    /* 背后微弱的环境光，让盒子即使在黑背景下也能分离出来 */
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 10px; left: 50%; transform: translateX(-50%);
+        width: 160px; height: 20px;
+        background: rgba(255, 255, 255, 0.15);
+        filter: blur(20px);
+        z-index: 1;
+    }
+
+    &.open {
+        animation: none; 
+        pointer-events: none; 
+        
+        .gift-lid {
+            /* 更有力度的掀盖倒退动作 */
+            transform: translateY(-130px) rotateX(25deg) rotateY(10deg) scale(1.05);
+            opacity: 0;
+            transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s 0.3s;
+        }
+        .gift-body-box {
+            transform: translateY(80px) scale(0.85);
+            opacity: 0;
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s 0.2s;
+        }
+        .gift-light-glow {
+            opacity: 1;
+            /* 绽放出耀眼的光芒 */
+            transform: translate(-50%, -50%) scale(2);
+        }
+    }
+}
+
+/* 3. 盒子构造 (精致的高反差黑白) */
+
+/* 盒子身：拉丝碳灰材质感 + 顶部白光勾边 */
+.gift-body-box {
+    position: absolute;
+    top: 45px; 
+    left: 5px; 
+    width: 190px;
+    height: 150px;
+    background: linear-gradient(135deg, #2a2a2a 0%, #111111 100%);
+    border-radius: 0 0 8px 8px;
+    z-index: 5;
+    /* 双层阴影：内发光作为边缘高光，外阴影制造立体感 */
+    box-shadow: 
+        inset 0 2px 0 rgba(255,255,255,0.2), 
+        inset 0 0 20px rgba(0,0,0,0.8),
+        0 30px 60px rgba(0,0,0,0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 盖子：纯黑哑光 + 明显的白色勾勒 */
+.gift-lid {
+    position: absolute;
+    top: 0; left: 0; width: 200px; height: 55px;
+    background: #151515; 
+    border-radius: 6px;
+    z-index: 10;
+    /* 精致的包边和底部深重阴影 */
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.3), /* 顶面高光线 */
+        inset 0 -2px 0 rgba(0,0,0,0.5),      /* 底面暗角 */
+        0 15px 25px rgba(0,0,0,0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 丝带系统：带有丝绸质感的珍珠白 */
+.ribbon-cross-h, .ribbon-body-v {
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 32px; height: 100%;
+    /* 银白金属拉丝感 */
+    background: linear-gradient(90deg, #e0e0e0 0%, #ffffff 30%, #f0f0f0 50%, #ffffff 70%, #d0d0d0 100%);
+    border-left: 1px solid rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+.ribbon-cross-h {
+    z-index: 11;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.ribbon-body-v {
+    z-index: 6;
+}
+
+/* 蝴蝶结中心结：圆润立体 */
+.ribbon-knot {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    /* ▼▼▼ 修改开始：调整尺寸和质感 ▼▼▼ */
+    width: 24px; height: 24px; 
+    /* 使用线性渐变模拟丝绸的高光折痕 */
+    background: linear-gradient(135deg, #ffffff 0%, #dcdcdc 50%, #aaaaaa 100%);
+    border-radius: 40% 40% 45% 45%; /* 形状更像一个绳结，而不是正圆 */
+    z-index: 15;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+    /* ▲▲▲ 修改结束 ▲▲▲ */
+}
+/* 蝴蝶结翅膀：通透感丝带弧度 */
+.ribbon-bow-left, .ribbon-bow-right {
+    position: absolute; top: -22px; /* 稍微往上提一点 */
+    width: 50px; height: 40px; /* 调整比例，稍微压扁一点更自然 */
+    /* ▼▼▼ 修改开始：重塑形状和质感 ▼▼▼ */
+    border: 12px solid #fff; /* 加粗边框，让丝带显厚实 */
+    /* 复杂的圆角，模拟丝带弯曲的自然形态 */
+    border-radius: 60% 60% 40% 40% / 80% 80% 30% 30%;
+    z-index: 12;
+    filter: drop-shadow(0 4px 3px rgba(0,0,0,0.3)); /* 柔和阴影 */
+    transition: all 0.3s ease;
+}
+.ribbon-bow-left {
+    left: 16px; 
+    /* 调整角度和倾斜，让它看起来是向左上方翘起 */
+    transform: rotate(-30deg) skewX(10deg);
+    /* 利用边框颜色制造立体感：左下深，右上浅 */
+    border-color: #f0f0f0 transparent transparent #d0d0d0;
+}
+.ribbon-bow-right {
+    right: 16px; 
+    /* 调整角度，与左边对称 */
+    transform: rotate(30deg) skewX(-10deg);
+    /* 利用边框颜色制造立体感：右下深，左上浅 */
+    border-color: #f0f0f0 #d0d0d0 transparent transparent;
+    /* ▲▲▲ 修改结束 ▲▲▲ */
+}
+
+/* 4. 开箱光效：改为奢华的黑白钻光扩散 */
+.gift-light-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 400px; height: 400px;
+    /* 内心极亮，边缘消散 */
+    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0) 70%);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 1s cubic-bezier(0.1, 0.8, 0.3, 1);
+    mix-blend-mode: plus-lighter;
+    z-index: 100;
+}
+
+/* 5. 结果展示卡片 (高级成衣水洗标 / 鉴定卡风格) */
+.gift-reveal-content {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    width: 300px;
+    z-index: 200;
+}
+.gift-overlay.revealed .gift-reveal-content {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+}
+
+.reveal-card {
+    background: #ffffff;
+    /* 模仿高级包装纹理，极细微的虚线外框 */
+    border: 1px solid #eee;
+    outline: 1px dashed #d0d0d0;
+    outline-offset: -8px;
+    padding: 30px 24px 24px;
+    border-radius: 4px; /* 直角边缘更显硬朗和现代 */
+    text-align: center;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    
+    /* 顶部黑底白字小标签 */
+    &::before {
+        content: "SPECIAL DELIVERY";
+        position: absolute;
+        top: -12px; left: 50%; transform: translateX(-50%);
+        background: #000; color: #fff;
+        font-family: -apple-system, sans-serif;
+        font-size: 10px; font-weight: 700; letter-spacing: 2px;
+        padding: 4px 12px;
+    }
+}
+
+.reveal-header {
+    font-size: 10px; color: #aaa; letter-spacing: 3px; margin-bottom: 20px; font-weight: 700; text-transform: uppercase;
+}
+.reveal-img-wrapper {
+    width: 160px; height: 160px;
+    margin-bottom: 20px;
+    border-radius: 0; /* 纯方正图 */
+    overflow: hidden;
+    background: #f4f4f4;
+    border: 1px solid rgba(0,0,0,0.05);
+    /* 高级感的图片底纹 */
+    position: relative;
+    
+    img {
+        width: 100%; height: 100%; object-fit: cover;
+    }
+}
+.reveal-card h3 {
+    font-family: 'Didot', 'Times New Roman', serif; /* 衬线体显贵 */
+    font-size: 22px; margin: 0 0 8px; color: #000; font-weight: 700; letter-spacing: -0.5px;
+}
+.reveal-desc {
+    font-size: 12px; color: #888; margin: 0 0 24px; line-height: 1.4; font-weight: 500;
+}
+.btn-accept-gift {
+    width: 100%; /* 全宽按钮 */
+    background: #000; color: #fff;
+    border: none; padding: 14px 0;
+    border-radius: 2px; /* 直角按钮 */
+    font-size: 13px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+    
+    &:active { 
+        transform: scale(0.97); 
+        background: #222;
+    }
+}
+
+/* 呼吸动画：更加克制沉稳的漂浮 */
+@keyframes giftFloatLuxury {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+/* ======================================================================
+   ▼▼▼ 【新增】购物车结算清单样式 ▼▼▼
+   ====================================================================== */
+/* 这里的样式用于购物车结算弹窗里的商品列表 */
+.checkout-product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* 商品之间的间距 */
+  margin-bottom: 10px;
+}
+
+.checkout-product-item {
+  display: flex;
+  gap: 12px;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 12px;
+  align-items: center;
+
+  /* 商品小图 */
+  .thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    background-color: #eee;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+  }
+
+  /* 右侧信息 */
+  .info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden; /* 防止文字溢出 */
+
+    .title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .specs {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 2px;
+    }
+    
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        .price { font-weight: 700; color: #000; }
+        .count { color: #888; }
+    }
+  }
+}

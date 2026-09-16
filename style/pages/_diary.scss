@@ -1,0 +1,1184 @@
+// 文件路径: /style/pages/_diary.scss
+// 描述: 日记列表页和详情页样式 (3.0 修复顶栏布局 + 精致黑白版)
+
+// --- 0. 变量定义 ---
+$diary-bg: #F9F9F9;           // 极浅灰白底色
+$diary-card-bg: #FFFFFF;      // 纯白卡片
+$diary-text-main: #1D1D1F;    // 苹果风深邃黑
+$diary-text-body: #555555;    // 优雅灰
+$diary-accent: #D3B8AE;       // 豆沙色 (点缀)
+$diary-border-radius: 24px;   // 统一的大圆角
+
+// --- 1. 页面容器 ---
+.diary-list-page,
+.diary-detail-page {
+  background-color: transparent; 
+  // 1. 默认读取列表壁纸变量，如果没有则显示背景色
+  background-image: var(--diary-list-wallpaper); 
+  // 2. 确保壁纸铺满且居中
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200; 
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+
+  &.active {
+    transform: translateX(0);
+  }
+// 专门为详情页指定它的壁纸变量
+.diary-detail-page {
+  background-image: var(--diary-detail-wallpaper) !important;
+}
+  // 内容滚动区
+  .app-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    -webkit-overflow-scrolling: touch;
+    background-color: transparent !important; 
+    &::-webkit-scrollbar { display: none; }
+    scrollbar-width: none;
+  }
+}
+
+// --- 2. 头部样式 (布局完全重构) ---
+// 参考 _settings.scss 中 #page-settings-account 的策略
+// 放弃不可靠的 env()，直接使用舒适的固定高度
+.diary-header {
+  // 【关键修改】去除磨砂白底，改为全透明，让壁纸通顶显示
+  background-color: transparent; 
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  
+  // 保持原有布局参数
+  padding-top: 50px; 
+  padding-bottom: 16px; 
+  
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  // 【可选】去除分割线，让纸张感更强（如果想要分割线可以保留这行）
+  border-bottom: none; 
+  flex-shrink: 0;
+  // 返回按钮：绝对定位在左侧
+  // 注意：top值设为 padding-top 附近，确保视觉居中
+  .back-btn {
+    position: absolute;
+    left: 20px;
+    top: 52px; // 视觉微调，与标题行对齐
+    
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.1); // 极细的圈
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: $diary-text-main;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+
+    &:active {
+      background-color: #f0f0f0;
+      transform: scale(0.95);
+    }
+  }
+
+  h1 {
+    font-family: -apple-system, "Songti SC", "Noto Serif SC", serif; // 使用宋体/衬线体增加精致感
+    font-size: 18px;
+    font-weight: 600;
+    color: $diary-text-main;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: 2px; // 增加字间距
+  }
+
+  // 装饰性元素：正负形线条
+  .decoration-line {
+    margin-top: 10px;
+    width: 30px;
+    height: 2px;
+    background-color: $diary-text-main; // 黑色实线
+    position: relative;
+    border-radius: 2px;
+
+    // 左侧：豆沙色实心圆 (正形)
+    &::before {
+        content: '';
+        position: absolute;
+        left: -12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: $diary-accent;
+    }
+
+    // 右侧：黑色空心圆 (负形)
+    &::after {
+      content: '';
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      border: 1px solid $diary-text-main;
+      background-color: transparent;
+    }
+  }
+// ▼▼▼ 在 _diary.scss 的 .diary-header { ... } 内部，追加以下代码 ▼▼▼
+
+  // 【新增】右上角操作按钮容器
+  .header-actions-right {
+    position: absolute;
+    right: 20px;
+    top: 52px; // 与返回按钮的 top 值保持一致
+    display: flex;
+    gap: 8px; // 两个按钮之间的间距
+  }
+
+  // 【新增】单个操作按钮的统一样式
+  .header-action-btn {
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.1);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: $diary-text-main;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+
+    svg {
+      width: 16px; // 图标大小
+      height: 16px;
+    }
+
+    &:active {
+      background-color: #f0f0f0;
+      transform: scale(0.95);
+    }
+  }
+
+// ▲▲▲ 追加代码到这里结束 ▲▲▲
+}
+
+// --- 3. 日记列表页: 无轴设计 + 拨盘元素 ---
+.diary-timeline-container {
+  // 修改：增加底部内边距，为悬浮按钮留出空间
+  padding: 20px 24px 120px 24px; 
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+  // 【核心修改】移除时间轴竖线
+  &::before {
+    display: none;
+  }
+}
+.diary-entry-card {
+  display: flex;
+  // 修改：增大卡片间距
+  margin-bottom: 40px; 
+  position: relative;
+  align-items: flex-start;
+  // --- 左侧：日期拨盘孔 (Dial Hole Design) ---
+  .entry-date-stamp {
+    flex-shrink: 0;
+    width: 50px;  // 修改：减小尺寸，更精致
+    height: 50px;
+    margin-right: 16px;
+    margin-top: 4px; // 稍微下移，与卡片内容视觉对齐
+    
+    // 【核心修改】替换为拨盘孔样式
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: linear-gradient(145deg, #ffffff, #f0f0f0); // 增加微妙的立体感
+    box-shadow: 
+        inset 2px 2px 5px rgba(0,0,0,0.05), // 内阴影制造凹陷感
+        5px 5px 10px rgba(0,0,0,0.03);    // 外阴影制造悬浮感
+        
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    .day {
+      font-family: "Didot", "Times New Roman", serif; // 使用更复古的字体
+      font-size: 22px; // 字体调小
+      font-weight: 700;
+      color: $diary-text-main;
+      line-height: 1;
+    }
+    .month {
+      font-size: 9px;
+      color: #b08f7d; // 使用偏复古的金色/棕色
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+    
+    // 【新增】连接线，像一个挂坠
+    &::before {
+        content: '';
+        position: absolute;
+        right: -16px; // 连接到卡片
+        top: 50%;
+        width: 16px;
+        height: 1px;
+        background-color: rgba(0,0,0,0.05); // 极淡的连接线
+    }
+  }
+
+  // 内容卡片：极简信纸风格 (紧凑版)
+  .entry-content {
+    background-color: $diary-card-bg;
+    border-radius: 16px; // 圆角稍微改小一点点，更精致
+    border-top-left-radius: 2px; // 保持折角设计
+    
+    padding: 16px 16px 5px 16px; 
+    min-height: 90px;
+    position: relative; // 设为相对定位，作为子元素的参考坐标
+    flex-grow: 1;
+    position: relative; // 设为相对定位，作为子元素的参考坐标
+    flex-grow: 1;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.02); // 阴影调淡，更贴合纸面
+    border: 1px solid #fff;
+    transition: transform 0.2s ease;
+
+    &:active {
+      transform: scale(0.99);
+    }
+    
+    .entry-snippet {
+      font-size: 14px; // 字体微调
+      color: #333;
+      line-height: 1.6; // 行高微调，更紧凑
+      margin: 0; // 去掉底部边距，由父级 padding 控制
+      font-weight: 400;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;  
+      overflow: hidden;
+    }
+    
+    // --- 底部统一工具栏区域 ---
+    
+    // 1. 左侧：元信息 (缩略图等)
+    .entry-meta {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0; 
+      height: 30px; // 固定高度
+      padding: 0 16px; // 与卡片内边距对齐
+      
+      display: flex;
+      align-items: center;
+      
+      // 【关键】只保留这一条分割线，且横跨整个卡片
+      border-top: 1px solid rgba(0,0,0,0.06); 
+      border-bottom: none; // 去掉多余的线
+
+      .entry-thumbnail {
+        width: 24px; // 头像调小
+        height: 24px;
+        border-radius: 50%; 
+        object-fit: cover;
+        border: 1px solid #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        // 如果没有地点文字，缩略图不需要 margin-left
+        margin: 0; 
+      }
+      
+      // 如果 JS 里还残留 location 结构，这里强制隐藏它，确保万无一失
+      .entry-location {
+          display: none; 
+      }
+    }
+
+    // 2. 右侧：操作按钮 (悬浮在 Meta 之上)
+    .entry-actions {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        height: 30px; // 与 meta 高度一致
+        padding-right: 12px; // 右侧留白
+        
+        display: flex;
+        align-items: center;
+        gap: 8px; // 按钮稍微紧凑一点
+        z-index: 2; // 确保按钮在分割线之上点击有效
+        
+        .action-btn {
+            background: transparent;
+            border: none;
+            width: 35px;  // 增大触摸区域但减小视觉占用
+            height: 35px;
+            border-radius: 10px;
+            color: #ccc; // 默认颜色更淡，不抢眼
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            svg {
+                width: 15px; // 图标更精致
+                height: 15px;
+            }
+
+            &:active {
+                background-color: #f0f0f0;
+                color: #555;
+            }
+
+            // 单独定义删除按钮激活色
+            &.delete-btn:active {
+                color: #D93026;
+                background-color: rgba(217, 48, 38, 0.05);
+            }
+        }
+    }
+  }
+
+
+}
+// --- 4. 日记详情页: 极简杂志风 ---
+.diary-detail-page {
+  
+  .app-content {
+    padding: 0 0 60px 0;
+    background-color: transparent; // 详情页纯白底
+  }
+
+  // 顶部留白
+  .detail-top-spacer { height: 20px; }
+
+  .diary-article {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px 28px;
+   // 【关键修改】去除白色卡片背景和阴影
+    background-color: transparent !important; 
+    box-shadow: none !important;
+    border-radius: 0;
+    
+    // 【建议】给文字加一层淡淡的白色光晕，防止壁纸太深导致字看不清
+    // 如果你的壁纸很浅，可以把下面这行 text-shadow 删掉
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .article-meta {
+    text-align: center;
+    margin-bottom: 40px;
+    
+    // 日期
+    .article-date {
+      font-family: 'Times New Roman', serif;
+      font-size: 32px;
+      font-weight: 400;
+      color: $diary-text-main;
+      margin: 0 0 10px 0;
+    }
+    
+    // 天气 (线条框风格)
+    .article-weather {
+      display: inline-block;
+      font-size: 12px;
+      padding: 4px 16px;
+      color: $diary-text-body;
+      border: 1px solid #eee;
+      border-radius: 20px;
+      letter-spacing: 1px;
+    }
+  }
+
+  // 分割线：极简的三个点
+  .separator-line {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 40px;
+
+    &::before, &::after {
+        content: '';
+        width: 4px;
+        height: 4px;
+        background-color: #ddd;
+        border-radius: 50%;
+    }
+    // 中间的一个是豆沙色
+    &::before { background-color: $diary-accent; }
+  }
+  
+  .article-body {
+    p {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 16px;
+      line-height: 1.9; // 很宽松的行高，适合阅读
+      color: #333;
+      text-align: justify;
+      margin-bottom: 24px;
+      
+      // 首段首字放大
+      &:first-of-type::first-letter {
+          font-family: 'Times New Roman', serif;
+          font-size: 40px;
+          float: left;
+          line-height: 0.8;
+          margin-right: 8px;
+          margin-top: 4px;
+          color: $diary-text-main;
+      }
+    }
+    
+    // 图片：无边框，大圆角，阴影
+    .article-image {
+      width: 100%;
+      border-radius: 16px;
+      margin: 20px 0 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08); // 更加弥散的阴影
+      display: block;
+    }
+  }
+}
+
+// --- 5. 响应式微调 ---
+@media (max-width: 380px) {
+  // 小屏手机适配
+  .diary-header { padding-top: 40px; } // 稍微减少一点
+  .diary-header .back-btn { top: 42px; }
+  .diary-entry-card .entry-content { padding: 16px; }
+}
+// --- 4. 悬浮时间拨盘按钮 (Floating Time Dial) ---
+// 这个样式对应 JS 中即将添加的 <div class="floating-dial-btn">
+.floating-dial-btn {
+  position: absolute;
+  bottom: 30px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: $diary-text-main; // 黑色底
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 300;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  // 内部的圆环结构
+  &::before {
+    content: '';
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2); // 淡淡的白环
+  }
+  
+  // 拨盘上的小孔 (装饰)
+  &::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 6px;
+    height: 6px;
+    background-color: #fff;
+    border-radius: 50%;
+  }
+  // 图标 (时钟)
+  svg {
+    width: 24px;
+    height: 24px;
+    stroke: #fff;
+    stroke-width: 1.5;
+    transition: transform 0.4s ease;
+  }
+  &:active {
+    transform: scale(0.9) rotate(20deg); // 点击时旋转一下
+  }
+}
+
+.dial-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(249, 248, 245, 0.9); // 温暖的米色背景
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+
+  &.visible { opacity: 1; pointer-events: auto; }
+
+  // --- 1. 年份控制器 (去棕色，改为中性深灰色) ---
+  .dial-year-control {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      margin-bottom: 35px;
+      opacity: 0;
+      animation: fadeIn-up 0.6s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+
+      .year-text {
+          font-family: "Georgia", serif;
+          font-size: 32px;
+          font-weight: 400;
+          color: #555; // 中性深灰色，比黑色柔和，比棕色更干净
+          letter-spacing: 1.5px;
+      }
+
+      .year-btn {
+          background: transparent; border: none;
+          color: #CCC; // 浅灰色
+          font-size: 22px; cursor: pointer;
+          transition: color 0.3s;
+          &:hover { color: #777; }
+      }
+  }
+
+  // --- 2. 主圆盘容器 ---
+  .rotary-dial-container {
+    position: relative;
+    width: 330px; height: 330px;
+    touch-action: none;
+    opacity: 0; transform: scale(0.9);
+    animation: fadeIn-scaleUp 0.6s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    
+    // 指针
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0; 
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #E85D54; // 珊瑚红
+      z-index: 100;
+    }
+  }
+  
+  // --- 3. 圆环 (保持外白内灰的层次) ---
+  .dial-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box; border: none;
+    transition: box-shadow 0.3s ease;
+
+    // 外圈: 日期 (Day) - 浮起的白盘
+    &.ring-outer {
+        width: 100%; height: 100%;
+        background-color: #FFFFFF; // 纯白，与米色背景形成对比
+        box-shadow: 0 15px 50px rgba(100, 100, 100, 0.1); 
+        z-index: 1;
+    }
+
+    // 内圈: 月份 (Month) - 凹陷的灰盘
+    &.ring-inner {
+        width: 60%; height: 60%;
+        background-color: #F5F5F7; // 中性浅灰
+        box-shadow: inset 0px 3px 15px rgba(0, 0, 0, 0.05);
+        z-index: 2;
+    }
+    
+    // 激活状态的光影增强
+    &.active {
+        &.ring-outer { box-shadow: 0 20px 60px rgba(100, 100, 100, 0.15); }
+        &.ring-inner { box-shadow: inset 0px 4px 20px rgba(0, 0, 0, 0.08); }
+    }
+  }
+
+  // --- 4. 数字项 (去棕色) ---
+  .dial-item {
+    position: absolute;
+    top: 50%; left: 50%; 
+    width: 32px; height: 32px; line-height: 32px;
+    margin-top: -16px; margin-left: -16px;
+    text-align: center;
+    font-size: 14px;
+    color: #BBB; // 浅灰色
+    font-family: -apple-system, "SF Pro Text", sans-serif;
+    font-weight: 400; user-select: none;
+    transition: color 0.3s, font-weight 0.3s;
+
+    &.active {
+      color: #333; // 激活时变为深灰色
+      font-weight: 600;
+    }
+  }
+  .ring-outer .dial-item.active {
+      color: #E85D54; // 指针下的日期，用珊瑚红强调
+      font-size: 16px;
+  }
+
+  // --- 5. 中心轴 (核心修改：黑色实体) ---
+  .dial-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30%; height: 30%; // 略微减小，显得更精致
+    border-radius: 50%;
+    
+    // 使用纯黑作为视觉锚点
+    background-color: #1C1C1E;
+    color: #FFFFFF; // 文字用纯白
+    
+    // 强烈的黑色阴影，使其从灰色内圈上“浮”起来
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center; align-items: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: transform 0.1s ease;
+    
+    &:active { transform: translate(-50%, -50%) scale(0.95); }
+    
+    .dial-center-label { font-size: 9px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; }
+    .dial-center-value { font-family: "Georgia", serif; font-size: 16px; }
+  }
+  
+  // --- 6. 确认/关闭按钮 ---
+  .dial-confirm-btn {
+      margin-top: 45px;
+      padding: 12px 50px;
+      background-color: #1c1c1e; // 与中心轴颜色统一
+      color: #fff;
+      border: none; border-radius: 30px;
+      font-size: 15px; font-weight: 500;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      cursor: pointer; opacity: 0;
+      animation: fadeIn-up 0.6s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      transition: all 0.2s;
+      
+      &:active { transform: scale(0.97); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+  }
+  
+  .close-dial-btn {
+      position: absolute;
+      bottom: 30px;
+      font-size: 14px; color: #AAA; // 中性灰
+      background: none; border: none; cursor: pointer;
+      opacity: 0;
+      animation: fadeIn-up 0.6s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+}
+
+// 动画
+@keyframes fadeIn-up { to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn-scaleUp { to { opacity: 1; transform: scale(1); } }
+
+  // 【新增】写日记按钮的加载状态
+  .header-action-btn.writing {
+    svg {
+      animation: diary-writing-spin 1.2s linear infinite;
+    }
+  }
+
+// 【新增】旋转动画的定义
+@keyframes diary-writing-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// 【新增】日记为空时的提示文字样式
+.empty-diary-prompt {
+  text-align: center;
+  margin-top: 50px;
+  color: #999;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#diary-multiselect-footer {
+  position: absolute; // 1. 固定在页面上
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95); // 磨砂背景
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 12px 20px 30px; // 底部留出安全区
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  z-index: 350; // 确保在时间拨盘按钮之上
+  
+  display: flex;
+  justify-content: space-around; // 按钮平均分布
+  align-items: center;
+  // 2. 默认隐藏状态
+  opacity: 0;
+  transform: translateY(100%);
+  pointer-events: none;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  // 单个操作按钮
+  .footer-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #555;
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+  
+  // 删除按钮特殊样式
+  .delete-btn {
+    color: #D93026; // 危险操作红色
+  }
+}
+// 3. 进入多选模式时，显示工具栏
+// (这个 class 将在后续的 JS 逻辑中被添加到 .diary-list-page 上)
+.diary-list-page.multiselect-active #diary-multiselect-footer {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+// --- 问题 2 修复：调整弹窗顶部横条位置 ---
+#diary-settings-modal .diary-settings-header::before {
+  top: 2px; // 将原来的 8px 或其他值改为 4px，使其更靠上
+}
+// 文件路径: _diary.scss
+
+// ... (您现有的所有scss代码) ...
+
+// ▼▼▼ 【请将此代码块完整地粘贴到 _diary.scss 文件的最底部】 ▼▼▼
+
+// --- 壁纸应用修复：使用 CSS 变量方案 ---
+
+// 为列表页和详情页的伪元素设置基础样式
+.diary-list-page::before,
+.diary-detail-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: -1; // 确保在内容之下
+  opacity: 0.5; // 壁纸透明度
+  transition: opacity 0.3s ease-in-out; // 切换时有淡入淡出效果
+}
+
+// 分别为列表页和详情页设置背景图变量
+.diary-list-page::before {
+  background-image: var(--diary-list-wallpaper, none); // 使用 --diary-list-wallpaper 变量, 默认为 none
+}
+
+.diary-detail-page::before {
+  background-image: var(--diary-detail-wallpaper, none); // 使用 --diary-detail-wallpaper 变量, 默认为 none
+}
+
+// ▲▲▲ 粘贴到此结束 ▲▲▲
+// _diary.scss
+
+// ... (你现有的所有 SCSS 代码) ...
+
+// ▼▼▼ 【补救】从这里开始复制：恢复日记设置弹窗的样式 ▼▼▼
+
+#diary-settings-modal {
+  // --- 基础布局与动画 ---
+  display: flex;
+  align-items: flex-end; // 让弹窗从底部出现
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+
+    .modal-card.diary-settings-card {
+      transform: translateY(0); // 弹窗滑入屏幕
+    }
+  }
+   .modal-card.diary-settings-card {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 28px 28px 0 0;
+    background-color: #f7f7f7;
+    
+    // ▼▼▼ 【核心修复：内部填充下沉法】 ▼▼▼
+    // 将内部海绵垫高 200px，再用负外边距往下沉，完美填平系统漏洞且无视裁剪
+    padding: 12px 0 200px; 
+    margin-bottom: -170px;
+    // ▲▲▲ 修复结束 ▲▲▲
+
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+    border: none;
+    transform: translateY(100%); // 默认隐藏在屏幕下方
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  // --- 弹窗头部 ---
+  .diary-settings-header {
+    padding: 4px 20px 16px;
+    text-align: center;
+    position: relative;
+
+    // 顶部拖动条
+    &::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 4px;
+      background-color: #d1d1d6;
+      border-radius: 2px;
+    }
+
+    .settings-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: $diary-text-main;
+      margin: 20px 0 0; // 为拖动条留出空间
+    }
+
+    .settings-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 14px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #e5e5ea;
+      border: none;
+      color: #8e8e93;
+      font-size: 22px;
+      line-height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  // --- 内容区域 ---
+  .diary-settings-content {
+    padding: 0 20px;
+    margin-top: 16px;
+  }
+
+  .settings-group {
+    background-color: #fff;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px; // 调整为更舒适的内边距
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    &:active {
+      background-color: #f0f0f0;
+    }
+
+    .label {
+      font-size: 16px;
+      font-weight: 400;
+      color: $diary-text-main;
+    }
+
+    .value-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px; // 增大间距
+      color: #8e8e93;
+      font-size: 16px;
+
+      .arrow {
+        font-size: 18px;
+        color: #c7c7cc;
+      }
+    }
+    
+    // 危险操作项的文本颜色
+    &.danger .label {
+      color: #D93026;
+      text-align: center;
+      width: 100%;
+    }
+  }
+  
+  // --- 壁纸来源选择弹窗 (Action Sheet 风格) ---
+  &.wallpaper-source-card {
+    padding: 0;
+    width: calc(100% - 16px);
+    max-width: 400px;
+    margin: 0 8px 8px;
+    border-radius: 14px;
+    background-color: transparent;
+    box-shadow: none;
+
+    .action-sheet-group {
+      background-color: rgba(249, 249, 249, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 14px;
+      margin-bottom: 8px;
+      
+      .action-sheet-btn {
+        width: 100%;
+        padding: 18px 0;
+        font-size: 17px;
+        color: #007aff;
+        border: none;
+        background: transparent;
+        
+        &:not(:last-child) {
+          border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        &.cancel {
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+// ▲▲▲ 粘贴到这里结束 ▲▲▲
+// _diary.scss
+
+// ... (您现有的所有其他SCSS代码) ...
+
+// ▼▼▼ 【新增】从这里开始，添加多选删除的精致样式 ▼▼▼
+
+// --- 1. 多选模式下，日记卡片左侧增加一个占位空间 ---
+.diary-list-page.multiselect-active {
+  .diary-entry-card {
+    // 关键：给左侧的日期戳增加一个左外边距，为多选框腾出空间
+    .entry-date-stamp {
+      margin-left: 30px; 
+    }
+  }
+}
+
+// --- 2. 多选框容器的样式 ---
+.multiselect-checkbox-container {
+  position: absolute;
+  left: 24px; // 与 timeline 容器的 padding 对齐
+  top: 58px;   // 定位在日期戳的下方
+  width: 24px;
+  height: 24px;
+  
+  // 默认隐藏
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  // 隐藏原生 checkbox
+  .multiselect-checkbox {
+    display: none;
+  }
+
+  // 自定义 checkbox 外观
+  .checkbox-label {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+    
+    // 勾选后的图标 (SVG)
+    svg {
+      width: 100%;
+      height: 100%;
+      stroke: #fff;
+      stroke-width: 3;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s ease;
+    }
+  }
+  
+  // 原生 checkbox 被勾选时，改变 label 的样式
+  .multiselect-checkbox:checked + .checkbox-label {
+    background-color: rgba(60, 60, 67, 0.6); // 【修改】改为与按钮同款的半透明深灰色
+    border-color: transparent; // 【修改】边框改为透明，让其完全融入背景
+    
+    svg {
+      opacity: 1;
+      transform: scale(0.7);
+    }
+  }
+}
+
+// --- 3. 多选模式激活时，显示多选框 ---
+.diary-list-page.multiselect-active .multiselect-checkbox-container {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+// --- 4. 被选中的卡片，增加一个遮罩层以示区分 ---
+.diary-entry-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(180, 180, 180, 0.15); // 【修改】改为更淡的半透明灰色
+  border-radius: inherit; // 继承父元素的圆角
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.diary-entry-card.selected-for-delete::after {
+  opacity: 1;
+}
+
+// --- 5. 【核心】重构底部删除/取消按钮 ---
+// 移除旧的 #diary-multiselect-footer 样式，因为它不再是 footer
+#diary-multiselect-footer {
+  // 旧的 footer 变为一个透明的、不占空间的容器
+  background: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  border-top: none;
+  padding: 0;
+  height: 0; // 不占高度
+
+  // 隐藏旧的按钮
+  .footer-action {
+    display: none;
+  }
+}
+
+// 新的独立悬浮按钮样式
+.multiselect-action-btn {
+  position: absolute;
+  bottom: 40px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: rgba(60, 60, 67, 0.6); // 半透明深灰色
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: none;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 400; // 确保在最上层
+  
+  // 默认隐藏
+  opacity: 0;
+  transform: translateY(30px) scale(0.8);
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  svg {
+    width: 26px;
+    height: 26px;
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  
+  // 定位
+  &.cancel-btn {
+    left: 40px;
+  }
+  &.delete-btn {
+    right: 40px;
+    background-color: rgba(255, 59, 48, 0.7); // 删除用红色
+  }
+}
+
+// 多选模式激活时，显示新按钮
+.diary-list-page.multiselect-active .multiselect-action-btn {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+#diary-font-modal {
+  // 关键！设置一个非常高的层级，确保它在所有东西之上
+  z-index: 1250; 
+  .diary-font-input-card {
+    // 让它看起来像个标准的输入弹窗
+    width: 85%;
+    max-width: 320px;
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    h3 {
+      text-align: center;
+      margin: 0 0 4px;
+      font-size: 17px;
+    }
+    .styled-input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #d1d1d6;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+    }
+  }
+}

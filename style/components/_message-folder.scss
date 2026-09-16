@@ -1,0 +1,30 @@
+// 文件: /style/components/_message-folder.scss
+// ▼▼▼【用下面的代码替换文件的全部内容】▼▼▼
+
+.message-folder {
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 0; // 调整一下间距
+  width: 100%;
+
+  .btn-load-more {
+    // 基础样式
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    // 核心：半透明小气泡样式
+    background-color: rgba(142, 142, 147, 0.12); // 半透明灰色背景
+    color: #8e8e93; // 中性灰色文字
+    padding: 0.4rem 0.8rem; // 调整内边距，让气泡更小巧
+    border-radius: 1rem; // 圆角
+
+    // 鼠标悬浮时的效果
+    &:hover {
+      background-color: rgba(142, 142, 147, 0.20); // 悬浮时加深一点
+      color: #6c6c70;
+    }
+  }
+}
+

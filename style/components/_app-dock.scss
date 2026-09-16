@@ -1,0 +1,25 @@
+// 文件路径: styles/components/_app-dock.scss
+// 描述: 主屏幕底部的 Dock 栏容器。
+
+.app-dock {
+  position: absolute;
+  bottom: 30px;
+  left: var(--space-md);
+  right: var(--space-md);
+  height: 85px;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 28px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 var(--space-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  // Dock 栏内的 app-icon 特殊样式
+  .app-icon .app-name {
+    display: none;
+  }
+}

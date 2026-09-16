@@ -1,0 +1,57 @@
+/* 
+  “启动幕帘”：默认隐藏整个 body，
+  防止在 JS 初始化完成前出现内容闪烁或布局错乱。
+  JS 会在一切就绪后将其设置为 'visible'。
+*/
+body {
+  visibility: visible;
+}
+
+body.is-booting #flj8W {
+  visibility: hidden;
+}
+
+/* ===== 基础布局样式 ===== */
+body {
+  margin: 0;
+  padding: 0;
+  
+  /* ▼▼▼ 修改开始：把 body 钉死在屏幕上，这是 iOS 不乱动的关键 ▼▼▼ */
+  position: fixed; 
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden; 
+  /* ▲▲▲ 修改结束 ▲▲▲ */
+
+  height: 100%;     
+  width: 100%;
+  
+  overscroll-behavior: none;
+  background-color: var(--c-bg-primary, #ffffff);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+:root {
+  /* 默认情况下，这个变量是空的，所以会使用备用字体 */
+  --custom-font-family: ; 
+}
+
+*, *::before, *::after {
+  /* 当 --custom-font-family 有值时，它会被优先使用 */
+  font-family: var(--custom-font-family), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* ===== 全局防误触优化 ===== */
+/* 禁止在图片和小组件上长按时弹出系统菜单 (如“保存图片”)，提升App感 */
+img, .large-photo-widget, .ticket-widget, .app-icon {
+  -webkit-touch-callout: none; /* iOS Safari 关键 */
+  user-select: none;           /* 禁止选中文本 (标准) */
+  -webkit-user-select: none;   /* 兼容旧版 Safari */
+}

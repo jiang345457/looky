@@ -1,0 +1,209 @@
+.github-backup-card {
+  margin: 0 0 12px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+}
+
+.github-backup-header,
+.github-backup-fields-row,
+.github-backup-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.github-backup-header {
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.github-backup-title,
+.github-backup-subtitle,
+.github-backup-field,
+.github-backup-note {
+  display: block;
+}
+
+.github-backup-title {
+  color: #111;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.github-backup-subtitle,
+.github-backup-note {
+  color: #888;
+  font-size: 12px;
+}
+
+.github-backup-subtitle { margin-top: 4px; }
+.github-backup-status {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-disconnected { background: #fff4e5; color: #a15c00; }
+.status-connected { background: #e7f7ed; color: #19733b; }
+.status-error { background: #ffebeb; color: #b3261e; }
+
+.github-backup-step {
+  display: flex;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.github-backup-step-number {
+  display: flex;
+  flex: 0 0 24px;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.github-backup-step-body { flex: 1; min-width: 0; }
+.github-backup-step-body > strong { display: block; color: #222; font-size: 13px; }
+.github-backup-step-body > span:not(.github-backup-hint) { display: block; margin-top: 4px; color: #888; font-size: 11px; line-height: 1.45; }
+
+.github-login-button,
+.github-secondary-button {
+  width: 100%;
+  min-height: 36px;
+  margin-top: 9px;
+  border: 0;
+  border-radius: 9px;
+  background: #f0f1f6;
+  color: #222;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.github-login-button { background: #24292f; color: #fff; }
+
+.github-backup-field {
+  flex: 1;
+  margin-bottom: 10px;
+  color: #666;
+  font-size: 12px;
+}
+
+.github-backup-field input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 5px;
+  padding: 10px;
+  border: 1px solid #e1e1e1;
+  border-radius: 9px;
+  background: #fafafa;
+  color: #222;
+  font: inherit;
+}
+
+.github-backup-step .github-backup-field { margin-top: 8px; margin-bottom: 0; }
+.github-account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 9px 10px;
+  border: 1px solid #e7ebe8;
+  border-radius: 9px;
+  background: #f7faf8;
+}
+.github-account-row > div { min-width: 0; }
+.github-account-row span { display: block; color: #7a827c; font-size: 11px; }
+.github-account-row strong { display: block; overflow: hidden; margin-top: 2px; color: #19733b; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.github-account-tag { flex: 0 0 auto; padding: 4px 6px; border-radius: 5px; background: #e8f5ec; color: #398050 !important; font-size: 10px !important; }
+.github-backup-hint { display: block; margin-top: 5px; color: #999; font-size: 11px; }
+
+.github-backup-main-actions { display: flex; gap: 10px; padding-top: 12px; }
+.github-backup-main-actions button { flex: 1; min-height: 42px; border: 0; border-radius: 10px; background: #111; color: #fff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+.github-backup-card.is-busy { cursor: wait; }
+.github-backup-card.is-busy button:disabled,
+.github-backup-card.is-busy input:disabled,
+.github-backup-card.is-busy select:disabled { cursor: wait; opacity: .55; }
+
+.github-backup-note { margin: 4px 0 12px; line-height: 1.5; }
+
+.github-backup-actions { flex-wrap: wrap; }
+
+.github-backup-actions button {
+  flex: 1 1 calc(50% - 5px);
+  min-height: 38px;
+  border: 0;
+  border-radius: 9px;
+  background: #f2f2f7;
+  color: #222;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.github-backup-actions button:active { opacity: .7; }
+
+.github-backup-auto {
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid #e1e5e8;
+  border-radius: 10px;
+  background: #fff;
+  color: #202427;
+  font-size: 12px;
+}
+
+.github-auto-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 14px; }
+.github-auto-title strong, .github-auto-title span { display: block; }
+.github-auto-title strong { color: #202427; font-size: 14px; }
+.github-auto-title span { margin-top: 3px; color: #788087; font-size: 11px; }
+
+/* Use a local switch so responsive rules for the page-wide switch cannot alter this control. */
+.github-auto-switch { position: relative; flex: 0 0 44px; width: 44px; height: 26px; margin: 0; cursor: pointer; }
+.github-auto-switch input { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); }
+.github-auto-toggle-track { display: block; width: 44px; height: 26px; box-sizing: border-box; padding: 3px; border-radius: 13px; background: #c8ced3; transition: background .2s ease; }
+.github-auto-toggle-thumb { display: block; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .2); transition: transform .2s ease; }
+.github-auto-switch input:checked + .github-auto-toggle-track { background: #151719; }
+.github-auto-switch input:checked + .github-auto-toggle-track .github-auto-toggle-thumb { transform: translateX(18px); }
+.github-auto-switch input:focus-visible + .github-auto-toggle-track { outline: 2px solid #4c8bf5; outline-offset: 2px; }
+
+.github-auto-controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 12px 14px 14px; border-top: 1px solid #edf0f2; background: #f7f8f9; }
+.github-auto-setting { display: grid; grid-template-columns: 84px minmax(0, 1fr); align-items: center; gap: 12px; min-width: 0; min-height: 38px; padding: 7px 10px; border: 1px solid #e4e8eb; border-radius: 8px; background: #fff; }
+.github-auto-setting > span:first-child { color: #626a71; font-size: 12px; }
+.github-auto-number { display: flex; align-items: center; min-height: 34px; border: 1px solid #d8dde1; border-radius: 6px; background: #fff; }
+.github-auto-number input { width: 100%; min-width: 0; padding: 0 8px; border: 0; outline: 0; background: transparent; color: #202427; font: inherit; text-align: center; }
+.github-auto-number i { padding: 0 9px 0 0; color: #7a8289; font-size: 12px; font-style: normal; }
+.github-auto-controls [hidden] { display: none; }
+.github-auto-controls.is-disabled { opacity: .52; }
+
+.github-backup-auto select,
+.github-backup-auto input[type="time"] {
+  width: 100%;
+  min-height: 34px;
+  box-sizing: border-box;
+  border: 1px solid #d8dde1;
+  border-radius: 6px;
+  background: #fff;
+  color: #202427;
+  font: inherit;
+}
+
+.github-backup-auto select { padding: 0 8px; }
+
+@media (max-width: 420px) {
+  .github-backup-fields-row { flex-direction: column; gap: 0; }
+}
